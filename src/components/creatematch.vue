@@ -6,6 +6,7 @@
           <img src="./assets/images/logo.jpg" style="float:left"><img>
           <img src="./assets/images/photo.jpg" style="float:right"><img>
         </el-header>
+        <el-main>
           <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
             <el-form-item label="活动名称" prop="name">
               <el-input v-model="ruleForm.name"></el-input>
