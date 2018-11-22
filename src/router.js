@@ -1,4 +1,6 @@
 import OrganizerPage from './components/organizer.vue'
+import CreateMatch from './components/creatematch.vue'
+import Home from './components/home.vue'
 
 const routers = [
   {
@@ -8,7 +10,13 @@ const routers = [
   },
   {
     path: '/',
-    component: OrganizerPage
+    name: 'home',
+    component: Home
   },
+  {
+      path: '/creatematch',
+      name: 'creatematch',
+      component: CreateMatch
+  }
 ]
 export default routers
