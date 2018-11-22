@@ -3,9 +3,8 @@
     <div>
       <el-container>
         <el-header style="font-size: 12px">
-          <img src="./assets/logo.jpg" style="float:left"><img>
-          <el-button type="primary" style="float:right; margin-right: 15px" plain>登录</el-button>
-          <el-button type="primary" style="float:right; margin-right: 15px" plain>注册</el-button>
+          <img src="./assets/images/logo.jpg" style="float:left"><img>
+          <img src="./assets/images/photo.jpg" style="float:right"><img>
         </el-header>
         <el-main>
           <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
