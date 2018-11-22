@@ -1,56 +1,30 @@
 <template>
   <div id="app">
-    <div>
-      <el-container>
+    <el-container>
         <el-header style="font-size: 12px">
-          <img src="./assets/images/logo.jpg" style="float:left"><img>
-          <img src="./assets/images/photo.jpg" style="float:right"><img>
+          <img src="./assets/images/logo.jpg" style="float:left; margin-left: 15px"><img>
+          <el-button type="primary" style="float:right; margin-right: 15px" plain>登录</el-button>
+          <el-button type="primary" style="float:right; margin-right: 15px" plain>注册</el-button>
         </el-header>
         <el-main>
-          <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
-            <el-form-item label="活动名称" prop="name">
-              <el-input v-model="ruleForm.name"></el-input>
-            </el-form-item>
-            <el-form-item label="主办方" prop="organizer">
-              <el-input v-model="ruleForm.organizer"></el-input>
-            </el-form-item>
-            <el-form-item label="报名时间" required>
-              <el-col :span="11">
-                <el-form-item prop="date1">
-                  <el-date-picker type="date" placeholder="选择日期" v-model="ruleForm.date1" style="width: 100%;"></el-date-picker>
-                </el-form-item>
-              </el-col>
-              <el-col class="line" :span="2">-</el-col>
-              <el-col :span="11">
-                <el-form-item prop="date2">
-                  <el-date-picker type="date" placeholder="选择日期" v-model="ruleForm.date2" style="width: 100%;"></el-date-picker>
-                </el-form-item>
-              </el-col>
-            </el-form-item>
-            <el-form-item label="比赛时间" required>
-              <el-col :span="11">
-                <el-form-item prop="date3">
-                  <el-date-picker type="date" placeholder="选择日期" v-model="ruleForm.date3" style="width: 100%;"></el-date-picker>
-                </el-form-item>
-              </el-col>
-              <el-col class="line" :span="2">-</el-col>
-              <el-col :span="11">
-                <el-form-item prop="date4">
-                  <el-date-picker type="date" placeholder="选择日期" v-model="ruleForm.date4" style="width: 100%;"></el-date-picker>
-                </el-form-item>
-              </el-col>
-            </el-form-item>
-            <el-form-item label="赛事详情" prop="desc">
-              <el-input type="textarea" v-model="ruleForm.desc"></el-input>
-            </el-form-item>
-            <el-form-item>
-              <el-button type="primary" @click="submitForm('ruleForm')">立即创建</el-button>
-              <el-button @click="resetForm('ruleForm')">重置</el-button>
-            </el-form-item>
-          </el-form>
+
+          <el-carousel :interval="4000" type="card" height="200px">
+            <el-carousel-item v-for="item in 3" :key="item">
+              <h3><a href="">{{ item }}</a></h3>
+            </el-carousel-item>
+          </el-carousel>
+
+          <el-table :data="tableData" border style="width: 100%; margin-top:100px">
+            <el-table-column prop="name" label="名称" width="180">
+            </el-table-column>
+            <el-table-column prop="organizer" label="主办方" width="180">
+            </el-table-column>
+            <el-table-column prop="detail" label="详情">
+            </el-table-column>
+          </el-table>
+
         </el-main>
       </el-container>
-    </div>
   </div>
 </template>
 
@@ -58,61 +32,42 @@
   export default {
     data() {
       return {
-        ruleForm: {
-          name: '',
-          organizer: '',
-          date1: '',
-          date2: '',
-          date3: '',
-          date4: '',
-          desc: ''
-        },
-        rules: {
-          name: [
-            { required: true, message: '请输入活动名称', trigger: 'blur' },
-          ],
-          organizer: [
-            { required: true, message: '主办方', trigger: 'blur' },
-          ],
-          date1: [
-            { type: 'date', required: true, message: '请选择日期', trigger: 'change' }
-          ],
-          date2: [
-            { type: 'date', required: true, message: '请选择日期', trigger: 'change' }
-          ],
-          date3: [
-            { type: 'date', required: true, message: '请选择日期', trigger: 'change' }
-          ],
-          date4: [
-            { type: 'date', required: true, message: '请选择日期', trigger: 'change' }
-          ],
-          desc: [
-            { required: true, message: '请填写活动形式', trigger: 'blur' }
-          ]
-        }
-      };
-    },
-    methods: {
-      submitForm(formName) {
-        this.$refs[formName].validate((valid) => {
-          if (valid) {
-            alert('创建成功!');
-          } else {
-            console.log('创建失败!');
-            return false;
-          }
-        });
-      },
-      resetForm(formName) {
-        this.$refs[formName].resetFields();
+        tableData: [{
+          name: '竞赛1',
+          organizer: '白箱官方平台',
+          detail: '大数据竞赛'
+        }, 
+        {
+          name: '竞赛2',
+          organizer: '白箱官方平台',
+          detail: '小程序竞赛'
+        }]
       }
     }
 }
 </script>
 
 <style>
+a {
+  text-decoration:none
+}
 #app {
   font-family: Helvetica, sans-serif;
   text-align: center;
 }
+.el-carousel__item h3 {
+    color: #475669;
+    font-size: 14px;
+    opacity: 0.75;
+    line-height: 200px;
+    margin: 0;
+  }
+  
+  .el-carousel__item:nth-child(2n) {
+    background-color: #99a9bf;
+  }
+  
+  .el-carousel__item:nth-child(2n+1) {
+    background-color: #d3dce6;
+  }
 </style>
