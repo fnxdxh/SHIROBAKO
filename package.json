@@ -8,7 +8,9 @@
     "build": "rimraf dist && webpack -p --progress --hide-modules"
   },
   "dependencies": {
+    "babel-eslint": "^10.0.1",
     "element-ui": "^2.3.4",
+    "eslint": "^5.9.0",
     "vue": "^2.5.16"
   },
   "engines": {
