@@ -5,53 +5,79 @@ from django.shortcuts import render
 from django.http import JsonResponse, StreamingHttpResponse
 from datetime import datetime
 from django.utils import timezone
+from hashlib import md5
+from random import Random
 from django.contrib import auth
 from django.db.models import Q
 from django.contrib.auth import authenticate, login, logout
-from .models import User, Competitor, Organizer, Rator, Competition, UserFile, SuperUser, RatorFile
+from .models import User, Competitor, Organizer, Jury, Competition, UserFile, SuperUser, JuryFile
 # Create your views here.
 
 
-def may_use(request):
-    now_time = str(datetime.now())
-    return render(request, 'hello_world.html', {'current_time': now_time})
+# 获取由4位随机大小写字母、数字组成的salt值
+def create_salt(length=4):
+    salt = ''
+    chars = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz0123456789'
+    # 获取chars的最大下标
+    len_chars = len(chars) - 1
+    random = Random()
+    for i in range(length):
+        # 每次随机从chars中抽取一位，拼接成一个salt值
+        salt += chars[random.randint(0, len_chars)]
+    return salt
 
 
-def index(request):
-    return render(request, '首页.html')
+# 获取原始密码+salt的md5值
+def create_md5(pwd, salt):
+    md5_obj = md5()
+    md5_obj.update((pwd+salt).endcode('utf-8'))
+    return md5_obj.hexdigest()
 
 
 def competitor_register(request):
+    response = {}
     if request.method == "POST":
-        username = request.POST.get('username')
-        password = request.POST.get('password')
+        username = request.POST.get('username', None)
+        password = request.POST.get('password', None)
         if username and password:
             try:
-                user = User.objects.create_user(username=username, password=password)
+                salt = create_salt()
+                md5_pwd = create_md5(password, salt)
+                user = User.objects.create_user(username=username, password=md5_pwd)
                 competitor = Competitor.objects.create(user=user)
-                return HttpResponse("register success")
+                response['msg'] = 'success'
+                response['error_num'] = 0
             except:
-                return HttpResponse("register failed")
-        return HttpResponse("register failed")
-    return HttpResponse("register failed")
+                response['msg'] = 'create failed'
+                response['error_num'] = 1
+            return JsonResponse(response)
+    response['msg'] = 'have no data'
+    response['error_num'] = 1
+    return JsonResponse(response)
 
 
-def rator_register(request):
+def jury_register(request):
+    response = {}
     if request.method == "POST":
         username = request.POST.get('username', None)
         password = request.POST.get('password', None)
         if username and password:
             try:
                 user = User.objects.create_user(username=username, password=password)
-                competitor = Rator.objects.create(user=user)
-                return HttpResponse("register success")
+                jury = Jury.objects.create(user=user)
+                response['msg'] = 'success'
+                response['error_num'] = 0
             except:
-                return HttpResponse("register failed")
-        return HttpResponse("register failed")
-    return HttpResponse("register failed")
+                response['msg'] = 'create failed'
+                response['error_num'] = 1
+            return JsonResponse(response)
+    response['msg'] = 'have no data'
+    response['error_num'] = 1
+    return JsonResponse(response)
 
 
 def organizer_register(request):
+    response = {}
     if request.method == "POST":
         username = request.POST.get('username', None)
         password = request.POST.get('password', None)
@@ -59,14 +85,19 @@ def organizer_register(request):
             try:
                 user = User.objects.create_user(username=username, password=password)
                 organizer = Organizer.objects.create(user=user, status=Organizer.STATUS_UNCONFIRM)
-                return HttpResponse("register success")
+                response['msg'] = 'success'
+                response['error_num'] = 0
             except:
-                return HttpResponse("register failed")
-        return HttpResponse("register failed")
-    return HttpResponse("register failed")
+                response['msg'] = 'create failed'
+                response['error_num'] = 1
+            return JsonResponse(response)
+    response['msg'] = 'have no data'
+    response['error_num'] = 1
+    return JsonResponse(response)
 
 
 def competitor_login(request):
+    response = {}
     if request.method == "POST":
         username = request.POST.get('username')
         password = request.POST.get('password')
@@ -77,15 +108,21 @@ def competitor_login(request):
                 try:
                     competitor = Competitor.objects.find(user=user)
                     login(request, user)
-                    return HttpResponse("competitor login success")
+                    request.session['username'] = username
+                    request.session.set_expiry(600)  #设置session的过期时间，为600s
+                    response['msg'] = 'success'
+                    response['error_num'] = 0
                 except:
-                    return HttpResponse("competitor login failed")
-            return HttpResponse("user not exist")
-        return HttpResponse("username or password is none")
-    return HttpResponse("false method")
+                    response['msg'] = 'create failed'
+                    response['error_num'] = 1
+                return JsonResponse(response)
+    response['msg'] = 'create failed'
+    response['error_num'] = 1
+    return JsonResponse(response)
 
 
 def organizer_login(request):
+    response = {}
     if request.method == "POST":
         username = request.POST.get('username', None)
         password = request.POST.get('password', None)
@@ -96,17 +133,22 @@ def organizer_login(request):
                     organizer = Organizer.objects.find(user=user)
                     if organizer.status == Organizer.STATUS_CONFIRMED:
                         login(request, user)
-                        return HttpResponse("organizer login success")
+                        response['msg'] = 'success'
+                        response['error_num'] = 0
                     elif organizer.status == Organizer.STATUS_UNCONFIRM:
-                        return HttpResponse("organizer didn't confirm")
+                        response['msg'] = 'have not confirmed'
+                        response['error_num'] = 1
                 except:
-                    return HttpResponse("orgnizer login failed")
-            return HttpResponse("user not exist")
-        return HttpResponse("username or password is none")
-    return HttpResponse("false method")
+                    response['msg'] = 'failed'
+                    response['error_num'] = 1
+                return JsonResponse(response)
+    response['msg'] = 'failed'
+    response['error_num'] = 1
+    return JsonResponse(response)
 
 
-def rator_login(request):
+def jury_login(request):
+    response = {}
     if request.method == "POST":
         username = request.POST.get('username')
         password = request.POST.get('password')
@@ -115,17 +157,21 @@ def rator_login(request):
             user = authenticate(username=username, password=password)
             if user is not None:
                 try:
-                    rator = Rator.objects.find(user=user)
+                    jury = Jury.objects.find(user=user)
                     login(request, user)
-                    return HttpResponse("rator login success")
+                    response['msg'] = 'success'
+                    response['error_num'] = 0
                 except:
-                    return HttpResponse("rator login failed")
-            return HttpResponse("user not exist")
-        return HttpResponse("username or password is none")
-    return HttpResponse("false method")
+                    response['msg'] = 'create failed'
+                    response['error_num'] = 1
+                return JsonResponse(response)
+    response['msg'] = 'create failed'
+    response['error_num'] = 1
+    return JsonResponse(response)
 
 
 def admin_login(request):
+    response = {}
     if request.method == "POST":
         username = request.POST.get('username')
         password = request.POST.get('password')
@@ -135,19 +181,23 @@ def admin_login(request):
             if user is not None:
                 if user.is_superuser:
                     login(request, user)
-                    return HttpResponse("rator login success")
-                return HttpResponse("not superuser")
-            return HttpResponse("user not exist")
-        return HttpResponse("username or password is none")
-    return HttpResponse("false method")
+                    response['msg'] = 'success'
+                    response['error_num'] = 0
+                else:
+                    response['msg'] = 'create failed'
+                    response['error_num'] = 1
+                return JsonResponse(response)
+    response['msg'] = 'create failed'
+    response['error_num'] = 1
+    return JsonResponse(response)
 
 
 def index_competition_list(request):
     now_time = timezone.now()
     competition_list = Competition.objects.filter(Q(sign_up_start__gte=now_time + datetime.timedelta(days=7)) &
                                                   Q(sign_up_end__lt=now_time))
+    response = []
     if competition_list is not None:
-        response = []
         for competition in competition_list:
             cmp = {}
             cmp['title'] = competition.title
@@ -157,68 +207,105 @@ def index_competition_list(request):
             cmp['start_time'] = start_time_list[0]
             end_time_list = competition.end_time.split(',')
             cmp['end_time'] = end_time_list[-1]
+            cmp['msg'] = 'success'
+            cmp['error_num'] = 0
             response.append(cmp)
         return JsonResponse(response)
-    return HttpResponse("recent no competition")
+    cmp = {}
+    cmp['msg'] = 'failed'
+    cmp['error_num'] = 1
+    response.append(cmp)
+    return JsonResponse(response)
 
 
 def competitor_competition_list(request):
+    response = []
+    fail_msg = {}
     if request.user.is_authenticated():
         try:
             competitor = Competitor.objects.find(user=request.user)
             competition_list = competitor.activity_list.split(',')
-            response = []
             if competition_list is not None:
                 for title in competition_list:
                     org = {}
                     org['title'] = title
+                    org['msg'] = 'success'
+                    org['error_num'] = 0
                     response.append(org)
                 return JsonResponse(response)
-            return HttpResponse("not sign up any Competition")
+            fail_msg['msg'] = 'recent has no competition'
+            fail_msg['error_num'] = 1
+            response.append(fail_msg)
+            return JsonResponse(response)
         except:
-            return HttpResponse("No User")
-    return HttpResponse("not log in")
+            fail_msg['msg'] = 'failed'
+            fail_msg['error_num'] = 1
+    fail_msg['msg'] = 'failed'
+    fail_msg['error_num'] = 1
+    response.append(fail_msg)
+    return JsonResponse(response)
 
 
-def rator_competition_list(request):
+def jury_competition_list(request):
+    response = []
+    fail_msg = {}
     if request.user.is_authenticated():
         try:
-            #rator = Rator.objects.find(user=request.user)
-            rator = request.user.rator
-            competition_list = rator.activity_list.split(',')
-            response = []
+            #jury = jury.objects.find(user=request.user)
+            jury = request.user.jury
+            competition_list = jury.activity_list.split(',')
             if competition_list is not None:
                 for title in competition_list:
                     org = {}
                     org['title'] = title
+                    org['msg'] = 'success'
+                    org['error_num'] = 0
                     response.append(org)
                 return JsonResponse(response)
-            return HttpResponse("not sign up any Competition")
+            fail_msg['msg'] = 'recent has no competition'
+            fail_msg['error_num'] = 1
+            response.append(fail_msg)
+            return JsonResponse(response)
         except:
-            return HttpResponse("No User")
-    return HttpResponse("not log in")
+            fail_msg['msg'] = 'failed'
+            fail_msg['error_num'] = 1
+    fail_msg['msg'] = 'failed'
+    fail_msg['error_num'] = 1
+    response.append(fail_msg)
+    return JsonResponse(response)
 
 
 def organizer_competition_list(request):
+    response = []
+    fail_msg = {}
     if request.user.is_authenticated():
         try:
             #organizer = Competitor.objects.find(user=request.user)
             organizer = request.user.organizer
             competition_list = organizer.activity_list.split(',')
-            response = []
             if competition_list is not None:
                 for title in competition_list:
                     org = {}
                     org['title'] = title
+                    org['msg'] = 'success'
+                    org['error_num'] = 0
                     response.append(org)
                 return JsonResponse(response)
-            return HttpResponse("not sign up any Competition")
+            fail_msg['msg'] = 'recent has no competition'
+            fail_msg['error_num'] = 1
+            response.append(fail_msg)
+            return JsonResponse(response)
         except:
-            return HttpResponse("No User")
-    return HttpResponse("not log in")
+            fail_msg['msg'] = 'failed'
+            fail_msg['error_num'] = 1
+    fail_msg['msg'] = 'failed'
+    fail_msg['error_num'] = 1
+    response.append(fail_msg)
+    return JsonResponse(response)
 
 
 def competitor_sign_up(request):
+    response = {}
     if request.user.is_authenticated():
         competitor = request.user.competitor
         if request.method == "POST":
@@ -235,15 +322,21 @@ def competitor_sign_up(request):
                 else:
                     competitor.competition_list = name
                 competitor.save()
-                return HttpResponse("Sign up success")
+                response['msg'] = 'success'
+                response['error_num'] = 0
+                return JsonResponse(response)
             except:
-                return HttpResponse('Sign up failed')
-        return HttpResponse("method failed")
-    return HttpResponse("not log in")
+                response['msg'] = 'failed'
+                response['error_num'] = 1
+                return JsonResponse(response)
+    response['msg'] = 'not login'
+    response['error_num'] = 1
+    return JsonResponse(response)
 
 
 # 参考：https://www.jianshu.com/p/1a5546ce0c92
 def file_upload(request):
+    response = {}
     if request.user.is_authenticated():
         if request.method == "POST":
             file = request.FILES.get("file")
@@ -256,12 +349,17 @@ def file_upload(request):
                 file = UserFile.objects.find(username=request.user.username, competition=competition)
                 file.file_url = file.name
                 file.save()
-                return HttpResponse("Upload Success 2")
+                response['msg'] = 'success'
+                response['error_num'] = 0
+                return JsonResponse(response)
             except:
                 UserFile.objects.create(username=request.user.username, competition=competition, file_url=file.name)
-                return HttpResponse("Upload success 1")
-        return HttpResponse("method wrong")
-    return HttpResponse("not log in")
+                response['msg'] = 'success'
+                response['error_num'] = 0
+                return JsonResponse(response)
+    response['msg'] = 'not login'
+    response['error_num'] = 1
+    return JsonResponse(response)
 
 
 # 参考网址：https://blog.igevin.info/posts/django-download-function/
@@ -289,90 +387,133 @@ def file_download(request):
 
 
 def grade_upload(request):
+    response = {}
     if request.user.is_authenticated():
         if request.method == "POST":
             grade = request.POST.get("grade")
             file_url = request.POST.get("filepath")
             try:
                 file = UserFile.objects.find(file_url=file_url)
-                file.grade = file.grade + grade / file.rator_count
+                file.grade = file.grade + grade / file.jury_count
                 file.save()
-                return HttpResponse("upload success")
+                response['msg'] = 'success'
+                response['error_num'] = 0
+                return JsonResponse(response)
             except:
-                return HttpResponse("upload fail")
-        return HttpResponse("method wrong")
-    return HttpResponse("not log in")
+                response['msg'] = 'failed'
+                response['error_num'] = 1
+                return JsonResponse(response)
+    response['msg'] = 'not login'
+    response['error_num'] = 1
+    return JsonResponse(response)
 
 
 def file_list(request):
+    response = []
+    org = {}
     if request.user.is_authenticated():
         if request.method == "POST":
             competition = request.POST.get("competition_name")
             try:
-                rator_file = RatorFile.objects.find(competition=competition, rator=request.user.username)
-                file_list = rator_file.file_list.split(",")
-                response = []
+                jury_file = JuryFile.objects.find(competition=competition, jury=request.user.username)
+                file_list = jury_file.file_list.split(",")
                 for file in file_list:
-                    response.append(file)
+                    org['name'] = file
+                    org['msg'] = 'success'
+                    org['error_num'] = 0
+                    response.append(org)
                 return JsonResponse(response)
             except:
-                return HttpResponse("no file to grade")
-        return HttpResponse("method wrong")
-    return HttpResponse("not log in")
+                org['msg'] = 'failed'
+                org['error_num'] = 1
+                response.append(org)
+                return JsonResponse(response)
+    org['msg'] = 'not login'
+    org['error_num'] = 0
+    response.append(org)
+    return JsonResponse(response)
 
 
 def competition_detail(request):
+    response = []
+    detail = {}
     if request.method == "POST":
         activity_name = request.POST.get("competition_title")
         try:
             activity = Competition.objects.find(title=activity_name)
-            response = []
-            detail = {}
             detail['title'] = activity.title
             detail['stage'] = activity.stage
             detail['organizor'] = activity.organizor.name
             detail['description'] = activity.description
+            detail['msg'] = 'success'
+            detail['error_num'] = 0
             response.append(detail)
             return JsonResponse(response)
         except:
-            return HttpResponse("load error")
+            detail['msg'] = 'failed'
+            detail['error_num'] = 1
+            response.append(detail)
+            return JsonResponse(response)
+    detail['msg'] = 'failed'
+    detail['error_num'] = 1
+    response.append(detail)
+    return JsonResponse(response)
 
 
 def admin_to_confirm_list(request):
-    organizers = Organizer.objects.filter(status=Organizer.STATUS_UNCONFIRM)
     organizer_list = []
-    for organizer in organizers:
-        org = {}
-        org['username'] = organizer.username
+    org = {}
+    if request.user.is_superuser:
+        organizers = Organizer.objects.filter(status=Organizer.STATUS_UNCONFIRM)
+        if organizers is not None:
+            for organizer in organizers:
+                org['username'] = organizer.username
+                org['msg'] = 'success'
+                org['error_num'] = 0
+                organizer_list.append(org)
+            return JsonResponse(organizer_list)
+        org['msg'] = 'no'
+        org['error_num'] = 0
         organizer_list.append(org)
+        return JsonResponse(organizer_list)
+    org['msg'] = 'failed'
+    org['error_num'] = 1
+    organizer_list.append(org)
     return JsonResponse(organizer_list)
 
 
 def admin_to_confirm(request):
+    response = {}
     if request.method == "POST":
         username = request.POST.get('username')
         try:
             organizer = Organizer.objects.find(username=username, status=Organizer.STATUS_UNCONFIRM)
             organizer.status = Organizer.STATUS_CONFIRMED
             organizer.save()
+            response['msg'] = 'success'
+            response['error_num'] = 0
+            return JsonResponse(response)
         except:
-            return HttpResponse("no user")
-    return HttpResponse("method wrong")
+            response['msg'] = 'failed'
+            response['error_num'] = 1
+            return JsonResponse(response)
+    response['msg'] = 'failed'
+    response['error_num'] = 1
+    return JsonResponse(response)
 
 
-def divide_test_paper(request):
+def divide_paper(request):
     if request.user.is_authenticated():
         if request.method == "POST":
             title = request.POST.get("competition_name")
             try:
                 competition = Competition.objects.find(title=title, organizer=request.user.username)
                 user_list = competition.competitor_list.split(",")
-                rator_list = competition.rator_list.split(",")
+                jury_list = competition.jury_list.split(",")
             except:
                 return HttpResponse("divide fail")
         return HttpResponse("method wrong")
     return HttpResponse("not log in")
-
 
 
 def create_competition(request):
@@ -401,18 +542,18 @@ def create_competition(request):
     return JsonResponse(response)
 
 
-def invite_rator(request):
+def invite_jury(request):
     response = {}
     if request.user.is_authenticated():
         if request.method == "POST":
-            rator = request.POST.get("rator")
+            jury = request.POST.get("jury")
             title = request.POST.get("competition_name")
             try:
                 competition = Competition.objects.find(title=title, organizer=request.user.username)
-                if competition.rator_list is not None:
-                    competition.rator_list = competition.rator_list + "," + rator
+                if competition.jury_list is not None:
+                    competition.jury_list = competition.jury_list + "," + jury
                 else:
-                    competition.rator_list = rator
+                    competition.jury_list = jury
                 competition.save()
                 response['msg'] = 'success'
                 response['error_num'] = 0
@@ -438,5 +579,30 @@ def my_logout(request):
         response['msg'] = 'logout failed'
         response['error_num'] = 1
     return JsonResponse(response)
+
+
+def search_competition(request):
+    response = []
+    org = {}
+    if request.method == "POST":
+        to_search = request.POST.get("to_search")
+        competition_list = Competition.objects.filter(Q(title__contains=to_search) | Q(type__contains=to_search))
+        if competition_list is not None:
+            for competition in competition_list:
+                org['title'] = competition.title
+                org['type'] = competition.type
+                org['msg'] = 'success'
+                org['error_num'] = 0
+                response.append(org)
+                return JsonResponse(response)
+            org['msg'] = 'no result'
+            org['error_num'] = 1
+            response.append(org)
+            return JsonResponse(response)
+    org['msg'] = 'failed'
+    org['error_num'] = 1
+    response.append(org)
+    return JsonResponse(response)
+
 
 

@@ -7,7 +7,7 @@ class User(AbstractUser):
     type_choices = (
         ('Comp', 'Competitor'),
         ('Org', 'Organizer'),
-        ('Rat', 'Rator'),
+        ('Rat', 'jury'),
         ('SU', 'Super User'),
     )
     user_type = models.CharField(max_length=20, choices=type_choices, default='Comp')
@@ -31,7 +31,7 @@ class Organizer(models.Model):
     STATUS_CONFIRMED = 1
 
 
-class Rator(models.Model):
+class Jury(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     competition_list = models.TextField()
 
@@ -54,7 +54,7 @@ class Competition(models.Model):
 
     organizer = models.CharField(max_length=128)
     competitor_list = models.TextField()
-    rator_list = models.TextField()
+    jury_list = models.TextField()
 
     STATUS_PREPARE = 0
     STATUS_PRELIMINARY = 1
@@ -69,16 +69,15 @@ class UserFile(models.Model):
     competition = models.CharField()
     file_url = models.CharField()    # ???FilePathField
     grade = models.IntegerField(default=0)
-    rator_count = models.FloatField()
+    jury_count = models.FloatField()
 
 
-class RatorFile(models.Model):
+class JuryFile(models.Model):
     file_list = models.TextField()
-    rator = models.CharField(max_length=128)
+    jury = models.CharField(max_length=128)
     competition = models.CharField(max_length=128)
     file_count = models.IntegerField()
     finished_count = models.IntegerField()
-
 
 
 '''class OrgCompetition(models.Model):
@@ -101,6 +100,6 @@ class UserCompetition(models.Model):
     grade = models.IntegerField()
     competiton = models.ForeignKey(OrgCompetition)
     competitor = models.OneToOneField(User)
-    rator = models.ManyToManyField(Rator)'''
+    jury = models.ManyToManyField(jury)'''
 
 
