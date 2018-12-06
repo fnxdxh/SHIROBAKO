@@ -1,6 +1,7 @@
 import VueRouter from 'vue-router'
 
 import homepage from './components/pages/Home.vue'
+import matchlistpage from './components/pages/MatchList.vue'
 import loginpage from './components/pages/Login.vue'
 import registerpage from './components/pages/Register.vue'
 import usercenterpage from './components/pages/UserCenter.vue'
@@ -16,6 +17,7 @@ var router = new VueRouter({
   routes: [
     { path: '/', redirect: '/home' },
     { path: '/home', component: homepage },
+    { path: '/matchlist', component: matchlistpage },
     { path: '/login', component: loginpage },
     { path: '/register', component: registerpage },
     {

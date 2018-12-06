@@ -9,9 +9,9 @@
             </router-link>
           </el-col>
           <el-col :span="8">
-            <el-menu mode="horizontal">
-              <el-menu-item index="1">首页</el-menu-item>
-              <el-menu-item index="2">赛事</el-menu-item>
+            <el-menu mode="horizontal" :router="true">
+              <el-menu-item index="home">首页</el-menu-item>
+              <el-menu-item index="matchlist">赛事</el-menu-item>
             </el-menu>
           </el-col>
           <el-col :span="5">
