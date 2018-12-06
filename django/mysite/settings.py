@@ -11,13 +11,10 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
 import os
-import json
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-#Configurations load from file
-CONFIGS = json.load(open(os.path.join(BASE_DIR, 'configs.json')).read())
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
@@ -40,7 +37,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
     'website',
 ]
 
@@ -79,15 +75,13 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases
 
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': CONFIGS['DB_NAME'],
-        'USER': CONFIGS['DB_USER'],
-        'PASSWORD':CONFIGS['DB_PASS'],
-        "HOST":CONFIGS['DB_HOST'],
-        'PORT':CONFIGS['DB_PORT'],
+        'NAME': 'myproject',
+        'USER': 'root',
+        'PASSWORD': 'Zrt2018',
+        'HOST': '127.0.0.1',
     }
 }
 
@@ -95,7 +89,7 @@ DATABASES = {
 # Password validation
 # https://docs.djangoproject.com/en/1.9/ref/settings/#auth-password-validators
 
-AUTH_USER_MODEL = 'website.User'
+AUTH_USER_MODEL = 'website.MyUser'
 
 AUTH_PASSWORD_VALIDATORS = [
     {
