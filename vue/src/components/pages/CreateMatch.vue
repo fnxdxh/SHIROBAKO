@@ -1,17 +1,21 @@
 <template>
   <div>
     <el-form
-      :model="ruleForm"
+      :model="from"
       :rules="rules"
-      ref="ruleForm"
+      ref="from"
       label-width="100px"
-      class="demo-ruleForm"
+      class="demo-from"
     >
-      <el-form-item label="活动名称" prop="name">
-        <el-input v-model="ruleForm.name"></el-input>
+      <el-form-item label="竞赛封面">
+        
       </el-form-item>
-      <el-form-item label="主办方" prop="organizer">
-        <el-input v-model="ruleForm.organizer"></el-input>
+      
+      <el-form-item label="竞赛名称名称" prop="name">
+        <el-input v-model="from.name"></el-input>
+      </el-form-item>
+      <el-form-item label="主办方" prop="sponsor">
+        <el-input v-model="from.sponsor"></el-input>
       </el-form-item>
       <el-form-item label="报名时间" required>
         <el-col :span="11">
@@ -19,7 +23,7 @@
             <el-date-picker
               type="date"
               placeholder="选择日期"
-              v-model="ruleForm.date1"
+              v-model="from.date1"
               style="width: 100%;"
             ></el-date-picker>
           </el-form-item>
@@ -30,7 +34,7 @@
             <el-date-picker
               type="date"
               placeholder="选择日期"
-              v-model="ruleForm.date2"
+              v-model="from.date2"
               style="width: 100%;"
             ></el-date-picker>
           </el-form-item>
@@ -42,7 +46,7 @@
             <el-date-picker
               type="date"
               placeholder="选择日期"
-              v-model="ruleForm.date3"
+              v-model="from.date3"
               style="width: 100%;"
             ></el-date-picker>
           </el-form-item>
@@ -53,18 +57,18 @@
             <el-date-picker
               type="date"
               placeholder="选择日期"
-              v-model="ruleForm.date4"
+              v-model="from.date4"
               style="width: 100%;"
             ></el-date-picker>
           </el-form-item>
         </el-col>
       </el-form-item>
       <el-form-item label="赛事详情" prop="desc">
-        <el-input type="textarea" v-model="ruleForm.desc"></el-input>
+        <el-input type="textarea" v-model="from.desc"></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="submitForm('ruleForm')">立即创建</el-button>
-        <el-button @click="resetForm('ruleForm')">重置</el-button>
+        <el-button type="primary" @click="submitForm('from')">立即创建</el-button>
+        <el-button @click="resetForm('from')">重置</el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -74,9 +78,9 @@
 export default {
   data() {
     return {
-      ruleForm: {
+      from: {
         name: "",
-        organizer: "",
+        sponsor: "",
         date1: "",
         date2: "",
         date3: "",
@@ -85,7 +89,7 @@ export default {
       },
       rules: {
         name: [{ required: true, message: "请输入活动名称", trigger: "blur" }],
-        organizer: [{ required: true, message: "主办方", trigger: "blur" }],
+        sponsor: [{ required: true, message: "主办方", trigger: "blur" }],
         date1: [
           {
             type: "date",
