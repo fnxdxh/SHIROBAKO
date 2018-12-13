@@ -7,7 +7,9 @@ from datetime import datetime
 from django.utils import timezone
 from hashlib import md5
 from random import Random
+from mysite import settings
 from django.contrib import auth
+import os
 from django.db.models import Q
 from django.contrib.auth import authenticate, login, logout
 from .models import User, Competitor, Organizer, Jury, Competition, UserFile, SuperUser, JuryFile
@@ -66,7 +68,7 @@ def jury_register(request):
                 salt = create_salt()
                 md5_pwd = create_md5(password, salt)
                 user = User.objects.create_user(username=username, password=md5_pwd, salt=salt)
-                jury = Jury.objects.create(user=user)
+                Jury.objects.create(user=user, competition_list="hello")
                 response['msg'] = 'success'
                 response['error_num'] = 0
             except:
@@ -88,7 +90,7 @@ def organizer_register(request):
                 salt = create_salt()
                 md5_pwd = create_md5(password, salt)
                 user = User.objects.create_user(username=username, password=md5_pwd, salt=salt)
-                organizer = Organizer.objects.create(user=user, status=Organizer.STATUS_UNCONFIRM)
+                Organizer.objects.create(user=user, status=Organizer.STATUS_UNCONFIRM)
                 response['msg'] = 'success'
                 response['error_num'] = 0
             except:
@@ -107,19 +109,26 @@ def competitor_login(request):
         password = request.POST.get('password')
         if username and password:
             username = username.strip()
-            user = authenticate(username=username, password=password)
-            if user is not None:
-                try:
-                    competitor = Competitor.objects.find(user=user)
-                    login(request, user)
-                    request.session['username'] = username
-                    request.session.set_expiry(600)  #设置session的过期时间，为600s
-                    response['msg'] = 'success'
-                    response['error_num'] = 0
-                except:
-                    response['msg'] = 'create failed'
-                    response['error_num'] = 1
-                return JsonResponse(response)
+            try:
+                user = User.objects.find(username=username)
+                salt = user.salt
+                pwd = create_md5(password, salt)
+                if pwd == user.password:
+                    try:
+                        user = authenticate(username=username, password=pwd)
+                        competitor = Competitor.objects.find(user=user)
+                        login(request, user)
+                        request.session['username'] = username
+                        request.session.set_expiry(600)  #设置session的过期时间，为600s
+                        response['msg'] = 'success'
+                        response['error_num'] = 0
+                    except:
+                        response['msg'] = 'login failed'
+                        response['error_num'] = 1
+            except:
+                response['msg'] = 'findfailed'
+                response['error_num'] = 1
+            return JsonResponse(response)
     response['msg'] = 'create failed'
     response['error_num'] = 1
     return JsonResponse(response)
@@ -343,11 +352,13 @@ def file_upload(request):
     response = {}
     if request.user.is_authenticated():
         if request.method == "POST":
-            file = request.FILES.get("file")
+            file = request.FILES.get("file", None)
             competition = request.POST.get("competition_name")
-            with open(file.name, 'wb+') as f:
+            with open('tempates/file/%s' % file.name, 'wb+') as f:
                 for chunk in file.chunks():
                     f.write(chunk)
+            file_url = os.path.join('/file', file.name).replace('\\', '/')
+            url = "http://" + settings.SITE_DOMAIN + file_url
             competitor = request.user.competitor
             try:
                 file = UserFile.objects.find(username=request.user.username, competition=competition)
@@ -357,7 +368,7 @@ def file_upload(request):
                 response['error_num'] = 0
                 return JsonResponse(response)
             except:
-                UserFile.objects.create(username=request.user.username, competition=competition, file_url=file.name)
+                UserFile.objects.create(username=request.user.username, competition=competition, file_url=url)
                 response['msg'] = 'success'
                 response['error_num'] = 0
                 return JsonResponse(response)
