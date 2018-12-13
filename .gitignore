@@ -4,4 +4,9 @@ dist/
 npm-debug.log
 .idea
 .vscode/
-__pycache__
+*.log
+*.pot
+*.pyc
+*/*/*/__pycache__/
+*/*/__pycache__/
+*/__pycache__/
