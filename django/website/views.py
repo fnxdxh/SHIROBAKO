@@ -522,28 +522,28 @@ def divide_paper(request):
 
 def create_competition(request):
     response = {}
-    if request.user.is_authenticated():
-        if request.method == "POST":
-            title = request.POST.get('title')
-            description = request.POST.get('description')
-            stage = request.POST.get("stage")
-            # there are some information of the competition
-            organizer = request.user.username
-            try:
-                competiton = Competition.objects.create(title=title, description=description, stage=stage,
-                                                        organizer=organizer)
-                response['msg'] = 'success'
-                response['error_num'] = 0
-            except:
-                response['msg'] = 'error'
-                response['error_num'] = 1
-            return JsonResponse(response)
-        response['msg'] = 'not POST'
-        response['error_num'] = 1
+    #if request.user.is_authenticated():
+    if request.method == "POST":
+        title = request.POST.get('name')
+        description = request.POST.get('desc')
+        stage = request.POST.get("stage",None)
+        # there are some information of the competition
+        organizer = request.user.username
+        try:
+            competiton = Competition.objects.create(title=title, description=description, stage=stage,
+                                                    organizer=organizer)
+            response['msg'] = 'success'
+            response['error_num'] = 0
+        except:
+            response['msg'] = 'error'
+            response['error_num'] = 1
         return JsonResponse(response)
-    response['msg'] = 'not log in'
+    response['msg'] = 'not POST'
     response['error_num'] = 1
     return JsonResponse(response)
+    #response['msg'] = 'not log in'
+    #response['error_num'] = 1
+    #return JsonResponse(response)
 
 
 def invite_jury(request):

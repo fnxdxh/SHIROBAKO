@@ -45,17 +45,17 @@ class Competition(models.Model):
     # basic_info:
     title = models.CharField(max_length=128)
     type = models.CharField(max_length=128)
-    description = models.TextField()
-    stage = models.IntegerField()
-    status = models.IntegerField()
+    description = models.TextField(default="")
+    stage = models.IntegerField(default=0)
+    status = models.IntegerField(default=0)
     sign_up_start = models.DateTimeField()
     sign_up_end = models.DateTimeField()
-    start_time = models.TextField()
-    end_time = models.TextField()
+    start_time = models.TextField(default="")
+    end_time = models.TextField(default="")
 
     organizer = models.CharField(max_length=128)
-    competitor_list = models.TextField()
-    jury_list = models.TextField()
+    competitor_list = models.TextField(default="")
+    jury_list = models.TextField(default="")
 
     STATUS_PREPARE = 0
     STATUS_PRELIMINARY = 1

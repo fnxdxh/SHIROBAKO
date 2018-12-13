@@ -1,21 +1,21 @@
 <template>
   <div>
     <el-form
-      :model="from"
+      :model="form"
       :rules="rules"
-      ref="from"
+      ref="form"
       label-width="100px"
-      class="demo-from"
+      class="demo-form"
     >
       <el-form-item label="竞赛封面">
         
       </el-form-item>
       
-      <el-form-item label="竞赛名称名称" prop="name">
-        <el-input v-model="from.name"></el-input>
+      <el-form-item label="竞赛名称" prop="name">
+        <el-input v-model="form.name"></el-input>
       </el-form-item>
       <el-form-item label="主办方" prop="sponsor">
-        <el-input v-model="from.sponsor"></el-input>
+        <el-input v-model="form.sponsor"></el-input>
       </el-form-item>
       <el-form-item label="报名时间" required>
         <el-col :span="11">
@@ -23,7 +23,7 @@
             <el-date-picker
               type="date"
               placeholder="选择日期"
-              v-model="from.date1"
+              v-model="form.date1"
               style="width: 100%;"
             ></el-date-picker>
           </el-form-item>
@@ -34,7 +34,7 @@
             <el-date-picker
               type="date"
               placeholder="选择日期"
-              v-model="from.date2"
+              v-model="form.date2"
               style="width: 100%;"
             ></el-date-picker>
           </el-form-item>
@@ -46,7 +46,7 @@
             <el-date-picker
               type="date"
               placeholder="选择日期"
-              v-model="from.date3"
+              v-model="form.date3"
               style="width: 100%;"
             ></el-date-picker>
           </el-form-item>
@@ -57,18 +57,18 @@
             <el-date-picker
               type="date"
               placeholder="选择日期"
-              v-model="from.date4"
+              v-model="form.date4"
               style="width: 100%;"
             ></el-date-picker>
           </el-form-item>
         </el-col>
       </el-form-item>
       <el-form-item label="赛事详情" prop="desc">
-        <el-input type="textarea" v-model="from.desc"></el-input>
+        <el-input type="textarea" v-model="form.desc"></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="submitForm('from')">立即创建</el-button>
-        <el-button @click="resetForm('from')">重置</el-button>
+        <el-button type="primary" @click="submitForm('form')">立即创建</el-button>
+        <el-button @click="resetForm('form')">重置</el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -78,7 +78,7 @@
 export default {
   data() {
     return {
-      from: {
+      form: {
         name: "",
         sponsor: "",
         date1: "",
@@ -88,8 +88,8 @@ export default {
         desc: ""
       },
       rules: {
-        name: [{ required: true, message: "请输入活动名称", trigger: "blur" }],
-        sponsor: [{ required: true, message: "主办方", trigger: "blur" }],
+        name: [{ required: true, message: "请输入竞赛名称", trigger: "blur" }],
+        sponsor: [{ required: true, message: "请输入主办方", trigger: "blur" }],
         date1: [
           {
             type: "date",
@@ -122,7 +122,7 @@ export default {
             trigger: "change"
           }
         ],
-        desc: [{ required: true, message: "请填写活动形式", trigger: "blur" }]
+        desc: [{ required: true, message: "请填写竞赛详情", trigger: "blur" }]
       }
     };
   },
@@ -130,6 +130,9 @@ export default {
     submitForm(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
+          this.$http.post('http://127.0.0.1:8000/api/creatematch/', this.form, {emulateJSON: true}).then(result => {
+           console.log('result.body')
+          })
           alert("创建成功!");
         } else {
           console.log("创建失败!");
