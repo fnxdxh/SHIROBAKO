@@ -78,7 +78,7 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'myproject',
+        'NAME': 'SHIROBAKO',
         'USER': 'root',
         'PASSWORD': 'Zrt2018',
         'HOST': '127.0.0.1',
@@ -89,7 +89,7 @@ DATABASES = {
 # Password validation
 # https://docs.djangoproject.com/en/1.9/ref/settings/#auth-password-validators
 
-AUTH_USER_MODEL = 'website.MyUser'
+AUTH_USER_MODEL = 'website.User'
 
 AUTH_PASSWORD_VALIDATORS = [
     {

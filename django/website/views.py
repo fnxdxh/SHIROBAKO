@@ -30,21 +30,21 @@ def create_salt(length=4):
 # 获取原始密码+salt的md5值
 def create_md5(pwd, salt):
     md5_obj = md5()
-    md5_obj.update((pwd+salt).endcode('utf-8'))
+    md5_obj.update((pwd+salt).encode('utf-8'))
     return md5_obj.hexdigest()
 
 
 def competitor_register(request):
     response = {}
     if request.method == "POST":
-        username = request.POST.get('username', None)
-        password = request.POST.get('password', None)
+        username = request.POST.get('username')
+        password = request.POST.get('password')
         if username and password:
             try:
                 salt = create_salt()
                 md5_pwd = create_md5(password, salt)
-                user = User.objects.create_user(username=username, password=md5_pwd)
-                competitor = Competitor.objects.create(user=user)
+                user = User.objects.create_user(username=username, password=md5_pwd, salt=salt)
+                Competitor.objects.create(user=user, uniq_id=0o012, competition_list="hello")
                 response['msg'] = 'success'
                 response['error_num'] = 0
             except:
@@ -59,11 +59,13 @@ def competitor_register(request):
 def jury_register(request):
     response = {}
     if request.method == "POST":
-        username = request.POST.get('username', None)
-        password = request.POST.get('password', None)
+        username = request.POST.get('username')
+        password = request.POST.get('password')
         if username and password:
             try:
-                user = User.objects.create_user(username=username, password=password)
+                salt = create_salt()
+                md5_pwd = create_md5(password, salt)
+                user = User.objects.create_user(username=username, password=md5_pwd, salt=salt)
                 jury = Jury.objects.create(user=user)
                 response['msg'] = 'success'
                 response['error_num'] = 0
@@ -79,11 +81,13 @@ def jury_register(request):
 def organizer_register(request):
     response = {}
     if request.method == "POST":
-        username = request.POST.get('username', None)
-        password = request.POST.get('password', None)
+        username = request.POST.get('username')
+        password = request.POST.get('password')
         if username and password:
             try:
-                user = User.objects.create_user(username=username, password=password)
+                salt = create_salt()
+                md5_pwd = create_md5(password, salt)
+                user = User.objects.create_user(username=username, password=md5_pwd, salt=salt)
                 organizer = Organizer.objects.create(user=user, status=Organizer.STATUS_UNCONFIRM)
                 response['msg'] = 'success'
                 response['error_num'] = 0
@@ -124,8 +128,8 @@ def competitor_login(request):
 def organizer_login(request):
     response = {}
     if request.method == "POST":
-        username = request.POST.get('username', None)
-        password = request.POST.get('password', None)
+        username = request.POST.get('username')
+        password = request.POST.get('password')
         if username and password:
             user = authenticate(username=username, password=password)
             if user is not None:

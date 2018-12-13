@@ -11,6 +11,7 @@ class User(AbstractUser):
         ('SU', 'Super User'),
     )
     user_type = models.CharField(max_length=20, choices=type_choices, default='Comp')
+    salt = models.CharField(max_length=128, default=' ')
 
 
 class Competitor(models.Model):
@@ -65,9 +66,9 @@ class Competition(models.Model):
 
 
 class UserFile(models.Model):
-    username = models.CharField()
-    competition = models.CharField()
-    file_url = models.CharField()    # ???FilePathField
+    username = models.CharField(max_length=128)
+    competition = models.CharField(max_length=128)
+    file_url = models.CharField(max_length=128)
     grade = models.IntegerField(default=0)
     jury_count = models.FloatField()
 
