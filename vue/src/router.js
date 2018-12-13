@@ -13,6 +13,8 @@ import judgedmatch from './components/usercenter/JudgedMatch.vue'
 import staredmatch from './components/usercenter/StaredMatch.vue'
 import userinfo from './components/usercenter/UserInfo.vue'
 
+import uploadbutton from './components/operation/Upload.vue'
+
 var router = new VueRouter({
   routes: [
     { path: '/', redirect: '/home' },
@@ -32,7 +34,8 @@ var router = new VueRouter({
         { path: 'userinfo', component: userinfo }
       ]
     },
-    { path: '/creatematch', component: creatematch }
+    { path: '/creatematch', component: creatematch },
+    { path: '/upload', component: uploadbutton}
   ]
 })
 
