@@ -1,29 +1,19 @@
 <template>
   <div>
-    <h1>MatchList</h1>
-    <div>{{msg}}</div>
+    <el-table :data="this.$store.state.matches">
+      <el-table-column prop="name" label="赛事名称" width="180"></el-table-column>
+      <el-table-column prop="sponsor" label="主办方" width="180"></el-table-column>
+    </el-table>
   </div>
 </template>
 
 <script>
 export default {
   data() {
-    return {
-      msg: 'msg'
-    }
+    return {};
   },
-  methods: {
-    getMatchList(){
-      this.$http.get('/api/getList').then(result => {
-        console.log('ok')
-      })
-    }
-  },
-  created() {
-    this.getMatchList()
-  },
-}
-
+  methods: {}
+};
 </script>
 
 <style scoped>

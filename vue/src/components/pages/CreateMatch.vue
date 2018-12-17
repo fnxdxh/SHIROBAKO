@@ -1,16 +1,8 @@
 <template>
   <div>
-    <el-form
-      :model="form"
-      :rules="rules"
-      ref="form"
-      label-width="100px"
-      class="demo-form"
-    >
-      <el-form-item label="竞赛封面">
-        
-      </el-form-item>
-      
+    <el-form :model="form" :rules="rules" ref="form" label-width="100px" class="demo-form">
+      <el-form-item label="竞赛封面"></el-form-item>
+
       <el-form-item label="竞赛名称" prop="name">
         <el-input v-model="form.name"></el-input>
       </el-form-item>
@@ -130,9 +122,7 @@ export default {
     submitForm(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
-          this.$http.post('http://127.0.0.1:8000/api/creatematch/', this.form, {emulateJSON: true}).then(result => {
-           console.log('result.body')
-          })
+          this.$store.commit('creatematch', this.form)
           alert("创建成功!");
         } else {
           console.log("创建失败!");

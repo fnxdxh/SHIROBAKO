@@ -19,9 +19,15 @@ var store = new Vuex.Store({
       username: 'admin',
       pwd: 'admin'
     }],
-    matches: [
-
-    ]
+    matches: [{
+      name: 'test1',
+      sponsor: '白箱test1',
+      date1: '',
+      date2: '',
+      date3: '',
+      date4: '',
+      desc: 'shirobako test1'
+    }]
   },
   mutations: {
     login(state, logininfo) {
@@ -68,6 +74,10 @@ var store = new Vuex.Store({
         alert('注册成功，请重新登录')
         router.push({path: '/login'})
       }
+    },
+
+    creatematch(state, matchinfo){
+      state.matches.push(matchinfo)
     }
   }
 })
