@@ -71,6 +71,7 @@ export default {
   data() {
     return {
       form: {
+        id: 0,
         name: "",
         sponsor: "",
         date1: "",
@@ -79,49 +80,50 @@ export default {
         date4: "",
         desc: ""
       },
-      rules: {
-        name: [{ required: true, message: "请输入竞赛名称", trigger: "blur" }],
-        sponsor: [{ required: true, message: "请输入主办方", trigger: "blur" }],
-        date1: [
-          {
-            type: "date",
-            required: true,
-            message: "请选择日期",
-            trigger: "change"
-          }
-        ],
-        date2: [
-          {
-            type: "date",
-            required: true,
-            message: "请选择日期",
-            trigger: "change"
-          }
-        ],
-        date3: [
-          {
-            type: "date",
-            required: true,
-            message: "请选择日期",
-            trigger: "change"
-          }
-        ],
-        date4: [
-          {
-            type: "date",
-            required: true,
-            message: "请选择日期",
-            trigger: "change"
-          }
-        ],
-        desc: [{ required: true, message: "请填写竞赛详情", trigger: "blur" }]
-      }
+      // rules: {
+      //   name: [{ required: true, message: "请输入竞赛名称", trigger: "blur" }],
+      //   sponsor: [{ required: true, message: "请输入主办方", trigger: "blur" }],
+      //   date1: [
+      //     {
+      //       type: "date",
+      //       required: true,
+      //       message: "请选择日期",
+      //       trigger: "change"
+      //     }
+      //   ],
+      //   date2: [
+      //     {
+      //       type: "date",
+      //       required: true,
+      //       message: "请选择日期",
+      //       trigger: "change"
+      //     }
+      //   ],
+      //   date3: [
+      //     {
+      //       type: "date",
+      //       required: true,
+      //       message: "请选择日期",
+      //       trigger: "change"
+      //     }
+      //   ],
+      //   date4: [
+      //     {
+      //       type: "date",
+      //       required: true,
+      //       message: "请选择日期",
+      //       trigger: "change"
+      //     }
+      //   ],
+      //   desc: [{ required: true, message: "请填写竞赛详情", trigger: "blur" }]
+      // }
     };
   },
   methods: {
     submitForm(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
+          this.form.id = this.$store.state.matchid
           this.$store.commit('creatematch', this.form)
           alert("创建成功!");
         } else {

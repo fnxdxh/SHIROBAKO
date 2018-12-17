@@ -15,11 +15,13 @@ Vue.use(Vuex)
 var store = new Vuex.Store({
   state: {
     islogin: false,
+    matchid: 2,
     users: [{
       username: 'admin',
       pwd: 'admin'
     }],
     matches: [{
+      id: 1,
       name: 'test1',
       sponsor: '白箱test1',
       date1: '',
@@ -78,6 +80,7 @@ var store = new Vuex.Store({
 
     creatematch(state, matchinfo){
       state.matches.push(matchinfo)
+      state.matchid++
     }
   }
 })
