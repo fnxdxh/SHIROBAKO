@@ -21,7 +21,7 @@
             <i class="el-icon-bell"></i>
           </el-col>
           <el-col :span="4">
-            <div v-if="iflogin">
+            <div v-if="$store.state.islogin">
               <router-link to="/usercenter">
                 <img src="src\assets\images\photo.jpg">
               </router-link>
@@ -49,7 +49,7 @@
 export default {
   data() {
     return {
-      iflogin: true
+      
     };
   }
 };
