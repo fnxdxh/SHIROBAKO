@@ -10,6 +10,7 @@ from random import Random
 from mysite import settings
 from django.contrib import auth
 import os
+import uuid
 from django.db.models import Q
 from django.contrib.auth import authenticate, login, logout
 from .models import User, Competitor, Organizer, Jury, Competition, UserFile, SuperUser, JuryFile
@@ -30,9 +31,9 @@ def create_salt(length=4):
 
 
 # 获取原始密码+salt的md5值
-def create_md5(pwd, salt):
+def create_md5(pwd):
     md5_obj = md5()
-    md5_obj.update((pwd+salt).encode('utf-8'))
+    md5_obj.update(pwd.encode('utf-8'))
     return md5_obj.hexdigest()
 
 
@@ -43,10 +44,10 @@ def competitor_register(request):
         password = request.POST.get('password')
         if username and password:
             try:
-                salt = create_salt()
-                md5_pwd = create_md5(password, salt)
-                user = User.objects.create_user(username=username, password=md5_pwd, salt=salt)
-                Competitor.objects.create(user=user, uniq_id=0o012, competition_list="hello")
+                #salt = create_salt()
+                md5_pwd = create_md5(password)
+                user = User.objects.create_user(username=username, password=md5_pwd)
+                Competitor.objects.create(user=user)
                 response['msg'] = 'success'
                 response['error_num'] = 0
             except:
@@ -65,10 +66,11 @@ def jury_register(request):
         password = request.POST.get('password')
         if username and password:
             try:
-                salt = create_salt()
-                md5_pwd = create_md5(password, salt)
-                user = User.objects.create_user(username=username, password=md5_pwd, salt=salt)
-                Jury.objects.create(user=user, competition_list="hello")
+                #salt = create_salt()
+                md5_pwd = create_md5(password)
+                uniq = uuid.uid5(uuid.NAMESPACE_DNS, username)
+                user = User.objects.create_user(username=username, password=md5_pwd, unique_id=uniq)
+                Jury.objects.create(user=user)
                 response['msg'] = 'success'
                 response['error_num'] = 0
             except:
@@ -87,9 +89,9 @@ def organizer_register(request):
         password = request.POST.get('password')
         if username and password:
             try:
-                salt = create_salt()
-                md5_pwd = create_md5(password, salt)
-                user = User.objects.create_user(username=username, password=md5_pwd, salt=salt)
+                #salt = create_salt()
+                md5_pwd = create_md5(password)
+                user = User.objects.create_user(username=username, password=md5_pwd)
                 Organizer.objects.create(user=user, status=Organizer.STATUS_UNCONFIRM)
                 response['msg'] = 'success'
                 response['error_num'] = 0
@@ -111,24 +113,21 @@ def competitor_login(request):
         if username and password:
             username = username.strip()
             try:
-                user = User.objects.find(username=username)
-                salt = user.salt
-                pwd = create_md5(password, salt)
-                if pwd == user.password:
-                    try:
-                        user = authenticate(username=username, password=pwd)
-                        competitor = Competitor.objects.find(user=user)
-                        login(request, user)
-                        request.session['username'] = username
-                        request.session.set_expiry(600)  #设置session的过期时间，为600s
-                        response['msg'] = 'success'
-                        response['error_num'] = 0
-                    except:
-                        response['msg'] = 'login failed'
-                        response['error_num'] = 1
+                #user = User.objects.find(username=username)
+                #salt = user.salt
+                pwd = create_md5(password)
+                #if pwd == user.password:
+
+                user = authenticate(username=username, password=pwd)
+                competitor = Competitor.objects.find(user=user)
+                login(request, user)
+                request.session['username'] = username
+                request.session.set_expiry(600)  #设置session的过期时间，为600s
+                response['msg'] = 'success'
+                response['error_num'] = 0
+
             except:
-                response['msg'] = 'findfailed'
-                response['username'] = salt
+                response['msg'] = 'find failed'
                 response['error_num'] = 1
             return JsonResponse(response)
     response['msg'] = 'create failed'
@@ -142,7 +141,8 @@ def organizer_login(request):
         username = request.POST.get('username')
         password = request.POST.get('password')
         if username and password:
-            user = authenticate(username=username, password=password)
+            pwd = create_md5(password)
+            user = authenticate(username=username, password=pwd)
             if user is not None:
                 try:
                     organizer = Organizer.objects.find(user=user)
@@ -169,7 +169,8 @@ def jury_login(request):
         password = request.POST.get('password')
         if username and password:
             username = username.strip()
-            user = authenticate(username=username, password=password)
+            pwd = create_md5(password)
+            user = authenticate(username=username, password=pwd)
             if user is not None:
                 try:
                     jury = Jury.objects.find(user=user)
@@ -177,7 +178,7 @@ def jury_login(request):
                     response['msg'] = 'success'
                     response['error_num'] = 0
                 except:
-                    response['msg'] = 'create failed'
+                    response['msg'] = 'no user'
                     response['error_num'] = 1
                 return JsonResponse(response)
     response['msg'] = 'create failed'
@@ -208,11 +209,10 @@ def admin_login(request):
 
 
 def index_competition_list(request):
-    '''now_time = timezone.now()
-    competition_list = Competition.objects.filter(Q(sign_up_start__gte=now_time) &
-                                                  Q(sign_up_end__lt=now_time))'''
+    now_time = timezone.now()
+    competition_list = Competition.objects.filter(Q(sign_up_start__gte=now_time) & Q(sign_up_end__lt=now_time))
     response = []
-    '''if competition_list is not None:
+    if competition_list is not None:
         for competition in competition_list:
             cmp = {}
             cmp['title'] = competition.title
@@ -225,9 +225,9 @@ def index_competition_list(request):
             cmp['msg'] = 'success'
             cmp['error_num'] = 0
             response.append(cmp)
-        return JsonResponse(response)'''
+        return JsonResponse(response)
     cmp = {}
-    cmp['msg'] = 'failed'
+    cmp['msg'] = 'no data failed'
     cmp['error_num'] = 1
     response.append(cmp)
     return JsonResponse(cmp)
@@ -238,7 +238,8 @@ def competitor_competition_list(request):
     fail_msg = {}
     if request.user.is_authenticated():
         try:
-            competitor = Competitor.objects.find(user=request.user)
+            #competitor = Competitor.objects.find(user=request.user)
+            competitor = request.user.competitor
             competition_list = competitor.activity_list.split(',')
             if competition_list is not None:
                 for title in competition_list:
@@ -248,14 +249,14 @@ def competitor_competition_list(request):
                     org['error_num'] = 0
                     response.append(org)
                 return JsonResponse(response)
-            fail_msg['msg'] = 'recent has no competition'
+            fail_msg['msg'] = 'no competition'
             fail_msg['error_num'] = 1
             response.append(fail_msg)
             return JsonResponse(response)
         except:
             fail_msg['msg'] = 'failed'
             fail_msg['error_num'] = 1
-    fail_msg['msg'] = 'failed'
+    fail_msg['msg'] = 'no user'
     fail_msg['error_num'] = 1
     response.append(fail_msg)
     return JsonResponse(response)
@@ -323,17 +324,17 @@ def competitor_sign_up(request):
     response = {}
     if request.user.is_authenticated():
         competitor = request.user.competitor
-        if request.method == "POST":
-            name = request.POST.get("competition_name")
+        if request.method == "GET":
+            name = request.GET.get("competition_name")
             try:
                 competition = Competition.objects.find(title=name)
-                if competition.competitor_list is not None:
-                    competition.competitor_list = competition.competitor_list + "," + str(competitor.uniq_id)
+                if competitor.competition_list is not None:
+                    competitor.competition_list = competition.competition_list + "," + name
                 else:
                     competition.competitor_list = str(competitor.uniq_id)
-                competition.save()
-                if competitor.competition_list is not None:
-                    competitor.competition_list = competitor.competition_list + "," + name
+                competitor.save()
+                if competition.competitor_list is not None:
+                    competitor.competition_list = competitor.competition_list + "," + str(competitor.uniq_id)
                 else:
                     competitor.competition_list = name
                 competitor.save()
