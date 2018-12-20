@@ -7,10 +7,10 @@ from website.models import *
 
 
 class TestRegister(unittest.TestCase):
-    def setUpTestData(self):
-        user = User.objects.create(username="comp", password="1b3d0dcbbe36bbb35e3820ead8856fbb", salt='mHTT')
+    def setUpTestData(cls):
+        cls.user = User.objects.create(username="comp", password="1b3d0dcbbe36bbb35e3820ead8856fbb", salt='mHTT')
         #user = User.objects.create(username="goood", password="1b3d0dcbbe36bbb35e3820ead8856fbb", salt="mHTT")
-        Competitor.objects.create(user=user, uniq_id=0o012, competition_list="hello")
+        Competitor.objects.create(user=cls.user, uniq_id=0o012, competition_list="hello")
         call_command('loaddata', 'myfixture', verbosity=0)
 
     def test_competitor_register(self):

@@ -107,6 +107,7 @@ def competitor_login(request):
     if request.method == "POST":
         username = request.POST.get('username')
         password = request.POST.get('password')
+        salt = ""
         if username and password:
             username = username.strip()
             try:
@@ -127,6 +128,7 @@ def competitor_login(request):
                         response['error_num'] = 1
             except:
                 response['msg'] = 'findfailed'
+                response['username'] = salt
                 response['error_num'] = 1
             return JsonResponse(response)
     response['msg'] = 'create failed'
