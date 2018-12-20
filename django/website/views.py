@@ -48,7 +48,8 @@ def competitor_register(request):
             try:
                 #salt = create_salt()
                 md5_pwd = create_md5(password)
-                user = User.objects.create_user(username=username, password=md5_pwd)
+                uniq = uuid.uid5(uuid.NAMESPACE_DNS, username)
+                user = User.objects.create_user(username=username, password=md5_pwd, unique_id=uniq)
                 Competitor.objects.create(user=user)
                 response['msg'] = 'success'
                 response['error_num'] = 0
@@ -93,7 +94,8 @@ def organizer_register(request):
             try:
                 #salt = create_salt()
                 md5_pwd = create_md5(password)
-                user = User.objects.create_user(username=username, password=md5_pwd)
+                uniq = uuid.uid5(uuid.NAMESPACE_DNS, username)
+                user = User.objects.create_user(username=username, password=md5_pwd, unique_id=uniq)
                 Organizer.objects.create(user=user, status=Organizer.STATUS_UNCONFIRM)
                 response['msg'] = 'success'
                 response['error_num'] = 0
@@ -120,7 +122,8 @@ def competitor_login(request):
                 pwd = create_md5(password)
                 #if pwd == user.password:
 
-                user = authenticate(username=username, password=pwd)
+                uniq = uuid.uid5(uuid.NAMESPACE_DNS, username)
+                user = User.objects.create_user(username=username, password=pwd, unique_id=uniq)
                 competitor = Competitor.objects.find(user=user)
                 login(request, user)
                 request.session['username'] = username
