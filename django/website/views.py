@@ -41,12 +41,17 @@ def competitor_register(request):
     if request.method == "POST":
         username = request.POST.get('username')
         password = request.POST.get('password')
+        print(username)
+        print(password)
         if username and password:
             try:
                 salt = create_salt()
                 md5_pwd = create_md5(password, salt)
-                user = User.objects.create_user(username=username, password=md5_pwd, salt=salt)
+                print(md5_pwd)
+                user = User.objects.create_user(username=username, password=md5_pwd)
+                print("ok")
                 Competitor.objects.create(user=user, uniq_id=0o012, competition_list="hello")
+                print("ok")
                 response['msg'] = 'success'
                 response['error_num'] = 0
             except:
