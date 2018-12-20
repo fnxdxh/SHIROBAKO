@@ -11,13 +11,12 @@ class User(AbstractUser):
         ('SU', 'Super User'),
     )
     user_type = models.CharField(max_length=20, choices=type_choices, default='Comp')
-    #salt = models.CharField(max_length=128, default=' ')
+    unique_id = models.CharField(max_length=128, default="")
 
 
 class Competitor(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    uniq_id = models.IntegerField()
-    competition_list = models.TextField()
+    competition_list = models.TextField(default='')
 
     # basic_info:
     school = models.CharField(max_length=128)
@@ -26,7 +25,7 @@ class Competitor(models.Model):
 class Organizer(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     status = models.IntegerField()
-    competition_list = models.TextField()
+    competition_list = models.TextField(default='')
 
     STATUS_UNCONFIRM = 0
     STATUS_CONFIRMED = 1
@@ -34,7 +33,7 @@ class Organizer(models.Model):
 
 class Jury(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    competition_list = models.TextField()
+    competition_list = models.TextField(default='')
 
 
 class SuperUser(models.Model):
