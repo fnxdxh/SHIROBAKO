@@ -208,11 +208,11 @@ def admin_login(request):
 
 
 def index_competition_list(request):
-    now_time = timezone.now()
-    competition_list = Competition.objects.filter(Q(sign_up_start__gte=now_time + datetime.timedelta(days=7)) &
-                                                  Q(sign_up_end__lt=now_time))
+    '''now_time = timezone.now()
+    competition_list = Competition.objects.filter(Q(sign_up_start__gte=now_time) &
+                                                  Q(sign_up_end__lt=now_time))'''
     response = []
-    if competition_list is not None:
+    '''if competition_list is not None:
         for competition in competition_list:
             cmp = {}
             cmp['title'] = competition.title
@@ -225,12 +225,12 @@ def index_competition_list(request):
             cmp['msg'] = 'success'
             cmp['error_num'] = 0
             response.append(cmp)
-        return JsonResponse(response)
+        return JsonResponse(response)'''
     cmp = {}
     cmp['msg'] = 'failed'
     cmp['error_num'] = 1
     response.append(cmp)
-    return JsonResponse(response)
+    return JsonResponse(cmp)
 
 
 def competitor_competition_list(request):

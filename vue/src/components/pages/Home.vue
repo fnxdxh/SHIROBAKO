@@ -10,11 +10,11 @@
 export default{
   data(){
     return{
-      msg:{初始msg}
+      msg:{key: '初始msg'}
     }
   },
   created(){
-    this.$http.get('url').then(result => {
+    this.$http.get('http://127.0.0.1:8000/api/index_competition_list/').then(result => {
       this.msg = result.body
     })
   }
