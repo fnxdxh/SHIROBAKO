@@ -40,7 +40,7 @@
       <el-main>
         <router-view></router-view>
       </el-main>
-      <el-footer>Footer</el-footer>
+      <el-footer id="footer">Footer</el-footer>
     </el-container>
   </div>
 </template>
@@ -55,5 +55,6 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 </style>
+
