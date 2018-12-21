@@ -1,6 +1,7 @@
 from django.test import TestCase
 from django.test.client import Client
 import unittest
+import md5
 from django.core.management import call_command
 from website.models import *
 # Create your tests here.
@@ -8,9 +9,9 @@ from website.models import *
 
 class TestRegister(unittest.TestCase):
     def setUpTestData(cls):
-        cls.user = User.objects.create(username="comp", password="1b3d0dcbbe36bbb35e3820ead8856fbb", salt='mHTT')
+        cls.user = User.objects.create_user(username="comp", password=hashlib.md5("2018").hexdigest())
         #user = User.objects.create(username="goood", password="1b3d0dcbbe36bbb35e3820ead8856fbb", salt="mHTT")
-        Competitor.objects.create(user=cls.user, uniq_id=0o012, competition_list="hello")
+        Competitor.objects.create(user=cls.user)
         call_command('loaddata', 'myfixture', verbosity=0)
 
     def test_competitor_register(self):
