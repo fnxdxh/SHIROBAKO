@@ -48,9 +48,14 @@ def competitor_register(request):
             try:
                 #salt = create_salt()
                 md5_pwd = create_md5(password)
-                uniq = uuid.uid5(uuid.NAMESPACE_DNS, username)
-                user = User.objects.create_user(username=username, password=md5_pwd, unique_id=uniq)
-                Competitor.objects.create(user=user)
+                uniq = uuid.uuid5(uuid.NAMESPACE_DNS, username)
+                print(uniq)
+                print(md5_pwd)
+                #user = User.objects.create_user(username=username, password=md5_pwd)
+                user = User.objects.create_user(username=username, password=md5_pwd)
+                print("ok")
+                Competitor.objects.create(user=user,school="")
+                print("ok")
                 response['msg'] = 'success'
                 response['error_num'] = 0
             except:
