@@ -43,7 +43,7 @@ class SuperUser(models.Model):
 class Competition(models.Model):
     # basic_info:
     title = models.CharField(max_length=128)
-    type = models.CharField(max_length=128)
+    type = models.CharField(max_length=128,default="")
     description = models.TextField(default="")
     stage = models.IntegerField(default=0)
     status = models.IntegerField(default=0)
@@ -51,6 +51,7 @@ class Competition(models.Model):
     sign_up_end = models.DateTimeField()
     start_time = models.TextField(default="")
     end_time = models.TextField(default="")
+    sponsor = models.CharField(max_length=128, default="")
 
     organizer = models.CharField(max_length=128)
     competitor_list = models.TextField(default="")

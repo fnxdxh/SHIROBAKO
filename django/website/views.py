@@ -50,7 +50,9 @@ def competitor_register(request):
                 #salt = create_salt()
                 md5_pwd = create_md5(password)
                 uniq = uuid.uuid5(uuid.NAMESPACE_DNS, username)
-                user = User.objects.create_user(username=username, password=md5_pwd, unique_id=uniq)
+                print(md5_pwd)
+                print(username)
+                user = User.objects.create_user(username=username, password=md5_pwd, unique_id=uniq, user_type='Comp')
                 Competitor.objects.create(user=user)
                 response['msg'] = 'success'
                 response['error_num'] = 0
@@ -73,7 +75,7 @@ def jury_register(request):
                 #salt = create_salt()
                 md5_pwd = create_md5(password)
                 uniq = uuid.uuid5(uuid.NAMESPACE_DNS, username)
-                user = User.objects.create_user(username=username, password=md5_pwd, unique_id=uniq)
+                user = User.objects.create_user(username=username, password=md5_pwd, unique_id=uniq, user_type='Rat')
                 Jury.objects.create(user=user)
                 response['msg'] = 'success'
                 response['error_num'] = 0
@@ -96,7 +98,7 @@ def organizer_register(request):
                 #salt = create_salt()
                 md5_pwd = create_md5(password)
                 uniq = uuid.uuid5(uuid.NAMESPACE_DNS, username)
-                user = User.objects.create_user(username=username, password=md5_pwd, unique_id=uniq)
+                user = User.objects.create_user(username=username, password=md5_pwd, unique_id=uniq, user_type='Org')
                 Organizer.objects.create(user=user, status=Organizer.STATUS_UNCONFIRM)
                 response['msg'] = 'success'
                 response['error_num'] = 0
@@ -114,7 +116,6 @@ def competitor_login(request):
     if request.method == "POST":
         username = request.POST.get('username')
         password = request.POST.get('password')
-        salt = ""
         if username and password:
             username = username.strip()
             try:
@@ -122,16 +123,19 @@ def competitor_login(request):
                 #salt = user.salt
                 pwd = create_md5(password)
                 #if pwd == user.password:
-
-                uniq = uuid.uuid5(uuid.NAMESPACE_DNS, username)
-                user = User.objects.create_user(username=username, password=pwd, unique_id=uniq)
-                competitor = Competitor.objects.find(user=user)
-                login(request, user)
-                request.session['username'] = username
-                request.session.set_expiry(600)  #设置session的过期时间，为600s
-                response['msg'] = 'success'
-                response['error_num'] = 0
-
+                print(pwd)
+                print(username)
+                user = authenticate(username=username, password=pwd)
+                #user = User.objects.find(username=username, password=pwd)
+                if user.user_type == "Comp":
+                    login(request, user)
+                    request.session['username'] = username
+                    request.session.set_expiry(600)  #设置session的过期时间，为600s
+                    response['msg'] = 'success'
+                    response['error_num'] = 0
+                else:
+                    response['msg'] = 'no permission'
+                    response['error_num'] = 1
             except:
                 response['msg'] = 'find failed'
                 response['error_num'] = 1
@@ -149,9 +153,9 @@ def organizer_login(request):
         if username and password:
             pwd = create_md5(password)
             user = authenticate(username=username, password=pwd)
-            if user is not None:
+            if user is not None and (user.user_type == "Org"):
+                organizer = user.organizer
                 try:
-                    organizer = Organizer.objects.find(user=user)
                     if organizer.status == Organizer.STATUS_CONFIRMED:
                         login(request, user)
                         response['msg'] = 'success'
@@ -177,7 +181,7 @@ def jury_login(request):
             username = username.strip()
             pwd = create_md5(password)
             user = authenticate(username=username, password=pwd)
-            if user is not None:
+            if user is not None and user.user_type == "Rat":
                 try:
                     jury = Jury.objects.find(user=user)
                     login(request, user)
@@ -550,12 +554,16 @@ def create_competition(request):
     if request.method == "POST":
         title = request.POST.get('name')
         description = request.POST.get('desc')
-        stage = request.POST.get("stage",None)
+        sign_up_start = request.POST.get('date1')
+        sign_up_end = request.POST.get('date2')
+        start_time = request.POST.get('date3')
+        end_time = request.POST.get("date4")
+        sponsor = request.POST.get('sponsor')
         # there are some information of the competition
         organizer = request.user.username
         try:
-            competiton = Competition.objects.create(title=title, description=description, stage=stage,
-                                                    organizer=organizer)
+            competiton = Competition.objects.create(title=title, description=description, sign_up_end=sign_up_end, sign_up_start=sign_up_start, start_time=start_time, end_time=end_time,
+                                                    organizer=organizer, sponsor=sponsor)
             response['msg'] = 'success'
             response['error_num'] = 0
         except:
