@@ -1,17 +1,19 @@
 <template>
   <div>
-    <el-form :model="form" ref="form" label-width="80px">
-      <el-form-item label="用户名">
-        <el-input v-model="form.username" placeholder="请输入用户名"></el-input>
-      </el-form-item>
-      <el-form-item label="密码">
-        <el-input v-model="form.password" placeholder="请输入密码"></el-input>
-      </el-form-item>
+    <div id="loginbox">
+      <el-form :model="form" ref="form" label-width="80px">
+        <el-form-item label="用户名">
+          <el-input v-model="form.username" placeholder="请输入用户名"></el-input>
+        </el-form-item>
+        <el-form-item label="密码">
+          <el-input v-model="form.password" placeholder="请输入密码"></el-input>
+        </el-form-item>
 
-      <el-form-item>
-        <el-button type="primary" @click="login">登录</el-button>
-      </el-form-item>
-    </el-form>
+        <el-form-item>
+          <el-button type="primary" @click="login">登录</el-button>
+        </el-form-item>
+      </el-form>
+    </div>
   </div>
 </template>
 
@@ -32,12 +34,11 @@ export default {
           emulateJSON: true
         })
         .then(result => {
-          console.log(result.body)
+          console.log(result.body);
           if (result.body.error_num === 0) {
-            alert('登陆成功')
-          }
-          else{
-            alert('登录失败')
+            alert("登陆成功");
+          } else {
+            alert("登录失败");
           }
         });
     }
@@ -46,4 +47,14 @@ export default {
 </script>
 
 <style scoped>
+
+#loginbox{
+  width: 400px;
+  height: 300px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-top: -150px;
+  margin-left: -200px;
+}
 </style>
