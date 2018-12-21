@@ -27,7 +27,20 @@ export default {
   },
   methods: {
     register(){
-      this.$store.commit('http://127.0.0.1:8000/api/register_competitor/', this.form)
+      console.log(this.form)
+      this.$http
+        .post("http://127.0.0.1:8000/api/register_competitor/", this.form, {
+          emulateJSON: true
+        })
+        .then(result => {
+          console.log(result.body)
+          if (result.body.error_num === 0) {
+            alert('注册成功')
+          }
+          else{
+            alert('注册失败')
+          }
+        });
     }
   }
 };

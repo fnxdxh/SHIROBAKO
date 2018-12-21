@@ -43,6 +43,8 @@ def competitor_register(request):
     if request.method == "POST":
         username = request.POST.get('username')
         password = request.POST.get('password')
+        print(username)
+        print(password)
         if username and password:
             try:
                 #salt = create_salt()

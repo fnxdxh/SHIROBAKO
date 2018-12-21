@@ -26,8 +26,20 @@ export default {
     };
   },
   methods: {
-    login(){
-      this.$store.commit('http://127.0.0.1:8000/api/login_competitor/', this.form)
+    login() {
+      this.$http
+        .post("http://127.0.0.1:8000/api/login_competitor/", this.form, {
+          emulateJSON: true
+        })
+        .then(result => {
+          console.log(result.body)
+          if (result.body.error_num === 0) {
+            alert('登陆成功')
+          }
+          else{
+            alert('登录失败')
+          }
+        });
     }
   }
 };
