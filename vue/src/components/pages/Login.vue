@@ -5,7 +5,7 @@
         <el-input v-model="form.username" placeholder="请输入用户名"></el-input>
       </el-form-item>
       <el-form-item label="密码">
-        <el-input v-model="form.pwd" placeholder="请输入密码"></el-input>
+        <el-input v-model="form.password" placeholder="请输入密码"></el-input>
       </el-form-item>
 
       <el-form-item>
@@ -21,13 +21,13 @@ export default {
     return {
       form: {
         username: "",
-        pwd: ""
+        password: ""
       }
     };
   },
   methods: {
     login(){
-      this.$store.commit('login', this.form)
+      this.$store.commit('http://127.0.0.1:8000/api/login_competitor/', this.form)
     }
   }
 };

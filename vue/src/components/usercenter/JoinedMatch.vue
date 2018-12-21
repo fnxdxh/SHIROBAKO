@@ -38,7 +38,7 @@
             name: 'mini程序竞赛',
             score: '90.8'
           }],
-          refs: ["http://127.0.0.1:8000/upload"]
+          refs: ["http://127.0.0.1:8000/api/upload"]
         }
       },
       methods:{
@@ -47,19 +47,20 @@
             this.errText = '';
             this.$emit('input', this.file);
             let formData = new FormData();
-            formData.append("attachment", this.file[0]);
+            formData.append("attachment", this.file);
             formData.append("competition", this.competition);
             this.$http.post(this.refs[0], formData,{
                 headers:{
                     'Content-Type': 'multipart/form-data'
                 }
             }).then(function(res){})
-        }
-      },
-      getFile: function (event, name) {
-        this.upath = event.target.files[0];
+        },
+        getFile(event, name) {
+        this.upath = event.files;
         this.competition = name;
       }
+      }
+      
     }
   </script>
 

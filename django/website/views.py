@@ -11,6 +11,7 @@ from mysite import settings
 from django.contrib import auth
 import os
 import uuid
+import json
 from django.db.models import Q
 from django.contrib.auth import authenticate, login, logout
 from .models import User, Competitor, Organizer, Jury, Competition, UserFile, SuperUser, JuryFile
@@ -46,7 +47,7 @@ def competitor_register(request):
             try:
                 #salt = create_salt()
                 md5_pwd = create_md5(password)
-                uniq = uuid.uid5(uuid.NAMESPACE_DNS, username)
+                uniq = uuid.uuid5(uuid.NAMESPACE_DNS, username)
                 user = User.objects.create_user(username=username, password=md5_pwd, unique_id=uniq)
                 Competitor.objects.create(user=user)
                 response['msg'] = 'success'
@@ -69,7 +70,7 @@ def jury_register(request):
             try:
                 #salt = create_salt()
                 md5_pwd = create_md5(password)
-                uniq = uuid.uid5(uuid.NAMESPACE_DNS, username)
+                uniq = uuid.uuid5(uuid.NAMESPACE_DNS, username)
                 user = User.objects.create_user(username=username, password=md5_pwd, unique_id=uniq)
                 Jury.objects.create(user=user)
                 response['msg'] = 'success'
@@ -92,7 +93,7 @@ def organizer_register(request):
             try:
                 #salt = create_salt()
                 md5_pwd = create_md5(password)
-                uniq = uuid.uid5(uuid.NAMESPACE_DNS, username)
+                uniq = uuid.uuid5(uuid.NAMESPACE_DNS, username)
                 user = User.objects.create_user(username=username, password=md5_pwd, unique_id=uniq)
                 Organizer.objects.create(user=user, status=Organizer.STATUS_UNCONFIRM)
                 response['msg'] = 'success'
@@ -120,7 +121,7 @@ def competitor_login(request):
                 pwd = create_md5(password)
                 #if pwd == user.password:
 
-                uniq = uuid.uid5(uuid.NAMESPACE_DNS, username)
+                uniq = uuid.uuid5(uuid.NAMESPACE_DNS, username)
                 user = User.objects.create_user(username=username, password=pwd, unique_id=uniq)
                 competitor = Competitor.objects.find(user=user)
                 login(request, user)
@@ -228,12 +229,15 @@ def index_competition_list(request):
             cmp['msg'] = 'success'
             cmp['error_num'] = 0
             response.append(cmp)
-        return JsonResponse(response)
+            print(response)
+        return HttpResponse(json.dumps(response))
     cmp = {}
     cmp['msg'] = 'no data failed'
     cmp['error_num'] = 1
     response.append(cmp)
-    return JsonResponse(cmp)
+    print(json.dumps(response))
+    print(cmp)
+    return HttpResponse(json.dumps(response))
 
 
 def competitor_competition_list(request):
@@ -251,18 +255,18 @@ def competitor_competition_list(request):
                     org['msg'] = 'success'
                     org['error_num'] = 0
                     response.append(org)
-                return JsonResponse(response)
+                return JsonResponse(json.dumps(response))
             fail_msg['msg'] = 'no competition'
             fail_msg['error_num'] = 1
             response.append(fail_msg)
-            return JsonResponse(response)
+            return JsonResponse(json.dumps(response))
         except:
             fail_msg['msg'] = 'failed'
             fail_msg['error_num'] = 1
     fail_msg['msg'] = 'no user'
     fail_msg['error_num'] = 1
     response.append(fail_msg)
-    return JsonResponse(response)
+    return JsonResponse(json.dumps(response))
 
 
 def jury_competition_list(request):
@@ -280,6 +284,7 @@ def jury_competition_list(request):
                     org['msg'] = 'success'
                     org['error_num'] = 0
                     response.append(org)
+                    
                 return JsonResponse(response)
             fail_msg['msg'] = 'recent has no competition'
             fail_msg['error_num'] = 1
@@ -365,7 +370,7 @@ def file_upload(request):
                     f.write(chunk)
             file_url = os.path.join('/file', file.name).replace('\\', '/')
             url = "http://" + settings.SITE_DOMAIN + file_url
-            competitor = request.user.competitor
+            '''competitor = request.user.competitor
             try:
                 file = UserFile.objects.find(username=request.user.username, competition=competition)
                 file.file_url = file.name
@@ -377,7 +382,7 @@ def file_upload(request):
                 UserFile.objects.create(username=request.user.username, competition=competition, file_url=url)
                 response['msg'] = 'success'
                 response['error_num'] = 0
-                return JsonResponse(response)
+                return JsonResponse(response)'''
     response['msg'] = 'not login'
     response['error_num'] = 1
     return JsonResponse(response)
