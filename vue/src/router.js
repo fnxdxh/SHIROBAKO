@@ -6,6 +6,8 @@ import loginpage from './components/pages/Login.vue'
 import registerpage from './components/pages/Register.vue'
 import usercenterpage from './components/pages/UserCenter.vue'
 import creatematch from './components/pages/CreateMatch.vue'
+import listpage from './components/pages/List.vue'
+
 
 import createdmatch from './components/usercenter/CreatedMatch.vue'
 import joinedmatch from './components/usercenter/JoinedMatch.vue'
@@ -22,6 +24,8 @@ var router = new VueRouter({
     { path: '/matchlist', component: matchlistpage },
     { path: '/login', component: loginpage },
     { path: '/register', component: registerpage },
+    { path: '/list', component: listpage },
+
     {
       path: '/usercenter',
       component: usercenterpage,
