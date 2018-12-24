@@ -376,7 +376,7 @@ def file_upload(request):
                     f.write(chunk)
             file_url = os.path.join('/file', file.name).replace('\\', '/')
             url = "http://" + settings.SITE_DOMAIN + file_url
-            '''competitor = request.user.competitor
+            competitor = request.user.competitor
             try:
                 file = UserFile.objects.find(username=request.user.username, competition=competition)
                 file.file_url = file.name
@@ -388,7 +388,7 @@ def file_upload(request):
                 UserFile.objects.create(username=request.user.username, competition=competition, file_url=url)
                 response['msg'] = 'success'
                 response['error_num'] = 0
-                return JsonResponse(response)'''
+                return JsonResponse(response)
     response['msg'] = 'not login'
     response['error_num'] = 1
     return JsonResponse(response)
@@ -426,7 +426,14 @@ def grade_upload(request):
             file_url = request.POST.get("filepath")
             try:
                 file = UserFile.objects.find(file_url=file_url)
-                file.grade = file.grade + grade / file.jury_count
+                grade = file.grade_list.split(',')
+                jury_list=file.jury_list.split(',')
+                i = 0
+                for jury in jury_list:
+                    if jury == request.user.username:
+                        grade[i] = grade
+                str = ','
+                file.grade_list = str.join(grade)
                 file.save()
                 response['msg'] = 'success'
                 response['error_num'] = 0
@@ -533,15 +540,60 @@ def admin_to_confirm(request):
     response['error_num'] = 1
     return JsonResponse(response)
 
+# 把paper_count张卷子平均划分为per_person个任务
+def partition(Task,paper_count,per_person,file_list):
+    for i in range(paper_count):
+        Task[i/per_person][i%per_person] = file_list[i].file_url
+        file_list[i].jury_count = file_list[i].jury_count + 1
+        file_list[i].save()
+
+
+#把第m个任务分给第K个阅卷人
+def assign(Task,jury_li,m,k,per_person):
+    for i in range(per_person):
+        #Teacher[k][i] = Task[m][i]
+        if jury_li[k].file_list is None:
+            jury_li[k].file_list = Task[m][i].file_url
+        else:
+            jury_li[k].file_list = jury_li[k].file_list + "," + Task[m][i].file_url
+        jury_li[k].file_count = jury_li[k].file_count + 1
+        jury_li[k].save()
+        if Task[m][i].jury_list is None:
+            Task[m][i].jury_list = jury_li[k].jury
+        else:
+            Task[m][i].jury_list = Task[m][i].jury_list + "," + jury_li[k].jury
+        Task[m][i].jury_count = Task[m][i].jury_count + 1
+        Task[m][i].save()
+
 
 def divide_paper(request):
     if request.user.is_authenticated():
         if request.method == "POST":
             title = request.POST.get("competition_name")
+            per_time = int(request.POST.get("time")) #阅卷次数
+            file_list=[]
+            jury_li = []
             try:
                 competition = Competition.objects.find(title=title, organizer=request.user.username)
                 user_list = competition.competitor_list.split(",")
+                paper_count = len(user_list)  #试卷数量
                 jury_list = competition.jury_list.split(",")
+                jury_count = len(jury_list)   #阅卷人数
+                per_person = paper_count/jury_count + 1 #每个人平均任务量
+                for user in user_list:
+                    new_file = UserFile.objects.find(username=user, competition=title)
+                    file_list.append(new_file)
+                for jury in jury_list:
+                    new_jury = JuryFile.objects.find(jury=jury, competition=title)
+                    jury_li.append(new_jury)
+                Task = [range(per_person) for i in range(jury_count)] 
+                #Teacher = [(range(per_person) for i in range(jury_count)]
+                partition(Task,paper_count,per_person,file_list)
+                for i in range(per_time):
+                    count = 0
+                    j = i
+                    for count in range(jury_count):
+                        assign(Task,jury_li,count,j,per_person)
             except:
                 return HttpResponse("divide fail")
         return HttpResponse("method wrong")
@@ -585,12 +637,19 @@ def invite_jury(request):
             jury = request.POST.get("jury")
             title = request.POST.get("competition_name")
             try:
-                competition = Competition.objects.find(title=title, organizer=request.user.username)
-                if competition.jury_list is not None:
-                    competition.jury_list = competition.jury_list + "," + jury
+                pre_jury = JuryFile.objects.filter(jury=jury, competition=title)
+                if pre_jury is not None:
+                    response['msg'] = 'exist'
+                    response['error_num'] = 1
+                    return JsonResponse(response)
                 else:
-                    competition.jury_list = jury
-                competition.save()
+                    competition = Competition.objects.find(title=title, organizer=request.user.username)
+                    if competition.jury_list is not None:
+                        competition.jury_list = competition.jury_list + "," + jury
+                    else:
+                        competition.jury_list = jury
+                    competition.save()
+                    JuryFile.objects.create(jury=jury, competition=title)
                 response['msg'] = 'success'
                 response['error_num'] = 0
             except:
