@@ -1,8 +1,20 @@
 <template>
   <div>
-    <el-form :model="form" :rules="rules" ref="form" label-width="100px" class="demo-form">
-      <el-form-item label="竞赛封面"></el-form-item>
-
+    <el-form :model="form" ref="form" label-width="100px" class="demo-form">
+      <el-form-item label="竞赛封面" prop="img">
+        <el-upload
+        action="#"
+        :limit="1"
+        accept="image/jpeg,image/jpg,image/png"
+        :auto-upload="false"
+        :on-exceed="handleExceed"
+        :before-upload="handleBefore"
+        :file-list="fileList"
+        :on-remove="handleRemove"
+        list-type="picture">
+          <el-button type="primary" size="small">上传图片</el-button>
+        </el-upload>
+      </el-form-item>
       <el-form-item label="竞赛名称" prop="name">
         <el-input v-model="form.name"></el-input>
       </el-form-item>
@@ -73,6 +85,7 @@ export default {
       form: {
         id: 0,
         name: "",
+        img: "",
         sponsor: "",
         date1: "",
         date2: "",
@@ -80,6 +93,7 @@ export default {
         date4: "",
         desc: ""
       },
+      fileList: []
       // rules: {
       //   name: [{ required: true, message: "请输入竞赛名称", trigger: "blur" }],
       //   sponsor: [{ required: true, message: "请输入主办方", trigger: "blur" }],
@@ -134,6 +148,23 @@ export default {
     },
     resetForm(formName) {
       this.$refs[formName].resetFields();
+    },
+    handleBefore(file)
+    {
+      const isIMAGE = (file.raw.type === 'image/jpeg' || file.raw.type === 'image/jpg' || file.raw.type === 'image/png');
+      if(!isIMAGE){
+        this.$message.error('上传图片只能是 jpg,jpeg,png格式!');
+        return false;
+      }
+      this.img = file;
+      return false;
+    },
+    handleExceed(file, fileList){
+      this.$message.error(`当前限制选择 1 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`);
+    },
+    handleRemove(file, fileList){
+      fileList.length = 0;
+      this.img = "";
     }
   }
 };
