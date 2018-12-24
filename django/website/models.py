@@ -69,16 +69,18 @@ class UserFile(models.Model):
     username = models.CharField(max_length=128)
     competition = models.CharField(max_length=128)
     file_url = models.CharField(max_length=128)
-    grade = models.IntegerField(default=0)
-    jury_count = models.FloatField()
+    grade_list = models.CharField(max_length=128,default="")
+    jury_list = models.CharField(max_length=128,default="")
+    grade = models.FloatField(default=0)
+    jury_count = models.IntegerField(default=0)
 
 
 class JuryFile(models.Model):
     file_list = models.TextField()
     jury = models.CharField(max_length=128)
     competition = models.CharField(max_length=128)
-    file_count = models.IntegerField()
-    finished_count = models.IntegerField()
+    file_count = models.IntegerField(default=0)
+    finished_count = models.IntegerField(default=0)
 
 
 '''class OrgCompetition(models.Model):
