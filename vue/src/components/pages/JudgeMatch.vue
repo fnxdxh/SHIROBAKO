@@ -42,18 +42,29 @@ export default {
     },
     methods:{
         FileDownload(){
-            url = this.url;
-            window.open(url);
+            this.$http.get('http://localhost:8000').then(response => {
+            console.log(response.data);
+            // get body data
+            this.file = response.body;
+            }, response => {
+                console.log("error");
+            });
+            let content = this.file.content;
+            let filename = this.file.filename
+            const blob = new Blob([this.content])
+            if (window.navigator.msSaveOrOpenBlob) {
+            // 兼容IE10
+                navigator.msSaveBlob(blob, filename)
+            } 
+            else {
+            //  chrome/firefox
+            let aTag = document.createElement('a')
+            aTag.download = filename
+            aTag.href = URL.createObjectURL(blob)
+            aTag.click()
+            URL.revokeObjectURL(aTag.href)
+            }
         }
-    },
-    mounted:function(){
-        this.$http.get('http://localhost:8000').then(response => {
-        console.log(response.data);
-        // get body data
-        this.url = response.body;
-        }, response => {
-            console.log("error");
-        });
     }
 }
 </script>
