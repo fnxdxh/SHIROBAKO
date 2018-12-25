@@ -14,7 +14,7 @@ export default{
     }
   },
   created(){
-    this.$http.get('http://127.0.0.1:8000/api/index_competition_list/').then(result => {
+    this.$http.get('api/index_competition_list/').then(result => {
       this.msg = result.body
     })
   }

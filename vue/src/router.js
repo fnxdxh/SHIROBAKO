@@ -11,6 +11,9 @@ import creatematch from './components/pages/CreateMatch.vue'
 import listpage from './components/pages/List.vue'
 import matchinfopage from './components/pages/MatchInfo.vue'
 
+import adminlogin from './components/admin/AdminLogin.vue'
+import admincenter from './components/admin/AdminCenter.vue'
+
 import competitor_register from './components/dialog/register_competitor.vue'
 import organizer_register from './components/dialog/register_organizer.vue'
 import jury_register from './components/dialog/register_jury.vue'
@@ -33,6 +36,8 @@ var router = new VueRouter({
     { path: '/home', component: homepage },
     { path: '/matchlist', component: matchlistpage },
     { path: '/matchinfo', component: matchinfopage },
+    { path: '/admin', component: adminlogin},
+    { path: '/admincenter', component: admincenter},
     { path: '/login', component: loginpage,
       children: [
         {path: '', redirect: 'competitor'},
