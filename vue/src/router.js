@@ -14,7 +14,7 @@ import joinedmatch from './components/usercenter/JoinedMatch.vue'
 import judgedmatch from './components/usercenter/JudgedMatch.vue'
 import staredmatch from './components/usercenter/StaredMatch.vue'
 import userinfo from './components/usercenter/UserInfo.vue'
-import store from './store';
+import store from './store.js';
 
 
 
