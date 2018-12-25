@@ -615,27 +615,27 @@ def divide_paper(request):
 
 def create_competition(request):
     response = {}
-    #if request.user.is_authenticated():
-    if request.method == "POST":
-        title = request.POST.get('name')
-        description = request.POST.get('desc')
-        sign_up_start = request.POST.get('date1')
-        sign_up_end = request.POST.get('date2')
-        start_time = request.POST.get('date3')
-        end_time = request.POST.get("date4")
-        sponsor = request.POST.get('sponsor')
-        # there are some information of the competition
-        organizer = request.user.username
-        try:
-            competiton = Competition.objects.create(title=title, description=description, sign_up_end=sign_up_end, sign_up_start=sign_up_start, start_time=start_time, end_time=end_time,
-                                                    organizer=organizer, sponsor=sponsor)
-            response['msg'] = 'success'
-            response['error_num'] = 0
-        except:
-            response['msg'] = 'error'
-            response['error_num'] = 1
-        return JsonResponse(response)
-    response['msg'] = 'not POST'
+    if request.user.is_authenticated() and request.user.user_type=='Org':
+        if request.method == "POST":
+            title = request.POST.get('name')
+            description = request.POST.get('desc')
+            sign_up_start = request.POST.get('date1')
+            sign_up_end = request.POST.get('date2')
+            start_time = request.POST.get('date3')
+            end_time = request.POST.get("date4")
+            sponsor = request.POST.get('sponsor')
+            # there are some information of the competition
+            organizer = request.user.username
+            try:
+                competiton = Competition.objects.create(title=title, description=description, sign_up_end=sign_up_end, sign_up_start=sign_up_start, start_time=start_time, end_time=end_time,
+                                                        organizer=organizer, sponsor=sponsor)
+                response['msg'] = 'success'
+                response['error_num'] = 0
+            except:
+                response['msg'] = 'error'
+                response['error_num'] = 1
+            return JsonResponse(response)
+    response['msg'] = 'failed'
     response['error_num'] = 1
     return JsonResponse(response)
     #response['msg'] = 'not log in'

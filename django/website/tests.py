@@ -76,6 +76,15 @@ class TestOrganizerLogin(unittest.TestCase):
         self.assertEqual(response.content.decode('utf-8'), '{"msg": "success", "error_num": 0}')
 
 
+class TestCreateCompetition(unittest.TestCase):
+    def setUp(self):
+        user = User.objects.create_user(username="org2", password=md5(("2018").encode('utf-8')).hexdigest(), user_type="Org")
+        Organizer.objects.create(user=user,status=Organizer.STATUS_CONFIRMED)
 
+    def test_create_competition(self):
+        c = Client()
+        response = c.post('/api/login_organizer/', {'username': 'org2', 'password': '2018'})
+        response = c.post('/api/create_competition/',{'name':'test','desc':'test','date1':'2018-12-25','date2':'2018-12-25','date3':'2018-12-26','date4':'2018-12-26','sponsor':'test'})
+        self.assertEqual(response.content.decode('utf-8'), '{"msg": "success", "error_num": 0}')
 
 
