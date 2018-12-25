@@ -243,14 +243,14 @@ def index_competition_list(request):
             cmp['error_num'] = 0
             response.append(cmp)
             print(response)
-        return HttpResponse(json.dumps(response))
+        return json.dumps(response)
     cmp = {}
     cmp['msg'] = 'no data failed'
     cmp['error_num'] = 1
     response.append(cmp)
     print(json.dumps(response))
     print(cmp)
-    return HttpResponse(json.dumps(response))
+    return json.dumps(response)
 
 
 def competitor_competition_list(request):
