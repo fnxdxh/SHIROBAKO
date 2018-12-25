@@ -8,6 +8,7 @@ urlpatterns = [
     url(r'^login_competitor/', competitor_login),
     url(r'^login_organizer/', organizer_login),
     url(r'^login_jury/', jury_login),
+    url(r'^login_superuser/', admin_login),
     url(r'^index_competition_list/', index_competition_list),
     url(r'^upload/', file_upload),
     url(r'^create_competition/',create_competition),
