@@ -42,18 +42,18 @@ export default {
     },
     methods:{
         FileDownload(){
-            url = this.url;
-            window.open(url);
+            this.$http.get('http://localhost:8000').then(response => {
+            console.log(response.data);
+            // get body data
+            this.content = response.body;
+            }, response => {
+                console.log("error");
+            });
+            
         }
     },
     mounted:function(){
-        this.$http.get('http://localhost:8000').then(response => {
-        console.log(response.data);
-        // get body data
-        this.url = response.body;
-        }, response => {
-            console.log("error");
-        });
+        
     }
 }
 </script>

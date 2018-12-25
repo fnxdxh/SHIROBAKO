@@ -1,48 +1,18 @@
 <template>
   <div>
-    <el-form :model="form" ref="form" label-width="80px">
-      <el-form-item label="用户名">
-        <el-input v-model="form.username" placeholder="请输入用户名"></el-input>
-      </el-form-item>
-      <el-form-item label="密码">
-        <el-input v-model="form.password" placeholder="请输入密码"></el-input>
-      </el-form-item>
+    <el-menu mode="horizontal" :router="true">
+      <el-menu-item index="competitor">我是参赛者</el-menu-item>
+      <el-menu-item index="organizer">我是主办方</el-menu-item>
+      <el-menu-item index="jury">我是评委</el-menu-item> 
+    </el-menu>
 
-      <el-form-item>
-        <el-button type="primary" @click="register">注册</el-button>
-      </el-form-item>
-    </el-form>
+    <router-view></router-view>
   </div>
 </template>
 
 <script>
 export default {
-  data() {
-    return {
-      form: {
-        username: "",
-        password: ""
-      }
-    };
-  },
-  methods: {
-    register(){
-      console.log(this.form)
-      this.$http
-        .post("http://127.0.0.1:8000/api/register_competitor/", this.form, {
-          emulateJSON: true
-        })
-        .then(result => {
-          console.log(result.body)
-          if (result.body.error_num === 0) {
-            alert('注册成功')
-          }
-          else{
-            alert('注册失败')
-          }
-        });
-    }
-  }
+
 };
 </script>
 
