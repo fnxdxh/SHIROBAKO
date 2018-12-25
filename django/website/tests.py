@@ -49,17 +49,6 @@ class TestCompetitorLogin(unittest.TestCase):
         self.assertEqual(response.content.decode('utf-8'), '{"msg": "success", "error_num": 0}')
 
 
-class TestOrganizerLogin(unittest.TestCase):
-    def setUp(self):
-        user = User.objects.create_user(username="org", password=md5(("2018").encode('utf-8')).hexdigest(), user_type="Org")
-        Organizer.objects.create(user=user,status=Organizer.STATUS_UNCONFIRM)
-        #user = User.objects.create_user(username="jury3", password=md5(("2018").encode('utf-8')).hexdigest(), user_type="Rat")
-        #Jury.objects.create(user=user,competition_list="")
-    def test_organizer_login(self):
-        c = Client()
-        response = c.post('/api/login_organizer/', {'username': 'org', 'password': '2018'})
-        self.assertEqual(response.content.decode('utf-8'), '{"msg": "success", "error_num": 0}')
-
 class TestJuryLogin(unittest.TestCase):
     def setUp(self):
         user = User.objects.create_user(username="jury", password=md5(("2018").encode('utf-8')).hexdigest(), user_type="Rat")
@@ -69,6 +58,24 @@ class TestJuryLogin(unittest.TestCase):
         c = Client()
         response = c.post('/api/login_jury/', {'username': 'jury', 'password': '2018'})
         self.assertEqual(response.content.decode('utf-8'), '{"msg": "success", "error_num": 0}')
+
+class TestOrganizerLogin(unittest.TestCase):
+    def setUp(self):
+        user = User.objects.create_user(username="org", password=md5(("2018").encode('utf-8')).hexdigest(), user_type="Org")
+        Organizer.objects.create(user=user,status=Organizer.STATUS_UNCONFIRM)
+
+        user = User.objects.create_user(username="org1", password=md5(("2018").encode('utf-8')).hexdigest(), user_type="Org")
+        Organizer.objects.create(user=user,status=Organizer.STATUS_CONFIRMED)
+        #user = User.objects.create_user(username="jury3", password=md5(("2018").encode('utf-8')).hexdigest(), user_type="Rat")
+        #Jury.objects.create(user=user,competition_list="")
+    def test_organizer_login(self):
+        c = Client()
+        response = c.post('/api/login_organizer/', {'username': 'org', 'password': '2018'})
+        self.assertEqual(response.content.decode('utf-8'), '{"msg": "have not confirmed", "error_num": 1}')
+        response = c.post('/api/login_organizer/', {'username': 'org1', 'password': '2018'})
+        self.assertEqual(response.content.decode('utf-8'), '{"msg": "success", "error_num": 0}')
+
+
 
 
 
