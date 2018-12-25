@@ -1,54 +1,23 @@
 <template>
   <div>
-    <div id="loginbox">
-      <el-form :model="form" ref="form" label-width="80px">
-        <el-form-item label="用户名">
-          <el-input v-model="form.username" placeholder="请输入用户名"></el-input>
-        </el-form-item>
-        <el-form-item label="密码">
-          <el-input v-model="form.password" placeholder="请输入密码"></el-input>
-        </el-form-item>
+    <el-menu mode="horizontal" :router="true">
+      <el-menu-item index="competitor">我是参赛者</el-menu-item>
+      <el-menu-item index="organizer">我是主办方</el-menu-item>
+      <el-menu-item index="jury">我是评委</el-menu-item> 
+    </el-menu>
+    <router-view></router-view>
 
-        <el-form-item>
-          <el-button type="primary" @click="login">登录</el-button>
-        </el-form-item>
-      </el-form>
     </div>
-  </div>
 </template>
 
 <script>
 export default {
-  data() {
-    return {
-      form: {
-        username: "",
-        password: ""
-      }
-    };
-  },
-  methods: {
-    login() {
-      this.$http
-        .post("http://127.0.0.1:8000/api/login_competitor/", this.form, {
-          emulateJSON: true
-        })
-        .then(result => {
-          console.log(result.body);
-          if (result.body.error_num === 0) {
-            alert("登陆成功");
-          } else {
-            alert("登录失败");
-          }
-        });
-    }
-  }
-};
+}
 </script>
 
 <style scoped>
 
-#loginbox{
+/* #loginbox{
   width: 400px;
   height: 300px;
   position: absolute;
@@ -56,5 +25,5 @@ export default {
   left: 50%;
   margin-top: -150px;
   margin-left: -200px;
-}
+} */
 </style>

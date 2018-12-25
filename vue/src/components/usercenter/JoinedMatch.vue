@@ -11,7 +11,8 @@
         label="上传文件"
         width="400">
         <template slot-scope="scope">
-        <el-input style="width: 260px" type="file" @change="getFile($event, scope.row.name)" @click="FileUpload">上传</el-input>
+        <el-input style="width: 260px" type="file" @change="getFile($event, scope.row.name)">上传</el-input>
+        <el-button type="primary"  @click="FileUpload">上传文件</el-button>
       </template>
       </el-table-column>
       <el-table-column
@@ -38,7 +39,7 @@
             name: 'mini程序竞赛',
             score: '90.8'
           }],
-          refs: ["http://127.0.0.1:8000/api/upload"]
+          refs: ["http://127.0.0.1:8000/api/upload/"]
         }
       },
       methods:{
@@ -49,6 +50,7 @@
             let formData = new FormData();
             formData.append("attachment", this.file);
             formData.append("competition", this.competition);
+            console.log("ok");
             this.$http.post(this.refs[0], formData,{
                 headers:{
                     'Content-Type': 'multipart/form-data'
@@ -56,9 +58,10 @@
             }).then(function(res){})
         },
         getFile(event, name) {
+        console.log(event);
         this.upath = event.files;
         this.competition = name;
-      }
+        }
       }
       
     }

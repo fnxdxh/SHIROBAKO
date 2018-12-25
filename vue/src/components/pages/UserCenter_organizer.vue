@@ -4,14 +4,8 @@
       <el-aside width="200px">
         <el-col>
           <el-menu class="el-menu-vertical-demo" :router="true">
-            <el-menu-item index="joined">
-              <span>我参加的比赛</span>
-            </el-menu-item>
             <el-menu-item index="created">
               <span>我创建的比赛</span>
-            </el-menu-item>
-            <el-menu-item index="judged">
-              <span>我评审的比赛</span>
             </el-menu-item>
             <el-menu-item index="stared">
               <span>我收藏的比赛</span>
@@ -30,6 +24,9 @@
 </template>
 
 <script>
+export default {
+
+}
 </script>
 
 <style scoped>
