@@ -8,6 +8,12 @@ import usercenterpage from './components/pages/UserCenter.vue'
 import creatematch from './components/pages/CreateMatch.vue'
 import listpage from './components/pages/List.vue'
 
+import competitor_register from './components/dialog/register_competitor.vue'
+import organizer_register from './components/dialog/register_organizer.vue'
+import jury_register from './components/dialog/register_jury.vue'
+import competitor_login from './components/dialog/login_competitor.vue'
+import organizer_login from './components/dialog/login_organizer.vue'
+import jury_login from './components/dialog/login_jury.vue'
 
 import createdmatch from './components/usercenter/CreatedMatch.vue'
 import joinedmatch from './components/usercenter/JoinedMatch.vue'
@@ -22,8 +28,22 @@ var router = new VueRouter({
     { path: '/', redirect: '/home' },
     { path: '/home', component: homepage },
     { path: '/matchlist', component: matchlistpage },
-    { path: '/login', component: loginpage },
-    { path: '/register', component: registerpage },
+    { path: '/login', component: loginpage,
+      children: [
+        {path: '', redirect: 'competitor'},
+        {path: 'competitor', component: competitor_login},
+        {path: 'organizer', component: organizer_login},
+        {path: 'jury', component: jury_login}
+      ]
+    },
+    { path: '/register', component: registerpage,
+      children: [
+        {path: '', redirect: 'competitor'},
+        {path: 'competitor', component: competitor_register},
+        {path: 'organizer', component: organizer_register},
+        {path: 'jury', component: jury_register}
+      ]
+    },
     { path: '/list', component: listpage },
 
     {

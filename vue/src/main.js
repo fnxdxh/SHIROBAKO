@@ -12,6 +12,9 @@ Vue.use(VueRouter)
 Vue.use(VueResource)
 Vue.use(Vuex)
 
+Vue.http.options.root = 'http://127.0.0.1:8000/'
+Vue.http.options.emulateJSON = true
+
 var store = new Vuex.Store({
   state: {
     islogin: false,
