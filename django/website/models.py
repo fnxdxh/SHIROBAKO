@@ -7,8 +7,8 @@ class User(AbstractUser):
     type_choices = (
         ('Comp', 'Competitor'),
         ('Org', 'Organizer'),
-        ('Rat', 'jury'),
-        ('SU', 'Super User'),
+        ('Rat', 'Jury'),
+        ('SU', 'SuperUser'),
     )
     user_type = models.CharField(max_length=20, choices=type_choices, default='Comp')
     unique_id = models.CharField(max_length=128, default='')
@@ -34,6 +34,7 @@ class Organizer(models.Model):
 class Jury(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     competition_list = models.TextField(default='')
+    tel = models.CharField(max_length=20,default='')
 
 
 class SuperUser(models.Model):
