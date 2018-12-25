@@ -63,7 +63,6 @@
         this.competition = name;
         }
       }
-      }
       
     }
   </script>

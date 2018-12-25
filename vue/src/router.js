@@ -14,33 +14,49 @@ import joinedmatch from './components/usercenter/JoinedMatch.vue'
 import judgedmatch from './components/usercenter/JudgedMatch.vue'
 import staredmatch from './components/usercenter/StaredMatch.vue'
 import userinfo from './components/usercenter/UserInfo.vue'
+import store from './store';
 
-import uploadbutton from './components/operation/Upload.vue'
+
 
 var router = new VueRouter({
   routes: [
     { path: '/', redirect: '/home' },
     { path: '/home', component: homepage },
     { path: '/matchlist', component: matchlistpage },
-    { path: '/login', component: loginpage },
+    { path: '/login', component: loginpage,},
     { path: '/register', component: registerpage },
     { path: '/list', component: listpage },
 
     {
       path: '/usercenter',
       component: usercenterpage,
+      meta:{
+        islogin:false,
+      },
       children: [
         { path: '', redirect: 'joined' },
-        { path: 'created', component: createdmatch },
-        { path: 'joined', component: joinedmatch },
-        { path: 'judged', component: judgedmatch },
-        { path: 'stared', component: staredmatch },
-        { path: 'userinfo', component: userinfo }
+        { path: 'created', component: createdmatch, meta:{islogin:false}},
+        { path: 'joined', component: joinedmatch, meta:{islogin:false} },
+        { path: 'judged', component: judgedmatch, meta:{islogin:false} },
+        { path: 'stared', component: staredmatch, meta:{islogin:false} },
+        { path: 'userinfo', component: userinfo, meta:{islogin:false} }
       ]
     },
-    { path: '/creatematch', component: creatematch },
-    { path: '/upload', component: uploadbutton}
+    { path: '/creatematch', component: creatematch, meta:{islogin:false} },
   ]
-})
+});
 
+router.beforeEach(function(to,from,next){
+  if(to.matched.some(record=>record.meta.islogin)){
+    if(store.state.islogin){
+      next();
+    }
+    else{
+      next({path:'/login',query:{redirect:to.fullPath}});
+    }
+  }
+  else{
+    next();
+  }
+});
 export default router
