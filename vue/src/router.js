@@ -4,7 +4,9 @@ import homepage from './components/pages/Home.vue'
 import matchlistpage from './components/pages/MatchList.vue'
 import loginpage from './components/pages/Login.vue'
 import registerpage from './components/pages/Register.vue'
-import usercenterpage from './components/pages/UserCenter.vue'
+import usercenterpage_competitor from './components/pages/UserCenter_competitor.vue'
+import usercenterpage_organizer from './components/pages/UserCenter_organizer.vue'
+import usercenterpage_jury from './components/pages/UserCenter_jury.vue'
 import creatematch from './components/pages/CreateMatch.vue'
 import listpage from './components/pages/List.vue'
 
@@ -48,15 +50,30 @@ var router = new VueRouter({
     { path: '/list', component: listpage },
 
     {
-      path: '/usercenter',
-      component: usercenterpage,
-      meta:{
-        islogin:false,
-      },
+      path: '/usercenter_competitor',
+      component: usercenterpage_competitor,
       children: [
         { path: '', redirect: 'joined' },
-        { path: 'created', component: createdmatch, meta:{islogin:false}},
         { path: 'joined', component: joinedmatch, meta:{islogin:false} },
+        { path: 'stared', component: staredmatch, meta:{islogin:false} },
+        { path: 'userinfo', component: userinfo, meta:{islogin:false} }
+      ]
+    },
+    {
+      path: '/usercenter_organizer',
+      component: usercenterpage_organizer,
+      children: [
+        { path: '', redirect: 'created' },
+        { path: 'created', component: createdmatch, meta:{islogin:false}},
+        { path: 'stared', component: staredmatch, meta:{islogin:false} },
+        { path: 'userinfo', component: userinfo, meta:{islogin:false} }
+      ]
+    },
+    {
+      path: '/usercenter_jury',
+      component: usercenterpage_jury,
+      children: [
+        { path: '', redirect: 'judged' },
         { path: 'judged', component: judgedmatch, meta:{islogin:false} },
         { path: 'stared', component: staredmatch, meta:{islogin:false} },
         { path: 'userinfo', component: userinfo, meta:{islogin:false} }
