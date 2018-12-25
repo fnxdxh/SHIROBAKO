@@ -9,6 +9,7 @@ import usercenterpage_organizer from './components/pages/UserCenter_organizer.vu
 import usercenterpage_jury from './components/pages/UserCenter_jury.vue'
 import creatematch from './components/pages/CreateMatch.vue'
 import listpage from './components/pages/List.vue'
+import matchinfopage from './components/pages/MatchInfo.vue'
 
 import competitor_register from './components/dialog/register_competitor.vue'
 import organizer_register from './components/dialog/register_organizer.vue'
@@ -31,6 +32,7 @@ var router = new VueRouter({
     { path: '/', redirect: '/home' },
     { path: '/home', component: homepage },
     { path: '/matchlist', component: matchlistpage },
+    { path: '/matchinfo', component: matchinfopage },
     { path: '/login', component: loginpage,
       children: [
         {path: '', redirect: 'competitor'},
