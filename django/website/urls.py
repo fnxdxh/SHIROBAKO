@@ -12,4 +12,12 @@ urlpatterns = [
     url(r'^index_competition_list/', index_competition_list),
     url(r'^upload/', file_upload),
     url(r'^create_competition/',create_competition),
+    url(r'^wait_list/', admin_to_confirm_list),
+    url(r'^recognize/', admin_to_confirm),
+    url(r'^upload_grade/', grade_upload),
+    url(r'^competition_detail/', competition_detail),
+    url(r'^sign_up/', competitor_sign_up),
+    url(r'^divide_paper/', divide_paper),
+    url(r'^file_list/', file_list),
+    
 ]
