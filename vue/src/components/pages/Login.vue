@@ -24,7 +24,8 @@ export default {
       form: {
         username: "",
         password: ""
-      }
+      },
+      isLogin:0
     };
   },
   methods: {
@@ -37,8 +38,11 @@ export default {
           console.log(result.body);
           if (result.body.error_num === 0) {
             alert("登陆成功");
+            this.isLogin = 1;
+            this.$router.replace('/usercenter');
           } else {
             alert("登录失败");
+            this.isLogin = 0;
           }
         });
     }

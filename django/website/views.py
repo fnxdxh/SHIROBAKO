@@ -367,15 +367,21 @@ def competitor_sign_up(request):
 # 参考：https://www.jianshu.com/p/1a5546ce0c92
 def file_upload(request):
     response = {}
+    print("ok")
+    print(request.user)
     if request.user.is_authenticated():
+        print("ok")
         if request.method == "POST":
-            file = request.FILES.get("file", None)
-            competition = request.POST.get("competition_name")
+            file = request.FILES.get("attachment", None)
+            competition = request.POST.get("competition")
+            print("ok")
             with open('tempates/file/%s' % file.name, 'wb+') as f:
                 for chunk in file.chunks():
                     f.write(chunk)
+            print("ok")
             file_url = os.path.join('/file', file.name).replace('\\', '/')
             url = "http://" + settings.SITE_DOMAIN + file_url
+            print(url)
             competitor = request.user.competitor
             try:
                 file = UserFile.objects.find(username=request.user.username, competition=competition)
