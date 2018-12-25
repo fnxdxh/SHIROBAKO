@@ -10,4 +10,5 @@ urlpatterns = [
     url(r'^login_jury/', jury_login),
     url(r'^index_competition_list/', index_competition_list),
     url(r'^upload/', file_upload),
+    url(r'^create_competition/',create_competition),
 ]

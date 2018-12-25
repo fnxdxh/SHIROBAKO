@@ -39,7 +39,7 @@
             name: 'mini程序竞赛',
             score: '90.8'
           }],
-          refs: ["http://127.0.0.1:8000/api/upload"]
+          refs: ["http://127.0.0.1:8000/api/upload/"]
         }
       },
       methods:{

@@ -75,8 +75,10 @@ def jury_register(request):
                 #salt = create_salt()
                 md5_pwd = create_md5(password)
                 uniq = uuid.uuid5(uuid.NAMESPACE_DNS, username)
+                print(md5_pwd)
+                print(username)
                 user = User.objects.create_user(username=username, password=md5_pwd, unique_id=uniq, user_type='Rat')
-                Jury.objects.create(user=user)
+                Jury.objects.create(user=user, tel="18853505212")
                 response['msg'] = 'success'
                 response['error_num'] = 0
             except:
@@ -145,33 +147,6 @@ def competitor_login(request):
     return JsonResponse(response)
 
 
-def organizer_login(request):
-    response = {}
-    if request.method == "POST":
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        if username and password:
-            pwd = create_md5(password)
-            user = authenticate(username=username, password=pwd)
-            if user is not None and (user.user_type == "Org"):
-                organizer = user.organizer
-                try:
-                    if organizer.status == Organizer.STATUS_CONFIRMED:
-                        login(request, user)
-                        response['msg'] = 'success'
-                        response['error_num'] = 0
-                    elif organizer.status == Organizer.STATUS_UNCONFIRM:
-                        response['msg'] = 'have not confirmed'
-                        response['error_num'] = 1
-                except:
-                    response['msg'] = 'failed'
-                    response['error_num'] = 1
-                return JsonResponse(response)
-    response['msg'] = 'failed'
-    response['error_num'] = 1
-    return JsonResponse(response)
-
-
 def jury_login(request):
     response = {}
     if request.method == "POST":
@@ -179,21 +154,53 @@ def jury_login(request):
         password = request.POST.get('password')
         if username and password:
             username = username.strip()
-            pwd = create_md5(password)
-            user = authenticate(username=username, password=pwd)
-            if user is not None and user.user_type == "Rat":
-                try:
-                    jury = Jury.objects.find(user=user)
+            try:
+                pwd = create_md5(password)
+                user = authenticate(username=username, password=pwd)
+                if user.user_type == "Rat":
                     login(request, user)
+                    request.session['username'] = username
+                    request.session.set_expiry(600)  #设置session的过期时间，为600s
                     response['msg'] = 'success'
                     response['error_num'] = 0
-                except:
-                    response['msg'] = 'no user'
+                else:
+                    response['msg'] = 'no permission'
                     response['error_num'] = 1
-                return JsonResponse(response)
+            except:
+                response['msg'] = 'no user'
+                response['error_num'] = 1
+            return JsonResponse(response)
     response['msg'] = 'create failed'
     response['error_num'] = 1
     return JsonResponse(response)
+
+def organizer_login(request):
+    response = {}
+    if request.method == "POST":
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        if username and password:
+            pwd = create_md5(password)
+            #user = authenticate(username=username, password=pwd)
+            try:
+                user = authenticate(username=username, password=pwd)
+            #if user is not None and (user.user_type == "Org"):
+                print(user.organizer.status)
+                if user.organizer.status == Organizer.STATUS_CONFIRMED:
+                    login(request, user)
+                    response['msg'] = 'success'
+                    response['error_num'] = 0
+                elif user.organizer.status == Organizer.STATUS_UNCONFIRM:
+                    response['msg'] = 'have not confirmed'
+                    response['error_num'] = 1
+            except:
+                response['msg'] = 'failed'
+                response['error_num'] = 1
+            return JsonResponse(response)
+    response['msg'] = 'failed'
+    response['error_num'] = 1
+    return JsonResponse(response)
+
 
 
 def admin_login(request):
@@ -367,15 +374,21 @@ def competitor_sign_up(request):
 # 参考：https://www.jianshu.com/p/1a5546ce0c92
 def file_upload(request):
     response = {}
+    print("ok")
+    print(request.user)
     if request.user.is_authenticated():
+        print("ok")
         if request.method == "POST":
-            file = request.FILES.get("file", None)
-            competition = request.POST.get("competition_name")
+            file = request.FILES.get("attachment", None)
+            competition = request.POST.get("competition")
+            print("ok")
             with open('tempates/file/%s' % file.name, 'wb+') as f:
                 for chunk in file.chunks():
                     f.write(chunk)
+            print("ok")
             file_url = os.path.join('/file', file.name).replace('\\', '/')
             url = "http://" + settings.SITE_DOMAIN + file_url
+            print(url)
             competitor = request.user.competitor
             try:
                 file = UserFile.objects.find(username=request.user.username, competition=competition)
@@ -602,27 +615,27 @@ def divide_paper(request):
 
 def create_competition(request):
     response = {}
-    #if request.user.is_authenticated():
-    if request.method == "POST":
-        title = request.POST.get('name')
-        description = request.POST.get('desc')
-        sign_up_start = request.POST.get('date1')
-        sign_up_end = request.POST.get('date2')
-        start_time = request.POST.get('date3')
-        end_time = request.POST.get("date4")
-        sponsor = request.POST.get('sponsor')
-        # there are some information of the competition
-        organizer = request.user.username
-        try:
-            competiton = Competition.objects.create(title=title, description=description, sign_up_end=sign_up_end, sign_up_start=sign_up_start, start_time=start_time, end_time=end_time,
-                                                    organizer=organizer, sponsor=sponsor)
-            response['msg'] = 'success'
-            response['error_num'] = 0
-        except:
-            response['msg'] = 'error'
-            response['error_num'] = 1
-        return JsonResponse(response)
-    response['msg'] = 'not POST'
+    if request.user.is_authenticated() and request.user.user_type=='Org':
+        if request.method == "POST":
+            title = request.POST.get('name')
+            description = request.POST.get('desc')
+            sign_up_start = request.POST.get('date1')
+            sign_up_end = request.POST.get('date2')
+            start_time = request.POST.get('date3')
+            end_time = request.POST.get("date4")
+            sponsor = request.POST.get('sponsor')
+            # there are some information of the competition
+            organizer = request.user.username
+            try:
+                competiton = Competition.objects.create(title=title, description=description, sign_up_end=sign_up_end, sign_up_start=sign_up_start, start_time=start_time, end_time=end_time,
+                                                        organizer=organizer, sponsor=sponsor)
+                response['msg'] = 'success'
+                response['error_num'] = 0
+            except:
+                response['msg'] = 'error'
+                response['error_num'] = 1
+            return JsonResponse(response)
+    response['msg'] = 'failed'
     response['error_num'] = 1
     return JsonResponse(response)
     #response['msg'] = 'not log in'
