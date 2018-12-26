@@ -226,12 +226,13 @@ def index_competition_list(request):
         for competition in competition_list:
             cmp = {}
             cmp['title'] = competition.title
-            cmp['organizer'] = competition.organizer
-            cmp['type'] = competition.type
-            start_time_list = competition.start_time.split(',')
-            cmp['start_time'] = start_time_list[0]
-            end_time_list = competition.end_time.split(',')
-            cmp['end_time'] = end_time_list[-1]
+            cmp['sponsor'] = competition.sponsor
+            #start_time_list = competition.start_time.split(',')
+            #cmp['start_time'] = start_time_list[0]
+            #cmp['start_time'] = competition.start_time
+            #end_time_list = competition.end_time.split(',')
+            #cmp['end_time'] = end_time_list[-1]
+            #cmp['end_time'] = competition.end_time
             cmp['msg'] = 'success'
             cmp['error_num'] = 0
             response.append(cmp)
@@ -338,16 +339,18 @@ def competitor_sign_up(request):
         if request.method == "GET":
             name = request.GET.get("competition_name")
             try:
-                competition = Competition.objects.find(title=name)
+                competition = Competition.objects.get(title=name)
                 if competitor.competition_list is not None:
-                    competitor.competition_list = competition.competition_list + "," + name
-                else:
-                    competition.competitor_list = str(competitor.uniq_id)
-                competitor.save()
-                if competition.competitor_list is not None:
-                    competitor.competition_list = competitor.competition_list + "," + str(competitor.uniq_id)
+                    competitor.competition_list = competitor.competition_list + "," + name
                 else:
                     competitor.competition_list = name
+                print(competitor.competition_list)
+                competitor.save()
+                if competition.competitor_list is not None:
+                    competition.competitor_list = competition.competitor_list + "," + request.user.username
+                else:
+                    competition.competitor_list = request.user.username
+                    print(competition.competitor_list)
                 competitor.save()
                 response['msg'] = 'success'
                 response['error_num'] = 0
@@ -552,6 +555,7 @@ def partition(Task,paper_count,per_person,file_list):
     for i in range(paper_count):
         Task[i/per_person][i%per_person] = file_list[i].file_url
         file_list[i].jury_count = file_list[i].jury_count + 1
+        print(file_list[i].jury_count)
         file_list[i].save()
 
 
@@ -581,15 +585,22 @@ def divide_paper(request):
     if request.user.is_authenticated() and request.user.user_type == "Org":
         if request.method == "POST":
             title = request.POST.get("competition_name")
+            print(title)
             per_time = int(request.POST.get("time")) #阅卷次数
+            print(per_time)
             file_list=[]
             jury_li = []
             try:
-                competition = Competition.objects.find(title=title, organizer=request.user.username)
+                print(request.user.username)
+                competition = Competition.objects.get(title=title, organizer=request.user.username)
                 user_list = competition.competitor_list.split(",")
+                print(user_list)
                 paper_count = len(user_list)  #试卷数量
+                print(paper_count)
                 jury_list = competition.jury_list.split(",")
+                print(jury_list)
                 jury_count = len(jury_list)   #阅卷人数
+                print(jury_count)
                 per_person = paper_count/jury_count + 1 #每个人平均任务量
                 for user in user_list:
                     new_file = UserFile.objects.find(username=user, competition=title)
