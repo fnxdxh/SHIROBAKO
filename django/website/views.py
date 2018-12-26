@@ -380,7 +380,7 @@ def file_upload(request):
         print("ok")
         if request.method == "POST":
             #competition = request.POST.get("competition")
-            file = request.FILES.get("file", None)
+            file = request.FILES.get("userfile", None)
             competition = request.POST.get('competition')
             name = file.name.split('.')
             file_name = name[0] + request.user.unique_id[0:10] + '.'+name[-1] 
@@ -391,7 +391,6 @@ def file_upload(request):
             print("ok")
             file_url = os.path.join('/file', file_name).replace('\\', '/')
             url = "http://" + settings.SITE_DOMAIN + file_url
-            
             #competitor = request.user.competitor
             try:
                 file = UserFile.objects.find(username=request.user.username, competition=competition)
@@ -530,11 +529,11 @@ def admin_to_confirm_list(request):
         org['msg'] = 'no'
         org['error_num'] = 0
         organizer_list.append(org)
-        return JsonResponse(organizer_list)
+        return JsonResponse(json.dumps(organizer_list))
     org['msg'] = 'failed'
     org['error_num'] = 1
     organizer_list.append(org)
-    return JsonResponse(organizer_list)
+    return JsonResponse(json.dumps(organizer_list))
 
 
 def admin_to_confirm(request):
