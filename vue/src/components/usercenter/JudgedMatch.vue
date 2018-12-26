@@ -12,7 +12,7 @@
         label="进入评审"
         width="200">
         <template slot-scope="scope">
-        <router-link to="/judgematch"><el-button type="primary">进入评审</el-button></router-link>
+        <router-link :to="{name: 'judge',params:{competition: scope.row.name}}"><el-button type="primary">进入评审</el-button></router-link>
       </template>
       </el-table-column>
       <el-table-column

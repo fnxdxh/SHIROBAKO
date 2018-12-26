@@ -88,7 +88,7 @@ var router = new VueRouter({
       ]
     },
     { path: '/creatematch', component: creatematch, meta:{islogin:false} },
-    { path: '/judgematch', component: judgematch, meta:{islogin:false}}
+    { path: '/judgematch/:competition',name: 'judge' , component: judgematch, meta:{islogin:false}}
   ]
 });
 

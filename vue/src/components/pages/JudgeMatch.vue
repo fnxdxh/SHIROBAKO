@@ -4,8 +4,8 @@
     :data="tableData"
     style="width: 100%">
         <el-table-column
-        prop="index"
-        label="作品序号"
+        prop="name"
+        label="作品名"
         width="180">
         </el-table-column>
         <el-table-column
@@ -22,17 +22,16 @@
         </el-table-column>
         <el-table-column
         label="评分"
-        width="400"
-        type="number">
+        width="400">
         <template slot-scope="scope">
         <el-input placeholder="请输入分数，分数介于0~100分内。" clearable type="number" v-model="score">
-            <el-button type="primary" slot="append">提交分数</el-button>
+            <el-button type="primary" slot="append" @click="UpdateScore(scope.row.name,scope.row.score)">提交分数</el-button>
         </el-input>
         </template>
         </el-table-column>
     </el-table>
     <p></p>
-    <router-link to="/usercenter/judged"><el-button>返回</el-button></router-link>
+    <router-link to="/usercenter_jury/judged"><el-button>返回</el-button></router-link>
 </div>
 </template>
 
@@ -41,16 +40,16 @@ export default {
     data(){
         return{
             tableData: [{
-            index: '1',
+            name: 'helloworld.zip',
             score: '15.7'
             }, {
-            index: '2',
+            name: 'fucktheworld.txt',
             score: ''
             }, {
-            index: '3',
+            name: 'nicetomeetyou.rar',
             score: '18.6'
             }, {
-            index: '4',
+            name: 'mi.txt',
             score: '100'
             }],
         }
@@ -79,8 +78,11 @@ export default {
             URL.revokeObjectURL(aTag.href);
             }
         },
-        UpdateScore(){
-            this.$http.post('http://127.0.0.1:8000/api/upload_grade/',)
+        UpdateScore(filename,score,path){
+            let temp_list = this.$router.path.split('/');
+            let competition = temp_list[temp_list.length - 1];
+            let score_list = {grade: score, filename: filename,title: competition};
+            this.$http.post('http://127.0.0.1:8000/api/upload_grade/',score_list);
         }
     }
 }

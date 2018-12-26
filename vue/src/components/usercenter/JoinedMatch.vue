@@ -11,7 +11,7 @@
         label="上传文件"
         width="400">
         <template slot-scope="scope">
-        <el-input style="width: 260px" type="file" @change="getFile($event, scope.row.name)">上传</el-input>
+        <input style="width: 260px" type="file" @change="getFile($event,scope.row.name)">上传</input>
         <el-button type="primary"  @click="FileUpload">上传文件</el-button>
       </template>
       </el-table-column>
@@ -28,42 +28,45 @@
         return {
           tableData: [{
             name: '小程序竞赛',
-            score: '18.5'
+            score: '18.5',
           }, {
             name: '大程序竞赛',
-            score: '24.0'
+            score: '24.0',
           }, {
             name: '中程序竞赛',
-            score: ''
+            score: '',
           }, {
             name: 'mini程序竞赛',
-            score: '90.8'
+            score: '90.8',
           }],
           refs: ["http://127.0.0.1:8000/api/upload/"]
         }
       },
       methods:{
-        FileUpload(name){
-            this.file = this.upath;
+        FileUpload(){
             this.errText = '';
-            this.$emit('input', this.file);
-            let formData = new FormData();
-            formData.append("attachment", this.file);
-            formData.append("competition", this.competition);
-            console.log("ok");
+            //this.$emit('input', this.file);
+            //let formData = new FormData();
+            //var formData = new FormData();
+            var formData = new window.FormData();
+            formData.append('userfile', document.querySelector('input[type=file]').files[0]);
+            //formData.append("file", this.file);
+            console.log(formData.get('userfile'));
+            formData.append('competition', this.competition);
+            console.log(formData.get('competition'));
             this.$http.post(this.refs[0], formData,{
                 headers:{
                     'Content-Type': 'multipart/form-data'
                 }
             }).then(function(res){})
+            
         },
-        getFile(event, name) {
-        console.log(event);
-        this.upath = event.files;
-        this.competition = name;
-        }
+        getFile(e,name){
+          console.log(e);
+          this.file = e.target.files[0];
+          this.competition = name;
       }
-      
+      } 
     }
   </script>
 
