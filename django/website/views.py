@@ -677,6 +677,7 @@ def invite_jury(request):
                         competition.jury_list = competition.jury_list + "," + jury
                     else:
                         competition.jury_list = jury
+                    print(competition.jury_list)
                     competition.save()
                     JuryFile.objects.create(jury=jury, competition=title)
                 response['msg'] = 'success'
