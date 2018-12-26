@@ -11,6 +11,7 @@ urlpatterns = [
     url(r'^login_superuser/', admin_login),
     url(r'^index_competition_list/', index_competition_list),
     url(r'^upload/', file_upload),
+    url(r'^create_file/', create_file),
     url(r'^create_competition/',create_competition),
     url(r'^wait_list/', admin_to_confirm_list),
     url(r'^recognize/', admin_to_confirm),

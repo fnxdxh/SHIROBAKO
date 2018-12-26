@@ -379,21 +379,23 @@ def file_upload(request):
     if request.user.is_authenticated():
         print("ok")
         if request.method == "POST":
-            file = request.FILES.get("file", None)
             #competition = request.POST.get("competition")
-            competition = file.name
-            print("ok")
-            with open('tempates/file/%s' % file.name, 'wb+') as f:
+            file = request.FILES.get("file", None)
+            competition = request.POST.get('competition')
+            name = file.name.split('.')
+            file_name = name[0] + request.user.unique_id[0:10] + '.'+name[-1] 
+            print(file_name)
+            with open('templates/file/%s' % file_name, 'wb+') as f:
                 for chunk in file.chunks():
                     f.write(chunk)
             print("ok")
-            file_url = os.path.join('/file', file.name).replace('\\', '/')
+            file_url = os.path.join('/file', file_name).replace('\\', '/')
             url = "http://" + settings.SITE_DOMAIN + file_url
-            print(url)
-            competitor = request.user.competitor
+            
+            #competitor = request.user.competitor
             try:
                 file = UserFile.objects.find(username=request.user.username, competition=competition)
-                file.file_url = file.name
+                file.file_url = url
                 file.save()
                 response['msg'] = 'success'
                 response['error_num'] = 0
@@ -576,6 +578,10 @@ def assign(Task,jury_li,m,k,per_person):
             Task[m][i].jury_list = jury_li[k].jury
         else:
             Task[m][i].jury_list = Task[m][i].jury_list + "," + jury_li[k].jury
+        if Task[m][i].grade_list is None:
+            Task[m][i].grade_list = '0'
+        else:
+            Task[m][i].grade_list = Task[m][i].grade_list + ",0" 
         Task[m][i].jury_count = Task[m][i].jury_count + 1
         Task[m][i].save()
 

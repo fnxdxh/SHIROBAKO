@@ -86,11 +86,20 @@ class TestIndexCompetitionList(unittest.TestCase):
         response = c.get('/api/index_competition_list/')
         response = json.loads(response.content)
         print(response)
-        self.assertEqual(response,"[{'title': 'test', 'organizer': 'org2', 'type': '', 'start_time': '2018-12-26', 'end_time': '2018-12-26', 'msg': 'success', 'error_num': 0}, {'title': 'test1', 'organizer': 'organizer1', 'type': '', 'start_time': '2018-12-26', 'end_time': '2018-12-26', 'msg': 'success', 'error_num': 0}, {'title': 'test2', 'organizer': 'organizer2', 'type': '', 'start_time': '2018-12-26', 'end_time': '2018-12-26', 'msg': 'success', 'error_num': 0}, {'title': 'test3', 'organizer': 'organizer3', 'type': '', 'start_time': '2018-12-26', 'end_time': '2018-12-26', 'msg': 'success', 'error_num': 0}]")
+        self.assertEqual(response,[{'title': 'test', 'organizer': 'org2', 'type': '', 'start_time': '2018-12-26', 'end_time': '2018-12-26', 'msg': 'success', 'error_num': 0}, {'title': 'test1', 'organizer': 'organizer1', 'type': '', 'start_time': '2018-12-26', 'end_time': '2018-12-26', 'msg': 'success', 'error_num': 0}, {'title': 'test2', 'organizer': 'organizer2', 'type': '', 'start_time': '2018-12-26', 'end_time': '2018-12-26', 'msg': 'success', 'error_num': 0}, {'title': 'test3', 'organizer': 'organizer3', 'type': '', 'start_time': '2018-12-26', 'end_time': '2018-12-26', 'msg': 'success', 'error_num': 0}])
 
 class TestUploadFile(unittest.TestCase):
+    def setUp(self):
+        user = User.objects.create_user(username="comp1", password=md5(("2018").encode('utf-8')).hexdigest(), user_type="Comp")
+        Competitor.objects.create(user=user)
+
     def test_upload_file(self):
         c = Client()
-        c.post('/api/login',{'username':'','password':})
-        with open('test.txt') as fp:
-            c.post('/api/upload/', {'name':'小程序竞赛'，'attachment':fp})
+        c.post('/api/login_competitor/',{'username':'comp1','password':'2018'})
+        with open('test.txt','rb') as fp:
+            response = c.post('/api/upload/', {'file':fp})
+            content = json.loads(response.content)
+            print(content['msg'])
+            self.assertEqual(content['msg'], "success")
+            res = c.post('/api/create_file/',{'url':content['url'],'competition':'小程序竞赛'})
+            self.assertEqual(res.content.decode('utf-8'), '{"msg": "success", "error_num": 0}')
