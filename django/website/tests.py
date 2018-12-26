@@ -97,7 +97,9 @@ class TestUploadFile(unittest.TestCase):
         c = Client()
         c.post('/api/login_competitor/',{'username':'comp1','password':'2018'})
         with open('test.txt','rb') as fp:
-            response = c.post('/api/upload/', {'file':fp,'competition':'小程序竞赛'})
+            response = c.post('/api/upload/', {'file':fp})
             content = json.loads(response.content)
-            print(content)
+            print(content['msg'])
             self.assertEqual(content['msg'], "success")
+            res = c.post('/api/create_file/',{'url':content['url'],'competition':'小程序竞赛'})
+            self.assertEqual(res.content.decode('utf-8'), '{"msg": "success", "error_num": 0}')
