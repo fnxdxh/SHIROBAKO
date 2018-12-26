@@ -4,7 +4,7 @@
     :data="tableData"
     style="width: 100%">
         <el-table-column
-        prop="name"
+        prop="filename"
         label="作品名"
         width="180">
         </el-table-column>
@@ -12,20 +12,15 @@
         label="下载文件"
         width="180">
         <template slot-scope="scope">
-            <el-button type="primary"  @click="FileDownload(scope.row.name)">下载文件</el-button>
+            <el-button type="primary"  @click="FileDownload(scope.row.filename)">下载文件</el-button>
         </template>
-        </el-table-column>
-        <el-table-column
-        prop="score"
-        label="评分结果"
-        width="110">
         </el-table-column>
         <el-table-column
         label="评分"
         width="400">
         <template slot-scope="scope">
-        <el-input placeholder="请输入分数，分数介于0~100分内。" clearable type="number" v-model="score">
-            <el-button type="primary" slot="append" @click="UpdateScore(scope.row.name,scope.row.score)">提交分数</el-button>
+        <el-input placeholder="请输入分数，分数介于0~100分内。" clearable type="number" v-model="scope.row.score">
+            <el-button type="primary" slot="append" @click="UpdateScore(scope.row.filename,scope.row.score)">提交分数</el-button>
         </el-input>
         </template>
         </el-table-column>
@@ -52,43 +47,49 @@ export default {
             name: 'mi.txt',
             score: '100'
             }],
+            file_list: []
         }
     },
     methods:{
         FileDownload(filename){
             var formData = new window.FormData();
             formData.append('filename', filename);
-            this.$http.post('http://127.0.0.1:8000/api/file_download/',formData,
-            {headers:{'Content-Type':'multipart/form-data'}}).then(response => {
+            this.$http.post('http://localhost:8000/api/file_download/',formData).then(response => {
             console.log(response.data);
             // get body data
-             const blob = new Blob([response.body]);
+            this.file = response.body;
+            }, response => {
+                console.log("error");
+            });
+            const blob = new Blob([this.file]);
             if (window.navigator.msSaveOrOpenBlob) {
             // 兼容IE10
                 navigator.msSaveBlob(blob, filename);
-                console.log(response.body);
-                console.log('IE10');
             } 
             else {
             //  chrome/firefox
             let aTag = document.createElement('a');
             aTag.download = filename;
             aTag.href = URL.createObjectURL(blob);
-            console.log(response.body);
-            console.log('Chrome');
             aTag.click();
             URL.revokeObjectURL(aTag.href);
-            }}, response => {
-                console.log("error");
-            
-            });
-            },
+            }
+        },
         UpdateScore(filename,score,path){
             let temp_list = this.$router.path.split('/');
             let competition = temp_list[temp_list.length - 1];
             let score_list = {grade: score, filename: filename,title: competition};
             this.$http.post('http://127.0.0.1:8000/api/upload_grade/',score_list);
         }
+    },
+    mounted(){
+      this.$http.get('http://127.0.0.1:8000/api/file_list/').then(response=>{
+        let json_list = response.body.json()
+        for(let i = 0;i < json_list.length;i++){
+          json_list[i].score = 0;
+          this.file_list.append(json_list[i]);
+        }
+      });;
     }
 }
 </script>

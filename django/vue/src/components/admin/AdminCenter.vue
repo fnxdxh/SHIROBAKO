@@ -1,6 +1,10 @@
 <template>
     <div>
-        <h1>{{msg}}</h1>
+        <el-table :data="tabledata">
+            <el-table-column prop="username" label="待审核主办方">
+            </el-table-column>
+        </el-table>
+        
     </div>
 </template>
 
@@ -8,19 +12,19 @@
 export default {
     data(){
         return {
-            msg: {}
+            tabledata: []
         }
     },
     methods: {
-        getmsg(){
+        gettabledata(){
             this.$http.get('api/wait_list/').then(result => {
                 console.log(result.body)
-                this.msg = result.body
+                this.tabledata = result.body
             })
         }
     },
     created(){
-        this.getmsg()
+        this.gettabledata()
     }
 }
 </script>
