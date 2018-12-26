@@ -617,12 +617,19 @@ def create_competition(request):
     if request.user.is_authenticated() and request.user.user_type=='Org':
         if request.method == "POST":
             title = request.POST.get('title')
+            print(title)
             description = request.POST.get('description')
+            print(description)
             sign_up_start = request.POST.get('sign_up_start')
+            print(sign_up_start)
             sign_up_end = request.POST.get('sign_up_end')
+            print(sign_up_end)
             start_time = request.POST.get('start_time')
+            print(start_time)
             end_time = request.POST.get("end_time")
+            print(end_time)
             sponsor = request.POST.get('sponsor')
+            print(title)
             # there are some information of the competition
             organizer = request.user.username
             try:
