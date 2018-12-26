@@ -521,27 +521,30 @@ def admin_to_confirm_list(request):
         organizers = Organizer.objects.filter(status=Organizer.STATUS_UNCONFIRM)
         if organizers is not None:
             for organizer in organizers:
-                org['username'] = organizer.username
+                org['username'] = organizer.user.username
+                org['uniq_id'] = organizer.user.unique_id
                 org['msg'] = 'success'
                 org['error_num'] = 0
                 organizer_list.append(org)
-            return JsonResponse(organizer_list)
+            return HttpResponse(json.dumps(organizer_list))
         org['msg'] = 'no'
         org['error_num'] = 0
         organizer_list.append(org)
-        return JsonResponse(json.dumps(organizer_list))
+        return HttpResponse(json.dumps(organizer_list))
     org['msg'] = 'failed'
     org['error_num'] = 1
     organizer_list.append(org)
-    return JsonResponse(json.dumps(organizer_list))
+    return HttpResponse(json.dumps(organizer_list))
 
 
 def admin_to_confirm(request):
     response = {}
     if request.method == "POST":
         username = request.POST.get('username')
+        unique_id = request.POST.get('unique_id')
         try:
-            organizer = Organizer.objects.find(username=username, status=Organizer.STATUS_UNCONFIRM)
+            user = Usre.objects.find(username=username, unique_id=unique_id,user_type="Org")
+            organizer = Organizer.objects.find(user=user, status=Organizer.STATUS_UNCONFIRM)
             organizer.status = Organizer.STATUS_CONFIRMED
             organizer.save()
             response['msg'] = 'success'
