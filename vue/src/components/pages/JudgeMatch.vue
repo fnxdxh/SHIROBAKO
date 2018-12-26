@@ -24,7 +24,7 @@
         label="评分"
         width="400">
         <template slot-scope="scope">
-        <el-input placeholder="请输入分数，分数介于0~100分内。" clearable type="number" v-model="score">
+        <el-input placeholder="请输入分数，分数介于0~100分内。" clearable type="number" v-model="scope.row.score">
             <el-button type="primary" slot="append" @click="UpdateScore(scope.row.name,scope.row.score)">提交分数</el-button>
         </el-input>
         </template>
@@ -56,7 +56,7 @@ export default {
     },
     methods:{
         FileDownload(){
-            this.$http.get('http://localhost:8000/api/file_upload/').then(response => {
+            this.$http.get('http://localhost:8000/api/file_download/').then(response => {
             console.log(response.data);
             // get body data
             this.file = response.body;
@@ -78,10 +78,13 @@ export default {
             URL.revokeObjectURL(aTag.href);
             }
         },
-        UpdateScore(filename,score,path){
-            let temp_list = this.$router.path.split('/');
+        UpdateScore(filename,score){
+            let temp_list = this.$route.path.split('/');
+            console.log(temp_list);
             let competition = temp_list[temp_list.length - 1];
+            console.log(competition);
             let score_list = {grade: score, filename: filename,title: competition};
+            console.log(score_list);
             this.$http.post('http://127.0.0.1:8000/api/upload_grade/',score_list);
         }
     }

@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-table
-      :data="compet_list"
+      :data="tableData"
       style="width: 100%">
       <el-table-column
         prop="name"
