@@ -34,7 +34,7 @@ export default {
         //   this.$store.state.islogin = ture
         //   this.$store.state.identify = 1
         this.$store.commit('login', 1)
-          this.$router.push({path: '/usercenter_competitor'})
+        this.$router.push({path: '/usercenter_competitor'})
         } else {
           alert("登录失败");
         }
