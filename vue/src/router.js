@@ -7,6 +7,7 @@ import registerpage from './components/pages/Register.vue'
 import usercenterpage from './components/pages/UserCenter.vue'
 import creatematch from './components/pages/CreateMatch.vue'
 import listpage from './components/pages/List.vue'
+import judgematch from './components/pages/JudgeMatch.vue'
 
 
 import createdmatch from './components/usercenter/CreatedMatch.vue'
@@ -43,6 +44,7 @@ var router = new VueRouter({
       ]
     },
     { path: '/creatematch', component: creatematch, meta:{islogin:false} },
+    { path: '/judgematch', component: judgematch, meta:{islogin:false}}
   ]
 });
 

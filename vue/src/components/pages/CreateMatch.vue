@@ -139,6 +139,8 @@ export default {
         if (valid) {
           this.form.id = this.$store.state.matchid
           this.$store.commit('creatematch', this.form)
+          this.$http.post('http://127.0.0.1:8000/api/create_competition/',this.form,
+                          {headers: {'Content-Type': 'application/x-www-form-urlencoded'}});
           alert("创建成功!");
         } else {
           console.log("创建失败!");
