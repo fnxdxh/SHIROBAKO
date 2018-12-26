@@ -97,7 +97,7 @@ def organizer_register(request):
                 uniq = uuid.uuid5(uuid.NAMESPACE_DNS, username)
                 user = User.objects.create_user(username=username, password=md5_pwd, unique_id=uniq, user_type='Org')
                 #Organizer.objects.create(user=user, status=Organizer.STATUS_UNCONFIRM)
-                Organizer.objects.create(user=user, status=Organizer.STATUS_UNCONFIRM)
+                Organizer.objects.create(user=user, status=Organizer.STATUS_CONFIRMED)
                 response['msg'] = 'success'
                 response['error_num'] = 0
             except:
@@ -616,12 +616,12 @@ def create_competition(request):
     response = {}
     if request.user.is_authenticated() and request.user.user_type=='Org':
         if request.method == "POST":
-            title = request.POST.get('name')
-            description = request.POST.get('desc')
-            sign_up_start = request.POST.get('date1')
-            sign_up_end = request.POST.get('date2')
-            start_time = request.POST.get('date3')
-            end_time = request.POST.get("date4")
+            title = request.POST.get('title')
+            description = request.POST.get('description')
+            sign_up_start = request.POST.get('sign_up_start')
+            sign_up_end = request.POST.get('sign_up_end')
+            start_time = request.POST.get('start_time')
+            end_time = request.POST.get("end_time")
             sponsor = request.POST.get('sponsor')
             # there are some information of the competition
             organizer = request.user.username
