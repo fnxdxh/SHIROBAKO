@@ -375,7 +375,10 @@ def competitor_sign_up(request):
 # 参考：https://www.jianshu.com/p/1a5546ce0c92
 def file_upload(request):
     response = {}
+    print("ok")
+    print(request.user)
     if request.user.is_authenticated():
+        print("ok")
         if request.method == "POST":
             #competition = request.POST.get("competition")
             file = request.FILES.get("userfile", None)
@@ -383,10 +386,10 @@ def file_upload(request):
             name = file.name.split('.')
             file_name = name[0] + request.user.unique_id[0:10] + '.'+name[-1] 
             print(file_name)
-            print(request.user.unique_id)
             with open('templates/file/%s' % file_name, 'wb+') as f:
                 for chunk in file.chunks():
                     f.write(chunk)
+            print("ok")
             file_url = os.path.join('/file', file_name).replace('\\', '/')
             url = "http://" + settings.SITE_DOMAIN + file_url
             #competitor = request.user.competitor
@@ -394,13 +397,11 @@ def file_upload(request):
                 file = UserFile.objects.find(username=request.user.username, competition=competition)
                 file.file_url = url
                 file.save()
-                response['url'] = url
                 response['msg'] = 'success'
                 response['error_num'] = 0
                 return JsonResponse(response)
             except:
                 UserFile.objects.create(username=request.user.username, competition=competition, file_url=url)
-                response['url'] = url
                 response['msg'] = 'success'
                 response['error_num'] = 0
                 return JsonResponse(response)
@@ -476,16 +477,16 @@ def file_list(request):
                     org['msg'] = 'success'
                     org['error_num'] = 0
                     response.append(org)
-                return HttpResponse(json.dumps(response))
+                return JsonResponse(response)
             except:
                 org['msg'] = 'failed'
                 org['error_num'] = 1
                 response.append(org)
-                return HttpResponse(json.dumps(response))
+                return JsonResponse(response)
     org['msg'] = 'not login'
     org['error_num'] = 0
     response.append(org)
-    return HttpResponse(json.dumps(response))
+    return JsonResponse(response)
 
 
 def competition_detail(request):
