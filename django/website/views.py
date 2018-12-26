@@ -269,11 +269,11 @@ def competitor_competition_list(request):
                     org['msg'] = 'success'
                     org['error_num'] = 0
                     response.append(org)
-                return JsonResponse(json.dumps(response))
+                return HttpResponse(json.dumps(response))
             fail_msg['msg'] = 'no competition'
             fail_msg['error_num'] = 1
             response.append(fail_msg)
-            return JsonResponse(json.dumps(response))
+            return HttpResponse(json.dumps(response))
         except:
             fail_msg['msg'] = 'failed'
             fail_msg['error_num'] = 1
