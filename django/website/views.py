@@ -101,7 +101,8 @@ def organizer_register(request):
                 md5_pwd = create_md5(password)
                 uniq = uuid.uuid5(uuid.NAMESPACE_DNS, username)
                 user = User.objects.create_user(username=username, password=md5_pwd, unique_id=uniq, user_type='Org')
-                Organizer.objects.create(user=user, status=Organizer.STATUS_UNCONFIRM)
+                #Organizer.objects.create(user=user, status=Organizer.STATUS_UNCONFIRM)
+                Organizer.objects.create(user=user, status=Organizer.STATUS_CONFIRMED)
                 response['msg'] = 'success'
                 response['error_num'] = 0
             except:
@@ -543,7 +544,7 @@ def admin_to_confirm(request):
         username = request.POST.get('username')
         unique_id = request.POST.get('unique_id')
         try:
-            user = Usre.objects.find(username=username, unique_id=unique_id,user_type="Org")
+            user = User.objects.find(username=username, unique_id=unique_id,user_type="Org")
             organizer = Organizer.objects.find(user=user, status=Organizer.STATUS_UNCONFIRM)
             organizer.status = Organizer.STATUS_CONFIRMED
             organizer.save()
