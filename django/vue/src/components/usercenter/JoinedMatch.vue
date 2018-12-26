@@ -1,9 +1,9 @@
 <template>
     <el-table
-      :data="tableData"
+      :data="compet_list"
       style="width: 100%">
       <el-table-column
-        prop="name"
+        prop="title"
         label="竞赛名称"
         width="180">
       </el-table-column>
@@ -14,10 +14,6 @@
         <input style="width: 260px" type="file" @change="getFile($event,scope.row.name)">上传</input>
         <el-button type="primary"  @click="FileUpload">上传文件</el-button>
       </template>
-      </el-table-column>
-      <el-table-column
-        prop="score"
-        label="评分结果">
       </el-table-column>
     </el-table>
   </template>
@@ -39,7 +35,8 @@
             name: 'mini程序竞赛',
             score: '90.8',
           }],
-          refs: ["http://127.0.0.1:8000/api/upload/"]
+          refs: ["http://127.0.0.1:8000/api/upload/"],
+          compet_list: []
         }
       },
       methods:{
@@ -66,7 +63,15 @@
           this.file = e.target.files[0];
           this.competition = name;
       }
-      } 
+    },
+    mounted(){
+      this.$http.get('http://127.0.0.1:8000/api/competitor_competition_list/').then(response=>{
+        let json_list = response.body.json()
+        for(let i = 0;i < json_list.length;i++){
+          this.compet_list.append(json_list[i]);
+        }
+      });;
+    }
     }
   </script>
 

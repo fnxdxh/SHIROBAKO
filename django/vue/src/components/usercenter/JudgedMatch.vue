@@ -1,10 +1,10 @@
 <template>
   <div>
     <el-table
-      :data="tableData"
+      :data="compet_list"
       style="width: 100%">
       <el-table-column
-        prop="name"
+        prop="title"
         label="竞赛名称"
         width="180">
       </el-table-column>
@@ -40,9 +40,18 @@ export default {
             name: 'mini程序竞赛',
             date: '2018.11.14'
           }],
-          refs: ["http://127.0.0.1:8000/upload"]
+          refs: ["http://127.0.0.1:8000/upload"],
+          compet_list: []
         }
-      }
+      },
+      mounted(){
+      this.$http.get('http://127.0.0.1:8000/api/organizer_competition_list/').then(response=>{
+        let json_list = response.body.json()
+        for(let i = 0;i < json_list.length;i++){
+          this.compet_list.append(json_list[i]);
+        }
+      });;
+    }
 }
 </script>
 
