@@ -102,7 +102,7 @@ def organizer_register(request):
                 uniq = uuid.uuid5(uuid.NAMESPACE_DNS, username)
                 user = User.objects.create_user(username=username, password=md5_pwd, unique_id=uniq, user_type='Org')
                 #Organizer.objects.create(user=user, status=Organizer.STATUS_UNCONFIRM)
-                Organizer.objects.create(user=user, status=Organizer.STATUS_CONFIRMED)
+                Organizer.objects.create(user=user, status=Organizer.STATUS_UNCONFIRM)
                 response['msg'] = 'success'
                 response['error_num'] = 0
             except:
@@ -269,18 +269,18 @@ def competitor_competition_list(request):
                     org['msg'] = 'success'
                     org['error_num'] = 0
                     response.append(org)
-                return JsonResponse(json.dumps(response))
+                return HttpResponse(json.dumps(response))
             fail_msg['msg'] = 'no competition'
             fail_msg['error_num'] = 1
             response.append(fail_msg)
-            return JsonResponse(json.dumps(response))
+            return HttpResponse(json.dumps(response))
         except:
             fail_msg['msg'] = 'failed'
             fail_msg['error_num'] = 1
     fail_msg['msg'] = 'no user'
     fail_msg['error_num'] = 1
     response.append(fail_msg)
-    return JsonResponse(json.dumps(response))
+    return HttpResponse(json.dumps(response))
 
 
 def jury_competition_list(request):
@@ -299,18 +299,18 @@ def jury_competition_list(request):
                     org['error_num'] = 0
                     response.append(org)
                     
-                return JsonResponse(response)
+                return HttpResponse(json.dumps(response))
             fail_msg['msg'] = 'recent has no competition'
             fail_msg['error_num'] = 1
             response.append(fail_msg)
-            return JsonResponse(response)
+            return HttpResponse(json.dumps(response))
         except:
             fail_msg['msg'] = 'failed'
             fail_msg['error_num'] = 1
     fail_msg['msg'] = 'failed'
     fail_msg['error_num'] = 1
     response.append(fail_msg)
-    return JsonResponse(response)
+    return HttpResponse(json.dumps(response))
 
 
 def organizer_competition_list(request):
@@ -328,18 +328,18 @@ def organizer_competition_list(request):
                     org['msg'] = 'success'
                     org['error_num'] = 0
                     response.append(org)
-                return JsonResponse(response)
+                return HttpResponse(json.dumps(response))
             fail_msg['msg'] = 'recent has no competition'
             fail_msg['error_num'] = 1
             response.append(fail_msg)
-            return JsonResponse(response)
+            return HttpResponse(json.dumps(response))
         except:
             fail_msg['msg'] = 'failed'
             fail_msg['error_num'] = 1
     fail_msg['msg'] = 'failed'
     fail_msg['error_num'] = 1
     response.append(fail_msg)
-    return JsonResponse(response)
+    return HttpResponse(json.dumps(response))
 
 
 def competitor_sign_up(request):
@@ -389,21 +389,23 @@ def file_upload(request):
             with open('templates/file/%s' % file_name, 'wb+') as f:
                 for chunk in file.chunks():
                     f.write(chunk)
-            print("ok")
-            file_url = os.path.join('/file', file_name).replace('\\', '/')
-            url = "http://" + settings.SITE_DOMAIN + file_url
+            file_url = os.path.join('templates/file', file_name).replace('\\', '/')
+            #url = "http://" + settings.SITE_DOMAIN + file_url
             #competitor = request.user.competitor
+            
             try:
                 file = UserFile.objects.find(username=request.user.username, competition=competition)
-                file.file_url = url
+                file.file_url = file_name
                 file.save()
+                response['url'] = file_name
                 response['msg'] = 'success'
                 response['error_num'] = 0
                 return JsonResponse(response)
             except:
-                UserFile.objects.create(username=request.user.username, competition=competition, file_url=url)
+                UserFile.objects.create(username=request.user.username, competition=competition, file_url=file_name)
                 response['msg'] = 'success'
                 response['error_num'] = 0
+                response['url'] = file_name
                 return JsonResponse(response)
     response['msg'] = 'not login'
     response['error_num'] = 1
@@ -414,7 +416,8 @@ def file_upload(request):
 #           https://blog.csdn.net/qq_30291335/article/details/79497911
 def file_download(request):
     if request.method == "POST":
-        file = request.POST.get('file')
+        file = request.POST.get('filename')
+        filename = os.path.join('templates/file', file).replace('\\', '/')
         try:
             def file_iterator(file_name, chunk_size=512):
                 with open(file_name) as f:
@@ -477,16 +480,16 @@ def file_list(request):
                     org['msg'] = 'success'
                     org['error_num'] = 0
                     response.append(org)
-                return JsonResponse(response)
+                return HttpResponse(json.dumps(response))
             except:
                 org['msg'] = 'failed'
                 org['error_num'] = 1
                 response.append(org)
-                return JsonResponse(response)
+                return HttpResponse(json.dumps(response))
     org['msg'] = 'not login'
     org['error_num'] = 0
     response.append(org)
-    return JsonResponse(response)
+    return HttpResponse(json.dumps(response))
 
 
 def competition_detail(request):
@@ -617,6 +620,7 @@ def divide_paper(request):
                     j = i
                     for count in range(jury_count):
                         assign(Task,jury_li,count,j,per_person)
+                return HttpResponse("success")
             except:
                 return HttpResponse("divide fail")
         return HttpResponse("method wrong")
@@ -712,15 +716,15 @@ def search_competition(request):
                 org['msg'] = 'success'
                 org['error_num'] = 0
                 response.append(org)
-                return JsonResponse(response)
+                return HttpResponse(json.dumps(response))
             org['msg'] = 'no result'
             org['error_num'] = 1
             response.append(org)
-            return JsonResponse(response)
+            return HttpResponse(json.dumps(response))
     org['msg'] = 'failed'
     org['error_num'] = 1
     response.append(org)
-    return JsonResponse(response)
+    return HttpResponse(json.dumps(response))
 
 
 

@@ -46,6 +46,17 @@ class TestJuryLogin(unittest.TestCase):
         response = c.post('/api/login_jury/', {'username': 'jury', 'password': '2018'})
         self.assertEqual(response.content.decode('utf-8'), '{"msg": "success", "error_num": 0}')
 
+class TestAdminLogin(unittest.TestCase):
+    def setUp(self):
+        user = User.objects.create_superuser(username="superuser",email="", password=md5(("2018").encode('utf-8')).hexdigest(), user_type="SU")
+
+    def test_admin_login(self):
+        c = Client()
+        response = c.post('/api/login_superuser/', {'username': 'superuser', 'password': md5(("2018").encode('utf-8')).hexdigest()})
+        self.assertEqual(response.content.decode('utf-8'), '{"msg": "success", "error_num": 0}')
+
+
+
 class TestOrganizerLogin(unittest.TestCase):
     def setUp(self):
         user = User.objects.create_user(username="org", password=md5(("2018").encode('utf-8')).hexdigest(), user_type="Org")
@@ -88,6 +99,10 @@ class TestIndexCompetitionList(unittest.TestCase):
         print(response)
         self.assertEqual(response,[{'title': 'test', 'organizer': 'org2', 'type': '', 'start_time': '2018-12-26', 'end_time': '2018-12-26', 'msg': 'success', 'error_num': 0}, {'title': 'test1', 'organizer': 'organizer1', 'type': '', 'start_time': '2018-12-26', 'end_time': '2018-12-26', 'msg': 'success', 'error_num': 0}, {'title': 'test2', 'organizer': 'organizer2', 'type': '', 'start_time': '2018-12-26', 'end_time': '2018-12-26', 'msg': 'success', 'error_num': 0}, {'title': 'test3', 'organizer': 'organizer3', 'type': '', 'start_time': '2018-12-26', 'end_time': '2018-12-26', 'msg': 'success', 'error_num': 0}])
 
+class TestCompetitorCompetitionList(unittest.TestCase):
+    def test_competitor_competition_list(self):
+        c = Client()
+
 class TestUploadFile(unittest.TestCase):
     def setUp(self):
         user = User.objects.create_user(username="comp1", password=md5(("2018").encode('utf-8')).hexdigest(), user_type="Comp")
@@ -97,9 +112,14 @@ class TestUploadFile(unittest.TestCase):
         c = Client()
         c.post('/api/login_competitor/',{'username':'comp1','password':'2018'})
         with open('test.txt','rb') as fp:
-            response = c.post('/api/upload/', {'file':fp})
+            response = c.post('/api/upload/', {'userfile':fp,'competition':'小程序竞赛'})
             content = json.loads(response.content)
-            print(content['msg'])
+            print(content['url'])
             self.assertEqual(content['msg'], "success")
-            res = c.post('/api/create_file/',{'url':content['url'],'competition':'小程序竞赛'})
-            self.assertEqual(res.content.decode('utf-8'), '{"msg": "success", "error_num": 0}')
+
+'''class TestDownloadFile(unittest.TestCase):
+    def test_download_file(self):
+        c = Client()
+
+
+class TestDividePaper(unittest.TestCase):'''

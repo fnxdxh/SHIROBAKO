@@ -56,7 +56,7 @@ export default {
     },
     methods:{
         FileDownload(){
-            this.$http.get('http://localhost:8000/api/file_upload/').then(response => {
+            this.$http.post('http://localhost:8000/api/file_download/',{'filename':'test.txt'}).then(response => {
             console.log(response.data);
             // get body data
             this.file = response.body;
