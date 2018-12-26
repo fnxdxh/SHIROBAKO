@@ -137,6 +137,22 @@ export default {
     submitForm(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
+          let str1 = this.dateToString(this.form.date1);
+          let str2 = this.dateToString(this.form.date2);
+          let str3 = this.dateToString(this.form.date3);
+          let str4 = this.dateToString(this.form.date4);
+          console.log(str1);
+          console.log(str2);
+          console.log(str3);
+          console.log(str4);
+          this.form.date1 = str1;
+          this.form.date2 = str2;
+          this.form.date3 = str3;
+          this.form.date4 = str4;
+          console.log(this.form.date1);
+          console.log(this.form.date2);
+          console.log(this.form.date3);
+          console.log(this.form.date4);
           this.form.id = this.$store.state.matchid
           this.$store.commit('creatematch', this.form)
           this.$http.post('http://127.0.0.1:8000/api/create_competition/',this.form,
@@ -167,7 +183,20 @@ export default {
     handleRemove(file, fileList){
       fileList.length = 0;
       this.img = "";
-    }
+    },
+    dateToString(date){ 
+      var year = date.getFullYear(); 
+      var month =(date.getMonth() + 1).toString(); 
+      var day = (date.getDate()).toString();  
+      if (month.length == 1) { 
+        month = "0" + month; 
+      } 
+      if (day.length == 1) { 
+        day = "0" + day; 
+      }
+      var dateTime = year + "-" + month + "-" + day;
+      return dateTime; 
+  }
   }
 };
 </script>
