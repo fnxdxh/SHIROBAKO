@@ -139,7 +139,7 @@ export default {
       this.$refs[formtitle].validate(valid => {
         if (valid) {
           this.$http
-            .post("api/create_competition/", this.form, {
+            .post("http://127.0.0.1:8000/api/create_competition/", this.form, {
               headers: { "Content-Type": "application/x-www-form-urlencoded" }
             })
             .then(result => {
