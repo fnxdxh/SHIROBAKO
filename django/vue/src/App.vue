@@ -10,8 +10,8 @@
           </el-col>
           <el-col :span="8">
             <el-menu mode="horizontal" :router="true">
-              <el-menu-item index="home">首页</el-menu-item>
-              <el-menu-item index="matchlist">赛事</el-menu-item>
+              <el-menu-item index="/home">首页</el-menu-item>
+              <el-menu-item index="/matchlist">赛事</el-menu-item>
             </el-menu>
           </el-col>
           <el-col :span="5">
@@ -21,8 +21,18 @@
             <i class="el-icon-bell"></i>
           </el-col>
           <el-col :span="4">
-            <div v-if="$store.state.islogin">
-              <router-link to="/usercenter">
+            <div v-if="$store.state.identify === 1">
+              <router-link to="/usercenter_competitor">
+                <img src="src\assets\images\photo.jpg">
+              </router-link>
+            </div>
+            <div v-else-if="$store.state.identify === 2">
+              <router-link to="/usercenter_organizer">
+                <img src="src\assets\images\photo.jpg">
+              </router-link>
+            </div>
+            <div v-else-if="$store.state.identify === 3">
+              <router-link to="/usercenter_jury">
                 <img src="src\assets\images\photo.jpg">
               </router-link>
             </div>
