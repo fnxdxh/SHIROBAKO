@@ -13,10 +13,8 @@ export default{
       msg:{key: '初始msg'}
     }
   },
-  created(){
-    this.$http.get('api/index_competition_list/').then(result => {
-      this.msg = result.body
-    })
+  created: {
+
   }
 }
 </script>
