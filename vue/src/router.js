@@ -10,6 +10,7 @@ import usercenterpage_jury from './components/pages/UserCenter_jury.vue'
 import creatematch from './components/pages/CreateMatch.vue'
 import listpage from './components/pages/List.vue'
 import matchinfopage from './components/pages/MatchInfo.vue'
+import judgematch from './components/pages/JudgeMatch.vue'
 
 import adminlogin from './components/admin/AdminLogin.vue'
 import admincenter from './components/admin/AdminCenter.vue'
@@ -87,6 +88,7 @@ var router = new VueRouter({
       ]
     },
     { path: '/creatematch', component: creatematch, meta:{islogin:false} },
+    { path: '/judgematch', component: judgematch, meta:{islogin:false}}
   ]
 });
 
