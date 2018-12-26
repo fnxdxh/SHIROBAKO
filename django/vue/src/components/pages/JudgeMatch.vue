@@ -16,11 +16,16 @@
         </template>
         </el-table-column>
         <el-table-column
+        prop="score"
+        label="评分结果"
+        width="110">
+        </el-table-column>
+        <el-table-column
         label="评分"
         width="400">
         <template slot-scope="scope">
-        <el-input placeholder="请输入分数，分数介于0~100分内。" clearable type="number" v-model="scope.row.score">
-            <el-button type="primary" slot="append" @click="UpdateScore(scope.row.filename,scope.row.score)">提交分数</el-button>
+        <el-input placeholder="请输入分数，分数介于0~100分内。" clearable type="number" v-model="score">
+            <el-button type="primary" slot="append" @click="UpdateScore(scope.row.name,scope.row.score)">提交分数</el-button>
         </el-input>
         </template>
         </el-table-column>
@@ -47,7 +52,6 @@ export default {
             name: 'mi.txt',
             score: '100'
             }],
-            file_list: []
         }
     },
     methods:{
@@ -80,15 +84,6 @@ export default {
             let score_list = {grade: score, filename: filename,title: competition};
             this.$http.post('http://127.0.0.1:8000/api/upload_grade/',score_list);
         }
-    },
-    mounted(){
-      this.$http.get('http://127.0.0.1:8000/api/file_list/').then(response=>{
-        let json_list = response.body.json()
-        for(let i = 0;i < json_list.length;i++){
-          json_list[i].score = 0;
-          this.file_list.append(json_list[i]);
-        }
-      });;
     }
 }
 </script>
