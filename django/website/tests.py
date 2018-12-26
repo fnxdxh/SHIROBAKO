@@ -9,15 +9,6 @@ import json
 
 
 class TestRegister(unittest.TestCase):
-    '''def setUp(self):
-        user = User.objects.create_user(username="comp", password=md5(("2018").encode('utf-8')).hexdigest(), user_type="Comp")
-        user = User.objects.create(username="goood", password="1b3d0dcbbe36bbb35e3820ead8856fbb", salt="mHTT")
-        Competitor.objects.create(user=user)
-        user = User.objects.create_user(username="org", password=md5(("2018").encode('utf-8')).hexdigest(), user_type="Org")
-        Organizer.objects.create(user=user,status=Organizer.STATUS_UNCONFIRM)
-        user = User.objects.create_user(username="jury", password=md5(("2018").encode('utf-8')).hexdigest(), user_type="Rat")
-        Jury.objects.create(user=user)
-        call_command('loaddata', 'myfixture', verbosity=0)'''
 
     def test_competitor_register(self):
         c = Client()
@@ -37,12 +28,7 @@ class TestRegister(unittest.TestCase):
 class TestCompetitorLogin(unittest.TestCase):
     def setUp(self):
         user = User.objects.create_user(username="comp", password=md5(("2018").encode('utf-8')).hexdigest(), user_type="Comp")
-        #user = User.objects.create(username="goood", password="1b3d0dcbbe36bbb35e3820ead8856fbb", salt="mHTT")
         Competitor.objects.create(user=user)
-        #user = User.objects.create_user(username="org3", password=md5(("2018").encode('utf-8')).hexdigest(), user_type="Org")
-        #Organizer.objects.create(user=user,status=Organizer.STATUS_UNCONFIRM,competition_list="")
-        #user = User.objects.create_user(username="jury3", password=md5(("2018").encode('utf-8')).hexdigest(), user_type="Rat")
-        #Jury.objects.create(user=user,competition_list="")
 
     def test_competitor_login(self):
         c = Client()
@@ -67,8 +53,7 @@ class TestOrganizerLogin(unittest.TestCase):
 
         user = User.objects.create_user(username="org1", password=md5(("2018").encode('utf-8')).hexdigest(), user_type="Org")
         Organizer.objects.create(user=user,status=Organizer.STATUS_CONFIRMED)
-        #user = User.objects.create_user(username="jury3", password=md5(("2018").encode('utf-8')).hexdigest(), user_type="Rat")
-        #Jury.objects.create(user=user,competition_list="")
+
     def test_organizer_login(self):
         c = Client()
         response = c.post('/api/login_organizer/', {'username': 'org', 'password': '2018'})
@@ -99,6 +84,13 @@ class TestIndexCompetitionList(unittest.TestCase):
     def test_index_competition_list(self):
         c = Client()
         response = c.get('/api/index_competition_list/')
-        response = json.loads(response)
+        response = json.loads(response.content)
         print(response)
+        self.assertEqual(response,"[{'title': 'test', 'organizer': 'org2', 'type': '', 'start_time': '2018-12-26', 'end_time': '2018-12-26', 'msg': 'success', 'error_num': 0}, {'title': 'test1', 'organizer': 'organizer1', 'type': '', 'start_time': '2018-12-26', 'end_time': '2018-12-26', 'msg': 'success', 'error_num': 0}, {'title': 'test2', 'organizer': 'organizer2', 'type': '', 'start_time': '2018-12-26', 'end_time': '2018-12-26', 'msg': 'success', 'error_num': 0}, {'title': 'test3', 'organizer': 'organizer3', 'type': '', 'start_time': '2018-12-26', 'end_time': '2018-12-26', 'msg': 'success', 'error_num': 0}]")
 
+class TestUploadFile(unittest.TestCase):
+    def test_upload_file(self):
+        c = Client()
+        c.post('/api/login',{'username':'','password':})
+        with open('test.txt') as fp:
+            c.post('/api/upload/', {'name':'小程序竞赛'，'attachment':fp})

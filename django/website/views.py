@@ -227,7 +227,7 @@ def admin_login(request):
 
 def index_competition_list(request):
     now_time = timezone.now()
-    competition_list = Competition.objects.filter(Q(sign_up_start__gte=now_time) & Q(sign_up_end__lt=now_time))
+    competition_list = Competition.objects.filter(Q(sign_up_start__gte=now_time) | Q(sign_up_end__lt=now_time))
     response = []
     if competition_list is not None:
         for competition in competition_list:
@@ -243,14 +243,14 @@ def index_competition_list(request):
             cmp['error_num'] = 0
             response.append(cmp)
             print(response)
-        return json.dumps(response)
+        return HttpResponse(json.dumps(response))
     cmp = {}
     cmp['msg'] = 'no data failed'
     cmp['error_num'] = 1
     response.append(cmp)
     print(json.dumps(response))
     print(cmp)
-    return json.dumps(response)
+    return HttpResponse(json.dumps(response))
 
 
 def competitor_competition_list(request):
@@ -379,8 +379,9 @@ def file_upload(request):
     if request.user.is_authenticated():
         print("ok")
         if request.method == "POST":
-            file = request.FILES.get("attachment", None)
-            competition = request.POST.get("competition")
+            file = request.FILES.get("file", None)
+            #competition = request.POST.get("competition")
+            competition = file.name
             print("ok")
             with open('tempates/file/%s' % file.name, 'wb+') as f:
                 for chunk in file.chunks():
