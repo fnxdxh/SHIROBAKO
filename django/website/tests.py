@@ -99,9 +99,11 @@ class TestIndexCompetitionList(unittest.TestCase):
         print(response)
         self.assertEqual(response,[{'title': 'test', 'organizer': 'org2', 'type': '', 'start_time': '2018-12-26', 'end_time': '2018-12-26', 'msg': 'success', 'error_num': 0}, {'title': 'test1', 'organizer': 'organizer1', 'type': '', 'start_time': '2018-12-26', 'end_time': '2018-12-26', 'msg': 'success', 'error_num': 0}, {'title': 'test2', 'organizer': 'organizer2', 'type': '', 'start_time': '2018-12-26', 'end_time': '2018-12-26', 'msg': 'success', 'error_num': 0}, {'title': 'test3', 'organizer': 'organizer3', 'type': '', 'start_time': '2018-12-26', 'end_time': '2018-12-26', 'msg': 'success', 'error_num': 0}])
 
-class TestCompetitorCompetitionList(unittest.TestCase):
+'''class TestCompetitorCompetitionList(unittest.TestCase):
     def test_competitor_competition_list(self):
         c = Client()
+        response'''
+
 
 class TestUploadFile(unittest.TestCase):
     def setUp(self):
@@ -117,9 +119,22 @@ class TestUploadFile(unittest.TestCase):
             print(content['url'])
             self.assertEqual(content['msg'], "success")
 
-'''class TestDownloadFile(unittest.TestCase):
+
+class TestDownloadFile(unittest.TestCase):
     def test_download_file(self):
         c = Client()
+        response = c.post('/api/download_file/',{''})
 
 
-class TestDividePaper(unittest.TestCase):'''
+class TestDividePaper(unittest.TestCase):
+    def setUp(self):
+        user = User.objects.create_user(username="org3", password=md5(("2018").encode('utf-8')).hexdigest(), user_type="Org")
+        Organizer.objects.create(user=user,status=Organizer.STATUS_CONFIRMED)
+        Competition.objects.create(title='test4', description='test4', sign_up_end='2018-12-25', sign_up_start='2018-12-25', start_time='2018-12-26', end_time='2018-12-26',
+                                                        organizer='org3', sponsor='sponsor4')
+
+
+    def test_divide_paper(self):
+        c = Client()
+        c.post('/api/login_organizer/', {'username': 'org3', 'password': '2018'})
+        response = c.post('/api/divide_paper/',{'competition_name':'小程序竞赛','time':3})

@@ -12,7 +12,7 @@
         label="下载文件"
         width="180">
         <template slot-scope="scope">
-            <el-button type="primary"  @click="FileDownload">下载文件</el-button>
+            <el-button type="primary"  @click="FileDownload(scope.row.name)">下载文件</el-button>
         </template>
         </el-table-column>
         <el-table-column
@@ -55,15 +55,18 @@ export default {
         }
     },
     methods:{
-        FileDownload(){
-            this.$http.post('http://localhost:8000/api/file_download/',{'filename':'test.txt'}).then(response => {
+        FileDownload(filename){
+            var formData = new window.FormData();
+            formData.append('filename', filename);
+            this.$http.post('http://127.0.0.1:8000/api/file_download/',formData,
+            {headers:{'Content-Type':'multipart/form-data'}}).then(response => {
             console.log(response.data);
             // get body data
             this.file = response.body;
             }, response => {
                 console.log("error");
             });
-            let filename = this.file.name;
+            
             const blob = new Blob([this.file]);
             if (window.navigator.msSaveOrOpenBlob) {
             // 兼容IE10

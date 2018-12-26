@@ -12,6 +12,7 @@ from django.contrib import auth
 import os
 import uuid
 import json
+from django.utils.encoding import escape_uri_path
 from django.db.models import Q
 from django.contrib.auth import authenticate, login, logout
 from .models import User, Competitor, Organizer, Jury, Competition, UserFile, SuperUser, JuryFile
@@ -417,6 +418,7 @@ def file_upload(request):
 def file_download(request):
     if request.method == "POST":
         file = request.POST.get('filename')
+        print(file)
         filename = os.path.join('templates/file', file).replace('\\', '/')
         try:
             def file_iterator(file_name, chunk_size=512):
@@ -428,9 +430,9 @@ def file_download(request):
                         else:
                             break
             #filename = "test.txt"
-            response = StreamingHttpResponse(file_iterator(file))
+            response = StreamingHttpResponse(file_iterator(filename))
             response['Content-Type'] = 'application/octet-stream'
-            response['Content-Disposition'] = 'attachment;filename="{0}"'.format(file)
+            response['Content-Disposition'] = "attachment;filename*=utf-8''{}".format(escape_uri_path(filename))
             return response
         except:
             return HttpResponse("download failed")
@@ -593,7 +595,7 @@ def assign(Task,jury_li,m,k,per_person):
 
 
 def divide_paper(request):
-    if request.user.is_authenticated():
+    if request.user.is_authenticated() and request.user.user_type == "Org":
         if request.method == "POST":
             title = request.POST.get("competition_name")
             per_time = int(request.POST.get("time")) #阅卷次数
