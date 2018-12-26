@@ -88,7 +88,7 @@ ROOT_URLCONF = 'mysite.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'vue/dist').replace('\\', '/')],
+        'DIRS': [ 'vue/dist'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -158,5 +158,5 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "vue/dist"),
+    os.path.join(BASE_DIR, "vue/dist/static"),
 ]

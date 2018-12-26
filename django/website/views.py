@@ -101,7 +101,8 @@ def organizer_register(request):
                 md5_pwd = create_md5(password)
                 uniq = uuid.uuid5(uuid.NAMESPACE_DNS, username)
                 user = User.objects.create_user(username=username, password=md5_pwd, unique_id=uniq, user_type='Org')
-                Organizer.objects.create(user=user, status=Organizer.STATUS_UNCONFIRM)
+                #Organizer.objects.create(user=user, status=Organizer.STATUS_UNCONFIRM)
+                Organizer.objects.create(user=user, status=Organizer.STATUS_CONFIRMED)
                 response['msg'] = 'success'
                 response['error_num'] = 0
             except:
@@ -374,10 +375,7 @@ def competitor_sign_up(request):
 # 参考：https://www.jianshu.com/p/1a5546ce0c92
 def file_upload(request):
     response = {}
-    print("ok")
-    print(request.user)
     if request.user.is_authenticated():
-        print("ok")
         if request.method == "POST":
             #competition = request.POST.get("competition")
             file = request.FILES.get("userfile", None)
@@ -385,10 +383,10 @@ def file_upload(request):
             name = file.name.split('.')
             file_name = name[0] + request.user.unique_id[0:10] + '.'+name[-1] 
             print(file_name)
+            print(request.user.unique_id)
             with open('templates/file/%s' % file_name, 'wb+') as f:
                 for chunk in file.chunks():
                     f.write(chunk)
-            print("ok")
             file_url = os.path.join('/file', file_name).replace('\\', '/')
             url = "http://" + settings.SITE_DOMAIN + file_url
             #competitor = request.user.competitor
@@ -396,11 +394,13 @@ def file_upload(request):
                 file = UserFile.objects.find(username=request.user.username, competition=competition)
                 file.file_url = url
                 file.save()
+                response['url'] = url
                 response['msg'] = 'success'
                 response['error_num'] = 0
                 return JsonResponse(response)
             except:
                 UserFile.objects.create(username=request.user.username, competition=competition, file_url=url)
+                response['url'] = url
                 response['msg'] = 'success'
                 response['error_num'] = 0
                 return JsonResponse(response)
@@ -476,16 +476,16 @@ def file_list(request):
                     org['msg'] = 'success'
                     org['error_num'] = 0
                     response.append(org)
-                return JsonResponse(response)
+                return HttpResponse(json.dumps(response))
             except:
                 org['msg'] = 'failed'
                 org['error_num'] = 1
                 response.append(org)
-                return JsonResponse(response)
+                return HttpResponse(json.dumps(response))
     org['msg'] = 'not login'
     org['error_num'] = 0
     response.append(org)
-    return JsonResponse(response)
+    return HttpResponse(json.dumps(response))
 
 
 def competition_detail(request):
@@ -521,27 +521,30 @@ def admin_to_confirm_list(request):
         organizers = Organizer.objects.filter(status=Organizer.STATUS_UNCONFIRM)
         if organizers is not None:
             for organizer in organizers:
-                org['username'] = organizer.username
+                org['username'] = organizer.user.username
+                org['uniq_id'] = organizer.user.unique_id
                 org['msg'] = 'success'
                 org['error_num'] = 0
                 organizer_list.append(org)
-            return JsonResponse(organizer_list)
+            return HttpResponse(json.dumps(organizer_list))
         org['msg'] = 'no'
         org['error_num'] = 0
         organizer_list.append(org)
-        return JsonResponse(json.dumps(organizer_list))
+        return HttpResponse(json.dumps(organizer_list))
     org['msg'] = 'failed'
     org['error_num'] = 1
     organizer_list.append(org)
-    return JsonResponse(json.dumps(organizer_list))
+    return HttpResponse(json.dumps(organizer_list))
 
 
 def admin_to_confirm(request):
     response = {}
     if request.method == "POST":
         username = request.POST.get('username')
+        unique_id = request.POST.get('unique_id')
         try:
-            organizer = Organizer.objects.find(username=username, status=Organizer.STATUS_UNCONFIRM)
+            user = User.objects.find(username=username, unique_id=unique_id,user_type="Org")
+            organizer = Organizer.objects.find(user=user, status=Organizer.STATUS_UNCONFIRM)
             organizer.status = Organizer.STATUS_CONFIRMED
             organizer.save()
             response['msg'] = 'success'
