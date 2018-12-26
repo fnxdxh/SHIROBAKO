@@ -44,15 +44,11 @@ def competitor_register(request):
     if request.method == "POST":
         username = request.POST.get('username')
         password = request.POST.get('password')
-        print(username)
-        print(password)
         if username and password:
             try:
                 #salt = create_salt()
                 md5_pwd = create_md5(password)
                 uniq = uuid.uuid5(uuid.NAMESPACE_DNS, username)
-                print(md5_pwd)
-                print(username)
                 user = User.objects.create_user(username=username, password=md5_pwd, unique_id=uniq, user_type='Comp')
                 Competitor.objects.create(user=user)
                 response['msg'] = 'success'
@@ -76,8 +72,6 @@ def jury_register(request):
                 #salt = create_salt()
                 md5_pwd = create_md5(password)
                 uniq = uuid.uuid5(uuid.NAMESPACE_DNS, username)
-                print(md5_pwd)
-                print(username)
                 user = User.objects.create_user(username=username, password=md5_pwd, unique_id=uniq, user_type='Rat')
                 Jury.objects.create(user=user, tel="18853505212")
                 response['msg'] = 'success'
@@ -127,8 +121,6 @@ def competitor_login(request):
                 #salt = user.salt
                 pwd = create_md5(password)
                 #if pwd == user.password:
-                print(pwd)
-                print(username)
                 user = authenticate(username=username, password=pwd)
                 #user = User.objects.find(username=username, password=pwd)
                 if user.user_type == "Comp":
@@ -187,7 +179,6 @@ def organizer_login(request):
             try:
                 user = authenticate(username=username, password=pwd)
             #if user is not None and (user.user_type == "Org"):
-                print(user.organizer.status)
                 if user.organizer.status == Organizer.STATUS_CONFIRMED:
                     login(request, user)
                     response['msg'] = 'success'
@@ -244,14 +235,11 @@ def index_competition_list(request):
             cmp['msg'] = 'success'
             cmp['error_num'] = 0
             response.append(cmp)
-            print(response)
         return HttpResponse(json.dumps(response))
     cmp = {}
     cmp['msg'] = 'no data failed'
     cmp['error_num'] = 1
     response.append(cmp)
-    print(json.dumps(response))
-    print(cmp)
     return HttpResponse(json.dumps(response))
 
 
@@ -376,17 +364,13 @@ def competitor_sign_up(request):
 # 参考：https://www.jianshu.com/p/1a5546ce0c92
 def file_upload(request):
     response = {}
-    print("ok")
-    print(request.user)
     if request.user.is_authenticated():
-        print("ok")
         if request.method == "POST":
             #competition = request.POST.get("competition")
             file = request.FILES.get("userfile", None)
             competition = request.POST.get('competition')
             name = file.name.split('.')
             file_name = name[0] + request.user.unique_id[0:10] + '.'+name[-1] 
-            print(file_name)
             with open('templates/file/%s' % file_name, 'wb+') as f:
                 for chunk in file.chunks():
                     f.write(chunk)
@@ -418,7 +402,6 @@ def file_upload(request):
 def file_download(request):
     if request.method == "POST":
         file = request.POST.get('filename')
-        print(file)
         filename = os.path.join('templates/file', file).replace('\\', '/')
         try:
             def file_iterator(file_name, chunk_size=512):
@@ -661,30 +644,30 @@ def create_competition(request):
 
 def invite_jury(request):
     response = {}
+    empty = []
     if request.user.is_authenticated():
         if request.method == "POST":
             jury = request.POST.get("jury")
             title = request.POST.get("competition_name")
             try:
-                pre_jury = JuryFile.objects.filter(jury=jury, competition=title)
-                if pre_jury is not None:
-                    response['msg'] = 'exist'
-                    response['error_num'] = 1
-                    return JsonResponse(response)
-                else:
-                    competition = Competition.objects.find(title=title, organizer=request.user.username)
-                    if competition.jury_list is not None:
-                        competition.jury_list = competition.jury_list + "," + jury
-                    else:
+                pre_jury = JuryFile.objects.find(jury=jury, competition=title)
+                response['msg'] = 'exist'
+                response['error_num'] = 1
+                return JsonResponse(response)
+            except:
+                try:
+                    competition = Competition.objects.get(title=title,organizer=request.user.username)
+                    if competition.jury_list == "":
                         competition.jury_list = jury
-                    print(competition.jury_list)
+                    else:
+                        competition.jury_list = competition.jury_list + "," + jury
                     competition.save()
                     JuryFile.objects.create(jury=jury, competition=title)
-                response['msg'] = 'success'
-                response['error_num'] = 0
-            except:
-                response['msg'] = 'error'
-                response['error_num'] = 1
+                    response['msg'] = 'success'
+                    response['error_num'] = 0
+                except:
+                    response['msg'] = 'error'
+                    response['error_num'] = 1
             return JsonResponse(response)
         response['msg'] = 'not POST'
         response['error_num'] = 1

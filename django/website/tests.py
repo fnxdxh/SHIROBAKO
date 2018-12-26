@@ -94,8 +94,7 @@ class TestIndexCompetitionList(unittest.TestCase):
         c = Client()
         response = c.get('/api/index_competition_list/')
         response = json.loads(response.content)
-        print(response)
-        self.assertEqual(response,[{'title': 'test', 'organizer': 'org2', 'type': '', 'start_time': '2018-12-26', 'end_time': '2018-12-26', 'msg': 'success', 'error_num': 0}, {'title': 'test1', 'organizer': 'organizer1', 'type': '', 'start_time': '2018-12-26', 'end_time': '2018-12-26', 'msg': 'success', 'error_num': 0}, {'title': 'test2', 'organizer': 'organizer2', 'type': '', 'start_time': '2018-12-26', 'end_time': '2018-12-26', 'msg': 'success', 'error_num': 0}, {'title': 'test3', 'organizer': 'organizer3', 'type': '', 'start_time': '2018-12-26', 'end_time': '2018-12-26', 'msg': 'success', 'error_num': 0}])
+        self.assertEqual(response,[{'title': 'test', 'organizer': 'org2', 'type': '', 'start_time': '2018-12-26', 'end_time': '2018-12-26', 'msg': 'success', 'error_num': 0}, {'title': 'test1', 'organizer': 'organizer1', 'type': '', 'start_time': '2018-12-26', 'end_time': '2018-12-26', 'msg': 'success', 'error_num': 0}, {'title': 'test2', 'organizer': 'organizer2', 'type': '', 'start_time': '2018-12-26', 'end_time': '2018-12-26', 'msg': 'success', 'error_num': 0}])
 
 '''class TestCompetitorCompetitionList(unittest.TestCase):
     def test_competitor_competition_list(self):
@@ -114,7 +113,6 @@ class TestUploadFile(unittest.TestCase):
         with open('test.txt','rb') as fp:
             response = c.post('/api/upload/', {'userfile':fp,'competition':'小程序竞赛'})
             content = json.loads(response.content)
-            print(content['url'])
             self.assertEqual(content['msg'], "success")
 
 
