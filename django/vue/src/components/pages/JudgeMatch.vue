@@ -62,25 +62,27 @@ export default {
             {headers:{'Content-Type':'multipart/form-data'}}).then(response => {
             console.log(response.data);
             // get body data
-            this.file = response.body;
-            }, response => {
-                console.log("error");
-            });
-            
-            const blob = new Blob([this.file]);
+             const blob = new Blob([response.body]);
             if (window.navigator.msSaveOrOpenBlob) {
             // 兼容IE10
                 navigator.msSaveBlob(blob, filename);
+                console.log(response.body);
+                console.log('IE10');
             } 
             else {
             //  chrome/firefox
             let aTag = document.createElement('a');
             aTag.download = filename;
             aTag.href = URL.createObjectURL(blob);
+            console.log(response.body);
+            console.log('Chrome');
             aTag.click();
             URL.revokeObjectURL(aTag.href);
-            }
-        },
+            }}, response => {
+                console.log("error");
+            
+            });
+            },
         UpdateScore(filename,score,path){
             let temp_list = this.$router.path.split('/');
             let competition = temp_list[temp_list.length - 1];
