@@ -128,10 +128,12 @@ class TestInviteJury(unittest.TestCase):
         c = Client()
         c.post('/api/login_organizer/', {'username': 'org3', 'password': '2018'})
         response = c.post('/api/invite_jury/',{"jury":"jury1","competition_name":"test3"})
-        print(response.content)
+        self.assertEqual(response.content.decode('utf-8'), '{"msg": "success", "error_num": 0}')
 
-'''class TestDividePaper(unittest.TestCase):
+class TestDividePaper(unittest.TestCase):
     def setUp(self):
+        user = User.objects.create_user(username="jury2", password=md5(("2018").encode('utf-8')).hexdigest(), user_type="Rat")
+        Jury.objects.create(user=user)
         user = User.objects.create_user(username="org4", password=md5(("2018").encode('utf-8')).hexdigest(), user_type="Org")
         Organizer.objects.create(user=user,status=Organizer.STATUS_CONFIRMED)
         Competition.objects.create(title='test4', description='test4', sign_up_end='2018-12-25', sign_up_start='2018-12-25', start_time='2018-12-26', end_time='2018-12-26',
@@ -141,4 +143,4 @@ class TestInviteJury(unittest.TestCase):
     def test_divide_paper(self):
         c = Client()
         c.post('/api/login_organizer/', {'username': 'org3', 'password': '2018'})
-        response = c.post('/api/divide_paper/',{'competition_name':'小程序竞赛','time':3})'''
+        response = c.post('/api/divide_paper/',{'competition_name':'小程序竞赛','time':3})
