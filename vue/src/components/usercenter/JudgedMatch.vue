@@ -4,7 +4,7 @@
       :data="compet_list"
       style="width: 100%">
       <el-table-column
-        prop="name"
+        prop="title"
         label="竞赛名称"
         width="180">
       </el-table-column>
