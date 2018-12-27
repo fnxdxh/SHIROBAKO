@@ -54,7 +54,7 @@
       <el-main>
         <router-view></router-view>
       </el-main>
-      <el-footer id="footer">Footer</el-footer>
+      <el-footer id="footer"></el-footer>
     </el-container>
   </div>
 </template>
