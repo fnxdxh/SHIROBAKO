@@ -5,7 +5,8 @@
         <el-row>
           <el-col :span="3">
             <router-link to="/home">
-              <img src="src\assets\images\logo.jpg">
+              <!-- <img src="\src\assets\images\logo.jpg"> -->
+              <img src="\vue\src\asserts\images\logo.jpg">
             </router-link>
           </el-col>
           <el-col :span="8">

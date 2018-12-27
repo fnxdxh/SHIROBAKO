@@ -96,7 +96,7 @@ export default {
         username:""
       },
       fileList: [],
-      items: {username: ""}
+      items: {username: ""},
       rules: {
         title: [{ required: true, message: "请输入竞赛名称", trigger: "blur" }],
         sponsor: [{ required: true, message: "请输入主办方", trigger: "blur" }],
