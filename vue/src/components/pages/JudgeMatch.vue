@@ -81,6 +81,7 @@ export default {
             console.log(competition);
             let score_list = {grade: score, filename: filename,title: competition};
             console.log(score_list);
+            var formData = new window.Form
             this.$http.post('http://127.0.0.1:8000/api/upload_grade/',score_list);
         }
     },
