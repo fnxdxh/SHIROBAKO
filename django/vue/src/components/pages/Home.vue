@@ -1,40 +1,70 @@
 <template>
-  <div>
-    <h1>HomePage</h1>
-    <el-table
-      :data="compet_list"
-      style="width: 100%">
-      <el-table-column
-        prop="title"
-        label="竞赛名称"
-        width="180">
-      </el-table-column>
-      <el-table-column
-        prop="sponsor"
-        label="主办方"
-        width="280">
-      </el-table-column>
-    </el-table>
-  </div>
+  <el-table :data="tableData" style="width: 100%">
+    <el-table-column type="expand">
+      <template slot-scope="props">
+        <el-form label-position="left" inline class="demo-table-expand">
+          <el-form-item label="比赛名称">
+            <span>{{ props.row.title }}</span>
+          </el-form-item>
+          <el-form-item label="开始时间">
+            <span>{{ props.row.start_time }}</span>
+          </el-form-item>
+          <el-form-item label="结束时间">
+            <span>{{ props.row.end_time }}</span>
+          </el-form-item>
+          <el-form-item label="组织单位">
+            <span>{{ props.row.sponsor }}</span>
+          </el-form-item>
+        </el-form>
+      </template>
+    </el-table-column>
+    <el-table-column label="比赛名称" prop="title"></el-table-column>
+    <el-table-column label="组织单位" prop="sponsor"></el-table-column>
+    <el-table-column label="查看详情" width="200">
+      <template slot-scope="scope">
+        <router-link to="/matchinfo">
+          <el-button type="primary">详情</el-button>
+        </router-link>
+      </template>
+    </el-table-column>
+  </el-table>
 </template>
 
+<style>
+.demo-table-expand {
+  font-size: 0;
+}
+.demo-table-expand label {
+  width: 90px;
+  color: #99a9bf;
+}
+.demo-table-expand .el-form-item {
+  margin-right: 0;
+  margin-bottom: 0;
+  width: 50%;
+}
+</style>
+
 <script>
-export default{
-  data(){
-    return{
-      msg:{key: '初始msg'}
+export default {
+  data() {
+    return {
+      tableData: []
+    };
+  },
+  methods: {
+    getdata() {
+      this.$http
+        .get("http://127.0.0.1:8000/api/index_competition_list/")
+        .then(result => {
+          console.log(result.body);
+          this.tableData = result.body;
+        });
     }
   },
-  mounted(){
-      this.$http.get('http://127.0.0.1:8000/api/organizer_competition_list/').then(response=>{
-        let json_list = JSON.parse(response.body);
-        for(let i = 0;i < json_list.length;i++){
-          this.compet_list.append(json_list[i]);
-        }
-      });;
-  }
-}
-</script>
 
-<style scoped>
-</style>
+  created() {
+    this.getdata();
+  }
+};
+</script>
