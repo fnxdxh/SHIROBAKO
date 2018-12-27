@@ -4,7 +4,7 @@
     :data="tableData"
     style="width: 100%">
         <el-table-column
-        prop="filename"
+        prop="name"
         label="作品名"
         width="180">
         </el-table-column>
@@ -12,7 +12,7 @@
         label="下载文件"
         width="180">
         <template slot-scope="scope">
-            <el-button type="primary"  @click="FileDownload(scope.row.filename)">下载文件</el-button>
+            <el-button type="primary"  @click="FileDownload">下载文件</el-button>
         </template>
         </el-table-column>
         <el-table-column
@@ -20,7 +20,7 @@
         width="400">
         <template slot-scope="scope">
         <el-input placeholder="请输入分数，分数介于0~100分内。" clearable type="number" v-model="scope.row.score">
-            <el-button type="primary" slot="append" @click="UpdateScore(scope.row.filename,scope.row.score)">提交分数</el-button>
+            <el-button type="primary" slot="append" @click="UpdateScore(scope.row.name,scope.row.score)">提交分数</el-button>
         </el-input>
         </template>
         </el-table-column>
@@ -51,16 +51,15 @@ export default {
         }
     },
     methods:{
-        FileDownload(filename){
-            var formData = new window.FormData();
-            formData.append('filename', filename);
-            this.$http.post('http://localhost:8000/api/file_download/',formData).then(response => {
+        FileDownload(){
+            this.$http.get('http://localhost:8000/api/file_download/').then(response => {
             console.log(response.data);
             // get body data
             this.file = response.body;
             }, response => {
                 console.log("error");
             });
+            let filename = this.file.name;
             const blob = new Blob([this.file]);
             if (window.navigator.msSaveOrOpenBlob) {
             // 兼容IE10
@@ -82,6 +81,7 @@ export default {
             console.log(competition);
             let score_list = {grade: score, filename: filename,title: competition};
             console.log(score_list);
+            var formData = new window.Form
             this.$http.post('http://127.0.0.1:8000/api/upload_grade/',score_list);
         }
     },

@@ -22,13 +22,12 @@
 export default{
   data(){
     return{
-      msg:{key: '初始msg'},
-      compet_list:[]
+      msg:{key: '初始msg'}
     }
   },
   mounted(){
-      this.$http.get('http://127.0.0.1:8000/api/index_competition_list/').then(response=>{
-        let json_list = eval(response.body);
+      this.$http.get('http://127.0.0.1:8000/api/organizer_competition_list/').then(response=>{
+        let json_list = JSON.parse(response.body);
         for(let i = 0;i < json_list.length;i++){
           this.compet_list.append(json_list[i]);
         }

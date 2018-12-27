@@ -138,10 +138,17 @@ export default {
     submitForm(formtitle) {
       this.$refs[formtitle].validate(valid => {
         if (valid) {
+          let str1 = this.dateToString(this.form.sign_up_start);
+          let str2 = this.dateToString(this.form.sign_up_end);
+          let str3 = this.dateToString(this.form.start_time);
+          let str4 = this.dateToString(this.form.end_time);
+          this.form.sign_up_start = str1;
+          this.form.sign_up_end = str2;
+          this.form.start_time = str3;
+          this.form.end_time = str4;
+          console.log(this.form);
           this.$http
-            .post("http://localhost:8000/api/create_competition/", this.form, {
-              headers: { "Content-Type": "application/x-www-form-urlencoded" }
-            })
+            .post("api/create_competition/", this.form)
             .then(result => {
               console.log(result.body);
             });
@@ -177,6 +184,19 @@ export default {
     handleRemove(file, fileList) {
       fileList.length = 0;
       this.img = "";
+    },
+    dateToString(date) {
+      var year = date.getFullYear();
+      var month = (date.getMonth() + 1).toString();
+      var day = date.getDate().toString();
+      if (month.length == 1) {
+        month = "0" + month;
+      }
+      if (day.length == 1) {
+        day = "0" + day;
+      }
+      var dateTime = year + "-" + month + "-" + day;
+      return dateTime;
     }
   }
 };
