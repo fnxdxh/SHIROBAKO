@@ -96,44 +96,44 @@ export default {
         username:""
       },
       fileList: [],
-      items: {username: ""}
-      // rules: {
-      //   title: [{ required: true, message: "请输入竞赛名称", trigger: "blur" }],
-      //   sponsor: [{ required: true, message: "请输入主办方", trigger: "blur" }],
-      //   sign_up_start: [
-      //     {
-      //       type: "date",
-      //       required: true,
-      //       message: "请选择日期",
-      //       trigger: "change"
-      //     }
-      //   ],
-      //   sign_up_end: [
-      //     {
-      //       type: "date",
-      //       required: true,
-      //       message: "请选择日期",
-      //       trigger: "change"
-      //     }
-      //   ],
-      //   start_time: [
-      //     {
-      //       type: "date",
-      //       required: true,
-      //       message: "请选择日期",
-      //       trigger: "change"
-      //     }
-      //   ],
-      //   end_time: [
-      //     {
-      //       type: "date",
-      //       required: true,
-      //       message: "请选择日期",
-      //       trigger: "change"
-      //     }
-      //   ],
-      //   description: [{ required: true, message: "请填写竞赛详情", trigger: "blur" }]
-      // }
+      items: {username: ""},
+      rules: {
+        title: [{ required: true, message: "请输入竞赛名称", trigger: "blur" }],
+        sponsor: [{ required: true, message: "请输入主办方", trigger: "blur" }],
+        sign_up_start: [
+          {
+            type: "date",
+            required: true,
+            message: "请选择日期",
+            trigger: "change"
+          }
+        ],
+        sign_up_end: [
+          {
+            type: "date",
+            required: true,
+            message: "请选择日期",
+            trigger: "change"
+          }
+        ],
+        start_time: [
+          {
+            type: "date",
+            required: true,
+            message: "请选择日期",
+            trigger: "change"
+          }
+        ],
+        end_time: [
+          {
+            type: "date",
+            required: true,
+            message: "请选择日期",
+            trigger: "change"
+          }
+        ],
+        description: [{ required: true, message: "请填写竞赛详情", trigger: "blur" }]
+      }
     };
   },
   methods: {
@@ -144,20 +144,16 @@ export default {
           let str2 = this.dateToString(this.form.sign_up_end);
           let str3 = this.dateToString(this.form.start_time);
           let str4 = this.dateToString(this.form.end_time);
-          console.log(str1);
-          consol
-          e.log(str2);
-          console.log(str3);
-          console.log(str4);
           this.form.sign_up_start = str1;
           this.form.sign_up_end = str2;
           this.form.start_time = str3;
           this.form.end_time = str4;
-          this.form.username = this.items.username;
-          this.form.id = this.$store.state.matchid
-          this.$store.commit('creatematch', this.form)
-          this.$http.post('http://127.0.0.1:8000/api/create_competition/',this.form,
-                          {headers: {'Content-Type': 'application/x-www-form-urlencoded'}});
+          console.log(this.form);
+          this.$http
+            .post("api/create_competition/", this.form)
+            .then(result => {
+              console.log(result.body);
+            });
           alert("创建成功!");
         } else {
           console.log("创建失败!");
