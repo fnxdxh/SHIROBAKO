@@ -45,8 +45,8 @@ export default {
         }
       },
       mounted(){
-      this.$http.get('http://127.0.0.1:8000/api/organizer_competition_list/').then(response=>{
-        let json_list = response.body.json()
+      this.$http.get('http://127.0.0.1:8000/api/jury_competition_list/').then(response=>{
+        let json_list = JSON.parse(response.body);
         for(let i = 0;i < json_list.length;i++){
           this.compet_list.append(json_list[i]);
         }

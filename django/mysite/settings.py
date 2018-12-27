@@ -112,11 +112,12 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'shirobako',
         'USER': 'root',
-        'PASSWORD': '123dxh',
+        'PASSWORD': '19971010xty',
         'HOST': '127.0.0.1',
     }
 }
 
+SESSION_ENGINE='django.contrib.sessions.backends.db'
 
 # Password validation
 # https://docs.djangoproject.com/en/1.9/ref/settings/#auth-password-validators
