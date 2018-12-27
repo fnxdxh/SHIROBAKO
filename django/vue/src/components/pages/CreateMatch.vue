@@ -92,9 +92,11 @@ export default {
         sign_up_end: "",
         start_time: "",
         end_time: "",
-        description: ""
+        description: "",
+        username:""
       },
-      fileList: []
+      fileList: [],
+      items: {username: ""}
       // rules: {
       //   title: [{ required: true, message: "请输入竞赛名称", trigger: "blur" }],
       //   sponsor: [{ required: true, message: "请输入主办方", trigger: "blur" }],
@@ -185,19 +187,22 @@ export default {
       fileList.length = 0;
       this.img = "";
     },
-    dateToString(date) {
-      var year = date.getFullYear();
-      var month = (date.getMonth() + 1).toString();
-      var day = date.getDate().toString();
-      if (month.length == 1) {
-        month = "0" + month;
-      }
-      if (day.length == 1) {
-        day = "0" + day;
+    dateToString(date){ 
+      var year = date.getFullYear(); 
+      var month =(date.getMonth() + 1).toString(); 
+      var day = (date.getDate()).toString();  
+      if (month.length == 1) { 
+        month = "0" + month; 
+      } 
+      if (day.length == 1) { 
+        day = "0" + day; 
       }
       var dateTime = year + "-" + month + "-" + day;
-      return dateTime;
-    }
+      return dateTime; 
+  }
+  },
+  mounted(){
+    this.items.username=sessionStorage.getItem("username");
   }
 };
 </script>

@@ -25,7 +25,14 @@
 
 <script>
 export default {
-
+  data(){
+    return {
+      items:{username: ""}
+    }
+  },
+  mounted(){
+    this.items.username=sessionStorage.getItem("username");
+  }
 }
 </script>
 

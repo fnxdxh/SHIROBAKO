@@ -175,7 +175,7 @@ class TestDividePaper(unittest.TestCase):
         #print(response.content)
         response = c.post('/api/divide_paper/',{'competition_name':'test4','time':2})
         print(response.content)
-
+        
 
 class TestCompetitorSignUp(unittest.TestCase):
     def setUp(self):

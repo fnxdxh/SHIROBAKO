@@ -41,16 +41,18 @@ export default {
             date: '2018.11.14'
           }],
           refs: ["http://127.0.0.1:8000/upload"],
-          compet_list: []
+          compet_list: [],
+          items:{username:""}
         }
       },
       mounted(){
       this.$http.get('http://127.0.0.1:8000/api/jury_competition_list/').then(response=>{
-        let json_list = JSON.parse(response.body);
+        let json_list = eval(response.body);
         for(let i = 0;i < json_list.length;i++){
           this.compet_list.append(json_list[i]);
         }
       });;
+      this.items.username=sessionStorage.getItem("username");
     }
 }
 </script>

@@ -1,7 +1,8 @@
 <template>
     <div>
-        <!-- <el-table :data="tabledata">
-            <el-table-column prop="username" label="待审核主办方">
+        <h1>{{tabledata}}</h1>
+        <el-table :data="tabledata">
+            <el-table-column prop="name" label="待审核主办方">
             </el-table-column>
             <el-table-column label="操作">
                 <el-button type="text" @click="accept(username)">通过</el-button>               

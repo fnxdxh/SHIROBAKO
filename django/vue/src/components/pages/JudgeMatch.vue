@@ -47,7 +47,8 @@ export default {
             name: 'mi.txt',
             score: '100'
             }],
-            file_list: []
+            file_list: [],
+            items: {username: ""}
         }
     },
     methods:{
@@ -81,18 +82,26 @@ export default {
             console.log(competition);
             let score_list = {grade: score, filename: filename,title: competition};
             console.log(score_list);
-            var formData = new window.Form
-            this.$http.post('http://127.0.0.1:8000/api/upload_grade/',score_list);
+            var formData = new window.FormData;
+            formData.append('grade',score);
+            formData.append('filename',filename);
+            formData.append('title',competition);
+            this.$http.post('http://127.0.0.1:8000/api/upload_grade/',formData,{
+                headers:{
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
         }
     },
     mounted(){
       this.$http.get('http://127.0.0.1:8000/api/file_list/').then(response=>{
-        let json_list = response.body.json()
+        let json_list = eval(response.body);
         for(let i = 0;i < json_list.length;i++){
           json_list[i].score = 0;
           this.file_list.append(json_list[i]);
         }
       });;
+      this.items.username=sessionStorage.getItem("username");
     }
 }
 </script>
