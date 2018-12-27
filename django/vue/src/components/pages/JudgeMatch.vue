@@ -75,10 +75,13 @@ export default {
             URL.revokeObjectURL(aTag.href);
             }
         },
-        UpdateScore(filename,score,path){
-            let temp_list = this.$router.path.split('/');
+        UpdateScore(filename,score){
+            let temp_list = this.$route.path.split('/');
+            console.log(temp_list);
             let competition = temp_list[temp_list.length - 1];
+            console.log(competition);
             let score_list = {grade: score, filename: filename,title: competition};
+            console.log(score_list);
             this.$http.post('http://127.0.0.1:8000/api/upload_grade/',score_list);
         }
     },
