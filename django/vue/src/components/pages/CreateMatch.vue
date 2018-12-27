@@ -92,9 +92,11 @@ export default {
         sign_up_end: "",
         start_time: "",
         end_time: "",
-        description: ""
+        description: "",
+        username:""
       },
-      fileList: []
+      fileList: [],
+      items: {username: ""}
       // rules: {
       //   title: [{ required: true, message: "请输入竞赛名称", trigger: "blur" }],
       //   sponsor: [{ required: true, message: "请输入主办方", trigger: "blur" }],
@@ -138,13 +140,23 @@ export default {
     submitForm(formtitle) {
       this.$refs[formtitle].validate(valid => {
         if (valid) {
-          this.$http
-            .post("http://localhost:8000/api/create_competition/", this.form, {
-              headers: { "Content-Type": "application/x-www-form-urlencoded" }
-            })
-            .then(result => {
-              console.log(result.body);
-            });
+          let str1 = this.dateToString(this.form.sign_up_start);
+          let str2 = this.dateToString(this.form.sign_up_end);
+          let str3 = this.dateToString(this.form.start_time);
+          let str4 = this.dateToString(this.form.end_time);
+          console.log(str1);
+          console.log(str2);
+          console.log(str3);
+          console.log(str4);
+          this.form.sign_up_start = str1;
+          this.form.sign_up_end = str2;
+          this.form.start_time = str3;
+          this.form.end_time = str4;
+          this.form.username = this.items.username;
+          this.form.id = this.$store.state.matchid
+          this.$store.commit('creatematch', this.form)
+          this.$http.post('http://127.0.0.1:8000/api/create_competition/',this.form,
+                          {headers: {'Content-Type': 'application/x-www-form-urlencoded'}});
           alert("创建成功!");
         } else {
           console.log("创建失败!");
@@ -177,7 +189,23 @@ export default {
     handleRemove(file, fileList) {
       fileList.length = 0;
       this.img = "";
-    }
+    },
+    dateToString(date){ 
+      var year = date.getFullYear(); 
+      var month =(date.getMonth() + 1).toString(); 
+      var day = (date.getDate()).toString();  
+      if (month.length == 1) { 
+        month = "0" + month; 
+      } 
+      if (day.length == 1) { 
+        day = "0" + day; 
+      }
+      var dateTime = year + "-" + month + "-" + day;
+      return dateTime; 
+  }
+  },
+  mounted(){
+    this.items.username=sessionStorage.getItem("username");
   }
 };
 </script>
