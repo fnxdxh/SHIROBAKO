@@ -62,6 +62,80 @@ def competitor_register(request):
     return JsonResponse(response)
 
 
+def info_list(request):
+    response = {}
+    if request.user.is_authenticated():
+        user = request.user
+        if user.user_type == "Comp":
+            response['name'] = user.username
+            response['school'] = user.competitor.school
+            response['age'] = user.competitor.age
+            response['tel'] = user.competitor.tel
+            response['email'] = user.competitor.email
+            response['msg'] = "success"
+            response['error_num'] = 0
+        elif user.user_type == "Org":
+            response['name'] = user.username
+            response['tel'] = user.organizer.tel
+            response['email'] = user.organizer.email
+            response['msg'] = "success"
+            response['error_num'] = 0
+        elif user.user_type == "Rat":
+            response['name'] = user.username
+            response['school'] = user.jury.school
+            response['tel'] = user.jury.tel
+            response['email'] = user.jury.email
+            response['msg'] = "success"
+            response['error_num'] = 0
+        else:
+            response['msg'] = "failed"
+            response['error_num'] = 1
+        return JsonResponse(response)
+    response['msg'] = "not login"
+    response['error_num'] = 1
+    return JsonResponse(response)
+
+
+def changeInfo(request):
+    response = {}
+    if request.user.is_authenticated():
+        if request.method == "POST":
+            tel = request.POST.get('tel')
+            email = request.POST.get('email')
+            user = request.user
+            if user.user_type == "Comp":
+                school = request.POST.get('school')
+                age = request.POST.get('age')
+                user.competitor.school = school
+                user.competitor.age = age
+                user.competitor.tel = tel
+                user.competitor.email = email
+                user.competitior.save()
+                response['msg'] = "success"
+                response['error_num'] = 0
+            elif user.user_type == "Org":
+                user.organizer.tel = tel
+                user.organizer.email = email
+                user.organizer.save()
+                response['msg'] = "success"
+                response['error_num'] = 0
+            elif user.user_type == "Rat":
+                school = request.POST.get('school')
+                user.jury.school = school
+                user.jury.tel = tel
+                user.jury.email = email
+                user.jury.save()
+                response['msg'] = "success"
+                response['error_num'] = 0
+            else:
+                response['msg'] = "failed"
+                response['error_num'] = 1
+            return JsonResponse(response)
+        response['msg'] = "not login"
+        response['error_num'] = 1
+        return JsonResponse(response)
+
+
 def jury_register(request):
     response = {}
     if request.method == "POST":
@@ -226,7 +300,7 @@ def index_competition_list(request):
         for competition in competition_list:
             cmp = {}
             cmp['title'] = competition.title
-            cmp['sponsor'] = competition.sponsor
+            cmp['sponsor'] = competition.organizer
             #start_time_list = competition.start_time.split(',')
             #cmp['start_time'] = start_time_list[0]
             #cmp['start_time'] = competition.start_time
@@ -442,7 +516,7 @@ def grade_upload(request):
                 print(request.user.username)
                 for jury in jury_list:
                     if jury == request.user.username:
-                        grade[i] = mygrade
+                        grade[i] = mygrade 
                     i = i+1
                 str = ','
                 file.grade_list = str.join(grade)
@@ -748,7 +822,7 @@ def search_competition(request):
             for competition in competition_list:
                 content = {}
                 content['title'] = competition.title
-                content['sponsor'] = competition.sponsor
+                content['sponsor'] = competition.organizer
                 content['msg'] = 'success'
                 content['error_num'] = 0
                 response.append(content)
