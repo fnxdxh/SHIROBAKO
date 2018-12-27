@@ -24,4 +24,5 @@ urlpatterns = [
     url(r'^file_list/', file_list),
     url(r'^invite_jury/', invite_jury),
     url(r'^sign_up/', competitor_sign_up),
+    url(r'^grade_upload/', grade_upload),
 ]

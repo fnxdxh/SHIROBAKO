@@ -429,18 +429,24 @@ def grade_upload(request):
     response = {}
     if request.user.is_authenticated():
         if request.method == "POST":
-            grade = request.POST.get("grade")
+            mygrade = request.POST.get("grade")
             file_url = request.POST.get("filepath")
             try:
+                print('ok')
                 file = UserFile.objects.get(file_url=file_url)
                 grade = file.grade_list.split(',')
+                print(grade)
                 jury_list=file.jury_list.split(',')
+                print(jury_list)
                 i = 0
+                print(request.user.username)
                 for jury in jury_list:
                     if jury == request.user.username:
-                        grade[i] = grade
+                        grade[i] = mygrade
+                    i = i+1
                 str = ','
                 file.grade_list = str.join(grade)
+                print(file.grade_list)
                 file.save()
                 response['msg'] = 'success'
                 response['error_num'] = 0
@@ -464,10 +470,19 @@ def file_list(request):
                 jury_file = JuryFile.objects.get(competition=competition, jury=request.user.username)
                 file_list = jury_file.file_list.split(",")
                 for file in file_list:
-                    org['name'] = file
-                    org['msg'] = 'success'
-                    org['error_num'] = 0
-                    response.append(org)
+                    content = {}
+                    newfile = UserFile.objects.get(file_url=file)
+                    grade = newfile.grade_list.split(',')
+                    jury = newfile.jury_list.split(',')
+                    i = 0
+                    for newjury in jury:
+                        if newjury == request.user.username:
+                            content['grade'] = grade[i]
+                        i = i+1
+                    content['name'] = file
+                    content['msg'] = 'success'
+                    content['error_num'] = 0
+                    response.append(content)
                 return HttpResponse(json.dumps(response))
             except:
                 org['msg'] = 'failed'

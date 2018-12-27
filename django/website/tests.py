@@ -175,7 +175,9 @@ class TestDividePaper(unittest.TestCase):
         #print(response.content)
         response = c.post('/api/divide_paper/',{'competition_name':'test4','time':2})
         print(response.content)
-
+        response = c.post('/api/login_jury/', {'username': 'jury2', 'password': '2018'})
+        response = c.post('/api/grade_upload/',{'grade':'98','filepath':'test2.txt'})
+        print(response.content)
 
 class TestCompetitorSignUp(unittest.TestCase):
     def setUp(self):
