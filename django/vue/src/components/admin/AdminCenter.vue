@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h1>{{tabledata}}</h1>
+        <!-- <h1>{{tabledata}}</h1>
         <el-table :data="tabledata">
             <el-table-column prop="name" label="待审核主办方">
             </el-table-column>

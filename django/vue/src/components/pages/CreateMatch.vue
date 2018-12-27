@@ -96,44 +96,44 @@ export default {
         username:""
       },
       fileList: [],
-      items: {username: ""}
-      // rules: {
-      //   title: [{ required: true, message: "请输入竞赛名称", trigger: "blur" }],
-      //   sponsor: [{ required: true, message: "请输入主办方", trigger: "blur" }],
-      //   sign_up_start: [
-      //     {
-      //       type: "date",
-      //       required: true,
-      //       message: "请选择日期",
-      //       trigger: "change"
-      //     }
-      //   ],
-      //   sign_up_end: [
-      //     {
-      //       type: "date",
-      //       required: true,
-      //       message: "请选择日期",
-      //       trigger: "change"
-      //     }
-      //   ],
-      //   start_time: [
-      //     {
-      //       type: "date",
-      //       required: true,
-      //       message: "请选择日期",
-      //       trigger: "change"
-      //     }
-      //   ],
-      //   end_time: [
-      //     {
-      //       type: "date",
-      //       required: true,
-      //       message: "请选择日期",
-      //       trigger: "change"
-      //     }
-      //   ],
-      //   description: [{ required: true, message: "请填写竞赛详情", trigger: "blur" }]
-      // }
+      items: {username: ""},
+      rules: {
+        title: [{ required: true, message: "请输入竞赛名称", trigger: "blur" }],
+        sponsor: [{ required: true, message: "请输入主办方", trigger: "blur" }],
+        sign_up_start: [
+          {
+            type: "date",
+            required: true,
+            message: "请选择日期",
+            trigger: "change"
+          }
+        ],
+        sign_up_end: [
+          {
+            type: "date",
+            required: true,
+            message: "请选择日期",
+            trigger: "change"
+          }
+        ],
+        start_time: [
+          {
+            type: "date",
+            required: true,
+            message: "请选择日期",
+            trigger: "change"
+          }
+        ],
+        end_time: [
+          {
+            type: "date",
+            required: true,
+            message: "请选择日期",
+            trigger: "change"
+          }
+        ],
+        description: [{ required: true, message: "请填写竞赛详情", trigger: "blur" }]
+      }
     };
   },
   methods: {
