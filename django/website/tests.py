@@ -147,15 +147,25 @@ class TestDividePaper(unittest.TestCase):
         Competitor.objects.create(user=user)
         user = User.objects.create_user(username="comp3", password=md5(("2018").encode('utf-8')).hexdigest(), user_type="Comp")
         Competitor.objects.create(user=user)
+        user = User.objects.create_user(username="comp4", password=md5(("2018").encode('utf-8')).hexdigest(), user_type="Comp")
+        Competitor.objects.create(user=user)
 
     def test_divide_paper(self):
         c = Client()
         c.post('/api/login_competitor/',{'username':'comp2','password':'2018'})
+        response = c.get('/api/sign_up/',{'competition_name':'test4'})
+        print(response.content)
         with open('test1.txt','rb') as fp:
             response = c.post('/api/upload/', {'userfile':fp,'competition':'test4'})
             #print(response.content)
         c.post('/api/login_competitor/',{'username':'comp3','password':'2018'})
+        c.get('/api/sign_up/',{'competition_name':'test4'})
         with open('test2.txt','rb') as fp:
+            response = c.post('/api/upload/', {'userfile':fp,'competition':'test4'})
+            #print(response.content)
+        c.post('/api/login_competitor/',{'username':'comp4','password':'2018'})
+        c.get('/api/sign_up/',{'competition_name':'test4'})
+        with open('test3.txt','rb') as fp:
             response = c.post('/api/upload/', {'userfile':fp,'competition':'test4'})
             #print(response.content)
         c.post('/api/login_organizer/', {'username': 'org4', 'password': '2018'})
@@ -169,12 +179,12 @@ class TestDividePaper(unittest.TestCase):
 
 class TestCompetitorSignUp(unittest.TestCase):
     def setUp(self):
-        user = User.objects.create_user(username="comp3", password=md5(("2018").encode('utf-8')).hexdigest(), user_type="Comp")
+        user = User.objects.create_user(username="comp5", password=md5(("2018").encode('utf-8')).hexdigest(), user_type="Comp")
         Competitor.objects.create(user=user)
         Competition.objects.create(title='test5', description='test5', sign_up_end='2018-12-25', sign_up_start='2018-12-25', start_time='2018-12-26', end_time='2018-12-26',
                                                         organizer='org4', sponsor='sponsor5')
     def test_competitor_sign_up(self):
         c = Client()
-        c.post('/api/login_competitor/',{'username':'comp3','password':'2018'})
-        response = c.post('/api/sign_up/',{'competition_name':'test5'})
+        response = c.post('/api/login_competitor/',{'username':'comp5','password':'2018'})
+        response = c.get('/api/sign_up/',{'competition_name':'test5'})
         self.assertEqual(response.content.decode('utf-8'), '{"msg": "success", "error_num": 0}')

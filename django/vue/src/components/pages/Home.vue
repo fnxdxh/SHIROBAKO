@@ -28,7 +28,7 @@ export default{
   },
   mounted(){
       this.$http.get('http://127.0.0.1:8000/api/index_competition_list/').then(response=>{
-        let json_list = JSON.parse(response.body);
+        let json_list = eval(response.body);
         for(let i = 0;i < json_list.length;i++){
           this.compet_list.append(json_list[i]);
         }

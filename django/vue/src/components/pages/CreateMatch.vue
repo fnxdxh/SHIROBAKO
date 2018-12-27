@@ -138,12 +138,8 @@ export default {
     submitForm(formtitle) {
       this.$refs[formtitle].validate(valid => {
         if (valid) {
-          console.log(this.form[sign_up_start]);
-          console.log(this.form[sign_up_end]);
-          console.log(this.form[end_time]);
-          console.log(this.form[start_time]);
           this.$http
-            .post("http://127.0.0.1:8000/api/create_competition/", this.form, {
+            .post("http://localhost:8000/api/create_competition/", this.form, {
               headers: { "Content-Type": "application/x-www-form-urlencoded" }
             })
             .then(result => {
