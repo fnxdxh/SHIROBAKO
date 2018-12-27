@@ -19,13 +19,19 @@ class Competitor(models.Model):
     competition_list = models.TextField(default='')
 
     # basic_info:
-    school = models.CharField(max_length=128)
-
+    school = models.CharField(max_length=128,default="")
+    age = models.CharField(max_length=20,default="")
+    tel = models.CharField(max_length=20,default="")
+    email = models.CharField(max_length=128, default='')
 
 class Organizer(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     status = models.IntegerField()
     competition_list = models.TextField(default='')
+
+# basic
+    tel = models.CharField(max_length=20,default="")
+    email = models.CharField(max_length=128, default='')
 
     STATUS_UNCONFIRM = 0
     STATUS_CONFIRMED = 1
@@ -34,8 +40,10 @@ class Organizer(models.Model):
 class Jury(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     competition_list = models.TextField(default='')
-    tel = models.CharField(max_length=20,default='')
 
+    school = models.CharField(max_length=128,default="")
+    tel = models.CharField(max_length=20,default="")
+    email = models.CharField(max_length=128, default='')
 
 class SuperUser(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)

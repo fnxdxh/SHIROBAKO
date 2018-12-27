@@ -8,7 +8,6 @@ import usercenterpage_competitor from './components/pages/UserCenter_competitor.
 import usercenterpage_organizer from './components/pages/UserCenter_organizer.vue'
 import usercenterpage_jury from './components/pages/UserCenter_jury.vue'
 import creatematch from './components/pages/CreateMatch.vue'
-import listpage from './components/pages/List.vue'
 import matchinfopage from './components/pages/MatchInfo.vue'
 import judgematch from './components/pages/JudgeMatch.vue'
 
@@ -55,7 +54,6 @@ var router = new VueRouter({
         {path: 'jury', component: jury_register}
       ]
     },
-    { path: '/list', component: listpage },
 
     {
       path: '/usercenter_competitor',

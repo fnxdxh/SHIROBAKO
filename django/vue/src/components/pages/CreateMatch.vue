@@ -145,7 +145,8 @@ export default {
           let str3 = this.dateToString(this.form.start_time);
           let str4 = this.dateToString(this.form.end_time);
           console.log(str1);
-          console.log(str2);
+          consol
+          e.log(str2);
           console.log(str3);
           console.log(str4);
           this.form.sign_up_start = str1;

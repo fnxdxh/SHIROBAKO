@@ -32,6 +32,7 @@ export default {
         console.log(result.body);
         if (result.body.error_num === 0) {
           alert("登陆成功");
+          this.$store.commit('login', 3)
           this.$router.push({path: '/usercenter_jury'})
           this.$store.commit('setSession', this.form.username);
         } else {
