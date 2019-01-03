@@ -5,7 +5,8 @@
         <el-row>
           <el-col :span="3">
             <router-link to="/home">
-              <img src="src\assets\images\logo.jpg">
+              <!-- <img src="\src\assets\images\logo.jpg"> -->
+              <h1>SHIROBAKO</h1>
             </router-link>
           </el-col>
           <el-col :span="8">
@@ -23,17 +24,20 @@
           <el-col :span="4">
             <div v-if="$store.state.identify === 1">
               <router-link to="/usercenter_competitor">
-                <img src="src\assets\images\photo.jpg">
+                <!-- <img src="src\assets\images\photo.jpg"> -->
+                <el-button type="text">个人中心</el-button>
               </router-link>
             </div>
             <div v-else-if="$store.state.identify === 2">
               <router-link to="/usercenter_organizer">
-                <img src="src\assets\images\photo.jpg">
+                <!-- <img src="src\assets\images\photo.jpg"> -->
+                <el-button type="text">个人中心</el-button>
               </router-link>
             </div>
             <div v-else-if="$store.state.identify === 3">
               <router-link to="/usercenter_jury">
-                <img src="src\assets\images\photo.jpg">
+                <!-- <img src="src\assets\images\photo.jpg"> -->
+                <el-button type="text">个人中心</el-button>
               </router-link>
             </div>
             <div v-else>
@@ -50,7 +54,7 @@
       <el-main>
         <router-view></router-view>
       </el-main>
-      <el-footer id="footer">Footer</el-footer>
+      <el-footer id="footer"></el-footer>
     </el-container>
   </div>
 </template>

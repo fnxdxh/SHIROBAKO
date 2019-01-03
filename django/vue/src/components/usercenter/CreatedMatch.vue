@@ -1,13 +1,35 @@
 <template>
   <div>
-    <router-link to="/creatematch"><el-button type="primary">创建比赛</el-button></router-link>
-    <el-table
-      :data="tableData"
-      style="width: 100%">
-      <el-table-column
-        prop="title"
-        label="竞赛名称"
-        width="180">
+    <router-link to="/creatematch">
+      <el-button type="primary">创建比赛</el-button>
+    </router-link>
+    <el-table :data="tableData" style="width: 100%">
+      <el-table-column type="expand">
+        <template slot-scope="props">
+          <el-form label-position="left" inline class="demo-table-expand">
+            <el-form-item label="比赛名称">
+              <span>{{ props.row.title }}</span>
+            </el-form-item>
+            <el-form-item label="开始时间">
+              <span>{{ props.row.start_time }}</span>
+            </el-form-item>
+            <el-form-item label="结束时间">
+              <span>{{ props.row.end_time }}</span>
+            </el-form-item>
+            <el-form-item label="组织单位">
+              <span>{{ props.row.sponsor }}</span>
+            </el-form-item>
+          </el-form>
+        </template>
+      </el-table-column>
+      <el-table-column label="比赛名称" prop="title"></el-table-column>
+      <el-table-column label="组织单位" prop="sponsor"></el-table-column>
+      <el-table-column label="查看详情" width="200">
+        <template slot-scope="scope">
+          <router-link to="/matchinfo">
+            <el-button type="primary">详情</el-button>
+          </router-link>
+        </template>
       </el-table-column>
       <el-table-column>
         <template slot-scope="scope">
@@ -25,30 +47,41 @@
   </div>
 </template>
 
+<style>
+.demo-table-expand {
+  font-size: 0;
+}
+.demo-table-expand label {
+  width: 90px;
+  color: #99a9bf;
+}
+.demo-table-expand .el-form-item {
+  margin-right: 0;
+  margin-bottom: 0;
+  width: 50%;
+}
+</style>
+
 <script>
-export default{
-  data(){
-    return{
-      tableData:[
-        {title:'小程序竞赛',number:0},
-        {title:'大程序竞赛',number:0},
-        {title:'中程序竞赛',number:0}
-      ],
-      compet_list:[],
-      items:{username:""}
+export default {
+  data() {
+    return {
+      tableData: []
+    };
+  },
+  methods: {
+    getdata() {
+      this.$http
+        .get("api/organizer_competition_list/")
+        .then(result => {
+          console.log(result.body);
+          this.tableData = result.body;
+        });
     }
   },
-  mounted(){
-      this.$http.get('api/organizer_competition_list/').then(response=>{
-        this.compet_list = response.body;
-      });
-      this.items.username=sessionStorage.getItem("username");
-    },
-  methods:{
-    Divi
-  }
-}
-</script>
 
-<style scoped>
-</style>
+  created() {
+    this.getdata();
+  }
+};
+</script>

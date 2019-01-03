@@ -400,7 +400,7 @@ def organizer_competition_list(request):
         except:
             fail_msg['msg'] = 'failed'
             fail_msg['error_num'] = 1
-    fail_msg['msg'] = 'failed'
+    fail_msg['msg'] = 'not login'
     fail_msg['error_num'] = 1
     response.append(fail_msg)
     return HttpResponse(json.dumps(response))
