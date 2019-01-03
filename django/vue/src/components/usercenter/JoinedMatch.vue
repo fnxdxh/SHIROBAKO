@@ -3,7 +3,7 @@
       :data="compet_list"
       style="width: 100%">
       <el-table-column
-        prop="title"
+        prop="name"
         label="竞赛名称"
         width="180">
       </el-table-column>
@@ -24,16 +24,16 @@
         return {
           tableData: [{
             name: '小程序竞赛',
-            score: '18.5',
+            score: '',
           }, {
             name: '大程序竞赛',
-            score: '24.0',
+            score: '',
           }, {
             name: '中程序竞赛',
             score: '',
           }, {
             name: 'mini程序竞赛',
-            score: '90.8',
+            score: '',
           }],
           refs: ["http://127.0.0.1:8000/api/upload/"],
           compet_list: [],
@@ -56,7 +56,9 @@
                 headers:{
                     'Content-Type': 'multipart/form-data'
                 }
-            }).then(function(res){})
+            }).then(resule => {
+              alert('上传成功！');
+            })
             
         },
         getFile(e,name){
@@ -67,11 +69,8 @@
     },
     mounted(){
       this.$http.get('http://127.0.0.1:8000/api/competitor_competition_list/').then(response=>{
-        let json_list = eval(response.body);
-        for(let i = 0;i < json_list.length;i++){
-          this.compet_list.append(json_list[i]);
-        }
-      });;
+        this.compet_list = response.body;
+      });
       this.items.username=sessionStorage.getItem("username");
     }
     }

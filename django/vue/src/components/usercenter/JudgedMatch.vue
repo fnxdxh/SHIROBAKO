@@ -4,7 +4,7 @@
       :data="tableData"
       style="width: 100%">
       <el-table-column
-        prop="title"
+        prop="name"
         label="竞赛名称"
         width="180">
       </el-table-column>
@@ -47,11 +47,8 @@ export default {
       },
       mounted(){
       this.$http.get('http://127.0.0.1:8000/api/jury_competition_list/').then(response=>{
-        let json_list = eval(response.body);
-        for(let i = 0;i < json_list.length;i++){
-          this.compet_list.append(json_list[i]);
-        }
-      });;
+        this.compet_list = response.body;
+      });
       this.items.username=sessionStorage.getItem("username");
     }
 }

@@ -12,7 +12,7 @@
         label="下载文件"
         width="180">
         <template slot-scope="scope">
-            <el-button type="primary"  @click="FileDownload">下载文件</el-button>
+            <el-button type="primary"  @click="FileDownload(scope.row.name)">下载文件</el-button>
         </template>
         </el-table-column>
         <el-table-column
@@ -35,33 +35,32 @@ export default {
     data(){
         return{
             tableData: [{
-            name: 'helloworld.zip',
-            score: '15.7'
-            }, {
-            name: 'fucktheworld.txt',
+            name: 'helloworld.txt',
             score: ''
             }, {
-            name: 'nicetomeetyou.rar',
-            score: '18.6'
+            name: 'ftheworld.txt',
+            score: ''
+            }, {
+            name: 'nicetomeetyou.txt',
+            score: ''
             }, {
             name: 'mi.txt',
-            score: '100'
+            score: ''
             }],
             file_list: [],
             items: {username: ""}
         }
     },
     methods:{
-        FileDownload(){
-            this.$http.get('http://localhost:8000/api/file_download/').then(response => {
+        FileDownload(filename){
+            var formdata = new window.FormData();
+            formdata.append('filename',filename)
+            this.$http.post('http://localhost:8000/api/file_download/',formdata,{headers:{
+                    'Content-Type': 'multipart/form-data'
+                }}).then(response => {
             console.log(response.data);
-            // get body data
-            this.file = response.body;
-            }, response => {
-                console.log("error");
-            });
-            let filename = this.file.name;
-            const blob = new Blob([this.file]);
+            // get body data;
+            const blob = new Blob([response.body]);
             if (window.navigator.msSaveOrOpenBlob) {
             // 兼容IE10
                 navigator.msSaveBlob(blob, filename);
@@ -74,6 +73,10 @@ export default {
             aTag.click();
             URL.revokeObjectURL(aTag.href);
             }
+            }, response => {
+                console.log("error");
+            });
+           
         },
         UpdateScore(filename,score){
             let temp_list = this.$route.path.split('/');
@@ -90,6 +93,8 @@ export default {
                 headers:{
                     'Content-Type': 'multipart/form-data'
                 }
+            }).then(result => {
+                alert('打分成功！');
             });
         }
     },

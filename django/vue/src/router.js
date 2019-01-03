@@ -27,6 +27,7 @@ import judgedmatch from './components/usercenter/JudgedMatch.vue'
 import staredmatch from './components/usercenter/StaredMatch.vue'
 import userinfo from './components/usercenter/UserInfo.vue'
 import store from './store.js';
+import invitejury from './components/pages/JuryInvite.vue'
 
 
 
@@ -86,7 +87,8 @@ var router = new VueRouter({
       ]
     },
     { path: '/creatematch', component: creatematch, meta:{islogin:false} },
-    { path: '/judgematch/:competition',name: 'judge' , component: judgematch, meta:{islogin:false}}
+    { path: '/judgematch/:competition',name: 'judge' , component: judgematch, meta:{islogin:false}},
+    { path: '/invitejury/:competition',name: 'invite' , component: invitejury, meta:{islogin:false}}
   ]
 });
 
