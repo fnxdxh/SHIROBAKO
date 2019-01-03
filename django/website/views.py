@@ -3,7 +3,7 @@ from django.shortcuts import redirect
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.http import JsonResponse, StreamingHttpResponse
-from datetime import datetime
+import datetime
 from django.utils import timezone
 from hashlib import md5
 from random import Random
@@ -19,20 +19,7 @@ from .models import User, Competitor, Organizer, Jury, Competition, UserFile, Su
 # Create your views here.
 
 
-# 获取由4位随机大小写字母、数字组成的salt值
-def create_salt(length=4):
-    salt = ''
-    chars = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz0123456789'
-    # 获取chars的最大下标
-    len_chars = len(chars) - 1
-    random = Random()
-    for i in range(length):
-        # 每次随机从chars中抽取一位，拼接成一个salt值
-        salt += chars[random.randint(0, len_chars)]
-    return salt
-
-
-# 获取原始密码+salt的md5值
+# 获取密码md5值
 def create_md5(pwd):
     md5_obj = md5()
     md5_obj.update(pwd.encode('utf-8'))
@@ -57,83 +44,12 @@ def competitor_register(request):
                 response['msg'] = 'create failed'
                 response['error_num'] = 1
             return JsonResponse(response)
+        response['msg'] = 'input error'
+        response['error_num'] = 1
+        return JsonResponse(response)
     response['msg'] = 'have no data'
     response['error_num'] = 1
     return JsonResponse(response)
-
-
-def info_list(request):
-    response = {}
-    if request.user.is_authenticated():
-        user = request.user
-        if user.user_type == "Comp":
-            response['name'] = user.username
-            response['school'] = user.competitor.school
-            response['age'] = user.competitor.age
-            response['tel'] = user.competitor.tel
-            response['email'] = user.competitor.email
-            response['msg'] = "success"
-            response['error_num'] = 0
-        elif user.user_type == "Org":
-            response['name'] = user.username
-            response['tel'] = user.organizer.tel
-            response['email'] = user.organizer.email
-            response['msg'] = "success"
-            response['error_num'] = 0
-        elif user.user_type == "Rat":
-            response['name'] = user.username
-            response['school'] = user.jury.school
-            response['tel'] = user.jury.tel
-            response['email'] = user.jury.email
-            response['msg'] = "success"
-            response['error_num'] = 0
-        else:
-            response['msg'] = "failed"
-            response['error_num'] = 1
-        return JsonResponse(response)
-    response['msg'] = "not login"
-    response['error_num'] = 1
-    return JsonResponse(response)
-
-
-def changeInfo(request):
-    response = {}
-    if request.user.is_authenticated():
-        if request.method == "POST":
-            tel = request.POST.get('tel')
-            email = request.POST.get('email')
-            user = request.user
-            if user.user_type == "Comp":
-                school = request.POST.get('school')
-                age = request.POST.get('age')
-                user.competitor.school = school
-                user.competitor.age = age
-                user.competitor.tel = tel
-                user.competitor.email = email
-                user.competitior.save()
-                response['msg'] = "success"
-                response['error_num'] = 0
-            elif user.user_type == "Org":
-                user.organizer.tel = tel
-                user.organizer.email = email
-                user.organizer.save()
-                response['msg'] = "success"
-                response['error_num'] = 0
-            elif user.user_type == "Rat":
-                school = request.POST.get('school')
-                user.jury.school = school
-                user.jury.tel = tel
-                user.jury.email = email
-                user.jury.save()
-                response['msg'] = "success"
-                response['error_num'] = 0
-            else:
-                response['msg'] = "failed"
-                response['error_num'] = 1
-            return JsonResponse(response)
-        response['msg'] = "not login"
-        response['error_num'] = 1
-        return JsonResponse(response)
 
 
 def jury_register(request):
@@ -154,6 +70,9 @@ def jury_register(request):
                 response['msg'] = 'create failed'
                 response['error_num'] = 1
             return JsonResponse(response)
+        response['msg'] = 'input error'
+        response['error_num'] = 1
+        return JsonResponse(response)
     response['msg'] = 'have no data'
     response['error_num'] = 1
     return JsonResponse(response)
@@ -171,13 +90,16 @@ def organizer_register(request):
                 uniq = uuid.uuid5(uuid.NAMESPACE_DNS, username)
                 user = User.objects.create_user(username=username, password=md5_pwd, unique_id=uniq, user_type='Org')
                 #Organizer.objects.create(user=user, status=Organizer.STATUS_UNCONFIRM)
-                Organizer.objects.create(user=user, status=Organizer.STATUS_UNCONFIRM)
+                Organizer.objects.create(user=user, status=Organizer.STATUS_CONFIRMED)
                 response['msg'] = 'success'
                 response['error_num'] = 0
             except:
                 response['msg'] = 'create failed'
                 response['error_num'] = 1
             return JsonResponse(response)
+        response['msg'] = 'input error'
+        response['error_num'] = 1
+        return JsonResponse(response)
     response['msg'] = 'have no data'
     response['error_num'] = 1
     return JsonResponse(response)
@@ -189,18 +111,12 @@ def competitor_login(request):
         username = request.POST.get('username')
         password = request.POST.get('password')
         if username and password:
-            username = username.strip()
             try:
-                #user = User.objects.find(username=username)
-                #salt = user.salt
                 pwd = create_md5(password)
-                #if pwd == user.password:
                 user = authenticate(username=username, password=pwd)
-                #user = User.objects.find(username=username, password=pwd)
                 if user.user_type == "Comp":
                     login(request, user)
                     request.session['username'] = username
-                    #request.session.set_expiry(600)  #设置session的过期时间，为600s
                     response['msg'] = 'success'
                     response['error_num'] = 0
                 else:
@@ -210,6 +126,9 @@ def competitor_login(request):
                 response['msg'] = 'find failed'
                 response['error_num'] = 1
             return JsonResponse(response)
+        response['msg'] = 'input error'
+        response['error_num'] = 1
+        return JsonResponse(response)
     response['msg'] = 'create failed'
     response['error_num'] = 1
     return JsonResponse(response)
@@ -221,14 +140,12 @@ def jury_login(request):
         username = request.POST.get('username')
         password = request.POST.get('password')
         if username and password:
-            username = username.strip()
             try:
                 pwd = create_md5(password)
                 user = authenticate(username=username, password=pwd)
                 if user.user_type == "Rat":
                     login(request, user)
                     request.session['username'] = username
-                    #request.session.set_expiry(600)  #设置session的过期时间，为600s
                     response['msg'] = 'success'
                     response['error_num'] = 0
                 else:
@@ -238,6 +155,9 @@ def jury_login(request):
                 response['msg'] = 'no user'
                 response['error_num'] = 1
             return JsonResponse(response)
+        response['msg'] = 'input error'
+        response['error_num'] = 1
+        return JsonResponse(response)
     response['msg'] = 'create failed'
     response['error_num'] = 1
     return JsonResponse(response)
@@ -249,10 +169,8 @@ def organizer_login(request):
         password = request.POST.get('password')
         if username and password:
             pwd = create_md5(password)
-            #user = authenticate(username=username, password=pwd)
             try:
                 user = authenticate(username=username, password=pwd)
-            #if user is not None and (user.user_type == "Org"):
                 if user.organizer.status == Organizer.STATUS_CONFIRMED:
                     login(request, user)
                     response['msg'] = 'success'
@@ -264,6 +182,9 @@ def organizer_login(request):
                 response['msg'] = 'failed'
                 response['error_num'] = 1
             return JsonResponse(response)
+        response['msg'] = 'input error'
+        response['error_num'] = 1
+        return JsonResponse(response)
     response['msg'] = 'failed'
     response['error_num'] = 1
     return JsonResponse(response)
@@ -276,46 +197,51 @@ def admin_login(request):
         username = request.POST.get('username')
         password = request.POST.get('password')
         if username and password:
-            username = username.strip()
             user = authenticate(username=username, password=password)
             if user is not None:
                 if user.is_superuser:
                     login(request, user)
                     response['msg'] = 'success'
                     response['error_num'] = 0
-                else:
-                    response['msg'] = 'create failed'
-                    response['error_num'] = 1
-                return JsonResponse(response)
-    response['msg'] = 'create failed'
+                    return JsonResponse(response)
+            response['msg'] = 'failed'
+            response['error_num'] = 1
+            return JsonResponse(response)
+        response['msg'] = 'input error'
+        response['error_num'] = 1
+        return JsonResponse(response)
+    response['msg'] = 'method failed'
     response['error_num'] = 1
     return JsonResponse(response)
 
 
 def index_competition_list(request):
-    now_time = timezone.now()
-    competition_list = Competition.objects.filter(Q(sign_up_start__gte=now_time) | Q(sign_up_end__lt=now_time))
+    now_time = datetime.datetime.now()
+    print(now_time)
+    competition_list = Competition.objects.filter(Q(sign_up_start__gte=(now_time - datetime.timedelta(days=7))) & Q(sign_up_end__lte=now_time+datetime.timedelta(days=7)))
     response = []
-    if competition_list is not None:
+    if len(competition_list) == 0:
+        cmp = {}
+        cmp['msg'] = 'no data'
+        cmp['error_num'] = 1
+        response.append(cmp)
+        return HttpResponse(json.dumps(response))
+    else:
         for competition in competition_list:
             cmp = {}
+            print(competition.title)
             cmp['title'] = competition.title
-            cmp['sponsor'] = competition.organizer
+            cmp['sponsor'] = competition.sponsor
             #start_time_list = competition.start_time.split(',')
             #cmp['start_time'] = start_time_list[0]
-            #cmp['start_time'] = competition.start_time
+            cmp['start_time'] = competition.start_time
             #end_time_list = competition.end_time.split(',')
             #cmp['end_time'] = end_time_list[-1]
-            #cmp['end_time'] = competition.end_time
+            cmp['end_time'] = competition.end_time
             cmp['msg'] = 'success'
             cmp['error_num'] = 0
             response.append(cmp)
         return HttpResponse(json.dumps(response))
-    cmp = {}
-    cmp['msg'] = 'no data failed'
-    cmp['error_num'] = 1
-    response.append(cmp)
-    return HttpResponse(json.dumps(response))
 
 
 def competitor_competition_list(request):
@@ -323,7 +249,6 @@ def competitor_competition_list(request):
     fail_msg = {}
     if request.user.is_authenticated():
         try:
-            #competitor = Competitor.objects.find(user=request.user)
             competitor = request.user.competitor
             competition_list = competitor.activity_list.split(',')
             if competition_list is not None:
@@ -352,7 +277,6 @@ def jury_competition_list(request):
     fail_msg = {}
     if request.user.is_authenticated():
         try:
-            #jury = jury.objects.find(user=request.user)
             jury = request.user.jury
             competition_list = jury.activity_list.split(',')
             if competition_list is not None:
@@ -362,16 +286,17 @@ def jury_competition_list(request):
                     org['msg'] = 'success'
                     org['error_num'] = 0
                     response.append(org)
-                    
                 return HttpResponse(json.dumps(response))
             fail_msg['msg'] = 'recent has no competition'
             fail_msg['error_num'] = 1
             response.append(fail_msg)
             return HttpResponse(json.dumps(response))
         except:
-            fail_msg['msg'] = 'failed'
+            fail_msg['msg'] = 'no permission'
             fail_msg['error_num'] = 1
-    fail_msg['msg'] = 'failed'
+            response.append(fail_msg)
+            return HttpResponse(json.dumps(response))
+    fail_msg['msg'] = 'not log in'
     fail_msg['error_num'] = 1
     response.append(fail_msg)
     return HttpResponse(json.dumps(response))
@@ -382,7 +307,6 @@ def organizer_competition_list(request):
     fail_msg = {}
     if request.user.is_authenticated():
         try:
-            #organizer = Competitor.objects.find(user=request.user)
             organizer = request.user.organizer
             competition_list = organizer.activity_list.split(',')
             if competition_list is not None:
@@ -398,9 +322,11 @@ def organizer_competition_list(request):
             response.append(fail_msg)
             return HttpResponse(json.dumps(response))
         except:
-            fail_msg['msg'] = 'failed'
+            fail_msg['msg'] = 'no permission'
             fail_msg['error_num'] = 1
-    fail_msg['msg'] = 'not login'
+            response.append(fail_msg)
+            return HttpResponse(json.dumps(response))
+    fail_msg['msg'] = 'not log in'
     fail_msg['error_num'] = 1
     response.append(fail_msg)
     return HttpResponse(json.dumps(response))
@@ -418,13 +344,11 @@ def competitor_sign_up(request):
                     competitor.competition_list = name
                 else:
                     competitor.competition_list = competitor.competition_list + "," + name
-                print(competitor.competition_list)
                 competitor.save()
                 if competition.competitor_list == "":
                     competition.competitor_list = request.user.username
                 else:
                     competition.competitor_list = competition.competitor_list + "," + request.user.username
-                print(competition.competitor_list)
                 competition.save()
                 response['msg'] = 'success'
                 response['error_num'] = 0
@@ -438,22 +362,23 @@ def competitor_sign_up(request):
     return JsonResponse(response)
 
 
-# 参考：https://www.jianshu.com/p/1a5546ce0c92
 def file_upload(request):
     response = {}
     if request.user.is_authenticated():
         if request.method == "POST":
-            #competition = request.POST.get("competition")
             file = request.FILES.get("userfile", None)
             competition = request.POST.get('competition')
+            if file is None and competition is None:
+                response['msg'] = 'input error'
+                response['error_num'] = 1
+                return JsonResponse(response)
             name = file.name.split('.')
-            file_name = name[0] + request.user.unique_id[0:10] + '.'+name[-1] 
+            str_rand = str(uuid.uuid4())
+            file_name = name[0] + request.user.unique_id[0:10] + str_rand[0:4] + '.'+name[-1] 
             with open('templates/file/%s' % file_name, 'wb+') as f:
                 for chunk in file.chunks():
                     f.write(chunk)
-            file_url = os.path.join('templates/file', file_name).replace('\\', '/')
-            #url = "http://" + settings.SITE_DOMAIN + file_url
-            #competitor = request.user.competitor
+            #file_url = os.path.join('templates/file', file_name).replace('\\', '/')
             
             try:
                 file = UserFile.objects.get(username=request.user.username, competition=competition)
@@ -474,11 +399,14 @@ def file_upload(request):
     return JsonResponse(response)
 
 
-# 参考网址：https://blog.igevin.info/posts/django-download-function/
-#           https://blog.csdn.net/qq_30291335/article/details/79497911
 def file_download(request):
+    fail_response = {}
     if request.method == "POST":
         file = request.POST.get('filename')
+        if file is None:
+            fail_response['msg'] = 'input error'
+            fail_response['error_num'] = 1
+            return JsonResponse(fail_response)
         filename = os.path.join('templates/file', file).replace('\\', '/')
         try:
             def file_iterator(file_name, chunk_size=512):
@@ -489,14 +417,17 @@ def file_download(request):
                             yield c
                         else:
                             break
-            #filename = "test.txt"
             response = StreamingHttpResponse(file_iterator(filename))
             response['Content-Type'] = 'application/octet-stream'
             response['Content-Disposition'] = "attachment;filename*=utf-8''{}".format(escape_uri_path(filename))
             return response
         except:
-            return HttpResponse("download failed")
-    return HttpResponse("method wrong")
+            fail_response['msg'] = 'download failed'
+            fail_response['error_num'] = 1
+            return JsonResponse(fail_response)
+    fail_response['msg'] = 'method error'
+    fail_response['error_num'] = 1
+    return JsonResponse(fail_response)
 
 
 def grade_upload(request):
@@ -509,14 +440,11 @@ def grade_upload(request):
                 print('ok')
                 file = UserFile.objects.get(file_url=file_url)
                 grade = file.grade_list.split(',')
-                print(grade)
                 jury_list=file.jury_list.split(',')
-                print(jury_list)
                 i = 0
-                print(request.user.username)
                 for jury in jury_list:
                     if jury == request.user.username:
-                        grade[i] = mygrade 
+                        grade[i] = mygrade
                     i = i+1
                 str = ','
                 file.grade_list = str.join(grade)
@@ -530,6 +458,45 @@ def grade_upload(request):
                 response['error_num'] = 1
                 return JsonResponse(response)
     response['msg'] = 'not login'
+    response['error_num'] = 1
+    return JsonResponse(response)
+
+
+def check_grade(request):
+    response = {}
+    if request.user.is_authenticated():
+        if request.method == "GET" and request.user.user_type == "Comp":
+            competition = request.GET.get('competition_name')
+            try:
+                file = UserFile.objects.get(username=request.user.username, competition=competition)
+                print(file.grade_list)
+                if file.grade == 0.0:
+                    grade_list = file.grade_list.split(',')
+                    jury_count = file.jury_count
+                    ans = 0.0
+                    if len(grade_list) == jury_count:
+                        for grade in grade_list:
+                            ans = ans + int(grade)
+                        ans = ans / jury_count
+                        file.grade = ans
+                        file.save()
+                        response['grade'] = ans
+                        response['msg'] = 'success'
+                        response['error_num'] = 0
+                        return JsonResponse(response)
+                    response['msg'] = 'not finished'
+                    response['error_num'] = 1
+                    return JsonResponse(response)
+                else:
+                    response['grade'] = file.grade
+                    response['msg'] = 'success'
+                    response['error_num'] = 0
+                    return JsonResponse(response)        
+            except:
+                response['msg'] = 'no file'
+                response['error_num'] = 1
+                return JsonResponse(response)
+    response['msg'] = 'not log in'
     response['error_num'] = 1
     return JsonResponse(response)
 
@@ -619,9 +586,9 @@ def admin_to_confirm(request):
     response = {}
     if request.method == "POST":
         username = request.POST.get('username')
-        # unique_id = request.POST.get('unique_id')
+        unique_id = request.POST.get('unique_id')
         try:
-            user = User.objects.get(username=username,user_type="Org")
+            user = User.objects.get(username=username, unique_id=unique_id,user_type="Org")
             organizer = Organizer.objects.get(user=user, status=Organizer.STATUS_UNCONFIRM)
             organizer.status = Organizer.STATUS_CONFIRMED
             organizer.save()
@@ -638,26 +605,24 @@ def admin_to_confirm(request):
 
 # 把paper_count张卷子平均划分为per_person个任务
 def partition(Task,paper_count,per_person,file_list):
-    print("start")
+    #print("start")
     for i in range(paper_count):
         Task[i/per_person][i%per_person] = file_list[i]
 
 
 #把第m个任务分给第K个阅卷人
 def assign(Task,jury_li,m,k,per_person):
-    print(m)
-    print(k)
     for i in range(per_person):
         #Teacher[k][i] = Task[m][i]
         if Task[m][i] is None:
             return
-        print(jury_li[k].file_list)
-        print(Task[m][i].file_url)
+        #print(jury_li[k].file_list)
+        #print(Task[m][i].file_url)
         if jury_li[k].file_list == "":
             jury_li[k].file_list = Task[m][i].file_url
         else:
             jury_li[k].file_list = jury_li[k].file_list + "," + Task[m][i].file_url
-        print(jury_li[k].file_list)
+        #print(jury_li[k].file_list)
         jury_li[k].file_count = jury_li[k].file_count + 1
         jury_li[k].save()
         if Task[m][i].jury_list == "":
@@ -670,56 +635,56 @@ def assign(Task,jury_li,m,k,per_person):
             Task[m][i].grade_list = Task[m][i].grade_list + ",0" 
         Task[m][i].jury_count = Task[m][i].jury_count + 1
         Task[m][i].save()
-        print("ok")
+        #print("ok")
 
 
 def divide_paper(request):
     if request.user.is_authenticated() and request.user.user_type == "Org":
         if request.method == "POST":
             title = request.POST.get("competition_name")
-            print(title)
+            #print(title)
             per_time = int(request.POST.get("time")) #阅卷次数
-            print(per_time)
+            #print(per_time)
             file_list=[]
             jury_li = []
             try:
-                print(request.user.username)
+                #print(request.user.username)
                 competition = Competition.objects.get(title=title, organizer=request.user.username)
                 user_list = competition.competitor_list.split(",")
-                print(user_list)
+                #print(user_list)
                 paper_count = len(user_list)  #试卷数量
-                print(paper_count)
+                #print(paper_count)
                 jury_list = competition.jury_list.split(",")
-                print(jury_list)
+                #print(jury_list)
                 jury_count = len(jury_list)   #阅卷人数
-                print(jury_count)
+                #print(jury_count)
                 per_person = int(paper_count/jury_count + 1) #每个人平均任务量
                 for user in user_list:
-                    print(user)
+                    #print(user)
                     new_file = UserFile.objects.get(username=user, competition=title)
                     file_list.append(new_file)
                 for jury in jury_list:
-                    print(jury)
+                    #print(jury)
                     new_jury = JuryFile.objects.get(jury=jury, competition=title)
                     jury_li.append(new_jury)
-                print(per_person)
-                print(jury_count)
+                #print(per_person)
+                #print(jury_count)
                 Task = [([None]*int(per_person)) for i in range(jury_count)] 
                 #Teacher = [(range(per_person) for i in range(jury_count)]
                 print(Task[0][0])
                 #partition(Task,paper_count,per_person,file_list)
                 for i in range(paper_count):
-                    print(i)
+                    #print(i)
                     Task[int(i/per_person)][i%per_person] = file_list[i]
                 for i in range(per_time):
                     count = 0
                     j = i
                     for count in range(jury_count):
-                        print(count)
+                        #print(count)
                         assign(Task,jury_li,count,j,per_person)
                         j = (j+1)%jury_count
-                for jury in jury_li:
-                    print(jury.file_list)
+                #for jury in jury_li:
+                    #print(jury.file_list)
                 return HttpResponse("success")
             except:
                 return HttpResponse("divide fail")
@@ -729,23 +694,23 @@ def divide_paper(request):
 
 def create_competition(request):
     response = {}
-    print(request.user.user_type)
+    #print(request.user.user_type)
     if request.user.is_authenticated() and request.user.user_type=='Org':
         if request.method == "POST":
             title = request.POST.get('title')
-            print(title)
+            #print(title)
             description = request.POST.get('description')
-            print(description)
+            #print(description)
             sign_up_start = request.POST.get('sign_up_start')
-            print(sign_up_start)
+            #print(sign_up_start)
             sign_up_end = request.POST.get('sign_up_end')
-            print(sign_up_end)
+            #print(sign_up_end)
             start_time = request.POST.get('start_time')
-            print(start_time)
+            #print(start_time)
             end_time = request.POST.get("end_time")
-            print(end_time)
+            #print(end_time)
             sponsor = request.POST.get('sponsor')
-            print(title)
+            #print(title)
             # there are some information of the competition
             organizer = request.user.username
             try:
@@ -773,25 +738,31 @@ def invite_jury(request):
             jury = request.POST.get("jury")
             title = request.POST.get("competition_name")
             try:
-                pre_jury = JuryFile.objects.get(jury=jury, competition=title)
-                response['msg'] = 'exist'
-                response['error_num'] = 1
+                exist_jury = User.objects.get(username=jury, user_type="Rat")
+                try:
+                    pre_jury = JuryFile.objects.get(jury=jury, competition=title)
+                    response['msg'] = 'exist'
+                    response['error_num'] = 1
+                    return JsonResponse(response)
+                except:
+                    try:
+                        competition = Competition.objects.get(title=title,organizer=request.user.username)
+                        if competition.jury_list == "":
+                            competition.jury_list = jury
+                        else:
+                            competition.jury_list = competition.jury_list + "," + jury
+                        competition.save()
+                        JuryFile.objects.create(jury=jury, competition=title)
+                        response['msg'] = 'success'
+                        response['error_num'] = 0
+                    except:
+                        response['msg'] = 'error'
+                        response['error_num'] = 1
                 return JsonResponse(response)
             except:
-                try:
-                    competition = Competition.objects.get(title=title,organizer=request.user.username)
-                    if competition.jury_list == "":
-                        competition.jury_list = jury
-                    else:
-                        competition.jury_list = competition.jury_list + "," + jury
-                    competition.save()
-                    JuryFile.objects.create(jury=jury, competition=title)
-                    response['msg'] = 'success'
-                    response['error_num'] = 0
-                except:
-                    response['msg'] = 'error'
-                    response['error_num'] = 1
-            return JsonResponse(response)
+                response['msg'] = 'no user'
+                response['error_num'] = 1
+                return JsonResponse(response)
         response['msg'] = 'not POST'
         response['error_num'] = 1
         return JsonResponse(response)
@@ -822,7 +793,7 @@ def search_competition(request):
             for competition in competition_list:
                 content = {}
                 content['title'] = competition.title
-                content['sponsor'] = competition.organizer
+                content['sponsor'] = competition.sponsor
                 content['msg'] = 'success'
                 content['error_num'] = 0
                 response.append(content)
