@@ -2,6 +2,7 @@ from django.test import TestCase
 from django.test.client import Client
 import unittest
 from hashlib import md5
+import datetime
 from django.core.management import call_command
 from website.models import *
 import json
@@ -26,7 +27,8 @@ class TestRegister(unittest.TestCase):
         self.assertEqual(response.content.decode('utf-8'), '{"msg": "success", "error_num": 0}')
 
 class TestCompetitorLogin(unittest.TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpClass(cls):
         user = User.objects.create_user(username="comp", password=md5(("2018").encode('utf-8')).hexdigest(), user_type="Comp")
         Competitor.objects.create(user=user)
 
@@ -35,9 +37,19 @@ class TestCompetitorLogin(unittest.TestCase):
         response = c.post('/api/login_competitor/', {'username': 'comp', 'password': '2018'})
         self.assertEqual(response.content.decode('utf-8'), '{"msg": "success", "error_num": 0}')
 
+    def test_competitor_login1(self):
+        c = Client()
+        response = c.post('/api/login_competitor/', {'username': 'comp'})
+        self.assertEqual(response.content.decode('utf-8'), '{"msg": "input error", "error_num": 1}')
+
+    def test_competitor_login2(self):
+        c = Client()
+        response = c.post('/api/login_competitor/', {'password': '2018'})
+        self.assertEqual(response.content.decode('utf-8'), '{"msg": "input error", "error_num": 1}')
 
 class TestJuryLogin(unittest.TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpClass(cls):
         user = User.objects.create_user(username="jury", password=md5(("2018").encode('utf-8')).hexdigest(), user_type="Rat")
         Jury.objects.create(user=user)
 
@@ -46,35 +58,60 @@ class TestJuryLogin(unittest.TestCase):
         response = c.post('/api/login_jury/', {'username': 'jury', 'password': '2018'})
         self.assertEqual(response.content.decode('utf-8'), '{"msg": "success", "error_num": 0}')
 
+    def test_jury_login1(self):
+        c = Client()
+        response = c.post('/api/login_jury/', {'username': 'jury'})
+        self.assertEqual(response.content.decode('utf-8'), '{"msg": "input error", "error_num": 1}')
+
+    def test_jury_login2(self):
+        c = Client()
+        response = c.post('/api/login_jury/', {'password': '2018'})
+        self.assertEqual(response.content.decode('utf-8'), '{"msg": "input error", "error_num": 1}')
+
 class TestAdminLogin(unittest.TestCase):
-    def setUp(self):
-        user = User.objects.create_superuser(username="superuser",email="", password=md5(("2018").encode('utf-8')).hexdigest(), user_type="SU")
+    @classmethod
+    def setUpClass(cls):
+        user = User.objects.create_superuser(username="superuser",email="", password='2018', user_type="SU")
 
     def test_admin_login(self):
         c = Client()
-        response = c.post('/api/login_superuser/', {'username': 'superuser', 'password': md5(("2018").encode('utf-8')).hexdigest()})
+        response = c.post('/api/login_superuser/', {'username': 'superuser', 'password':'2018'})
         self.assertEqual(response.content.decode('utf-8'), '{"msg": "success", "error_num": 0}')
 
 
 
 class TestOrganizerLogin(unittest.TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpClass(cls):
         user = User.objects.create_user(username="org", password=md5(("2018").encode('utf-8')).hexdigest(), user_type="Org")
         Organizer.objects.create(user=user,status=Organizer.STATUS_UNCONFIRM)
 
         user = User.objects.create_user(username="org1", password=md5(("2018").encode('utf-8')).hexdigest(), user_type="Org")
         Organizer.objects.create(user=user,status=Organizer.STATUS_CONFIRMED)
 
-    def test_organizer_login(self):
+    def test_organizer_login_unconfirm(self):
         c = Client()
         response = c.post('/api/login_organizer/', {'username': 'org', 'password': '2018'})
         self.assertEqual(response.content.decode('utf-8'), '{"msg": "have not confirmed", "error_num": 1}')
+
+    def test_organizer_login_confirmed(self):
+        c = Client()
         response = c.post('/api/login_organizer/', {'username': 'org1', 'password': '2018'})
         self.assertEqual(response.content.decode('utf-8'), '{"msg": "success", "error_num": 0}')
 
+    def test_organizer_login_confirmed1(self):
+        c = Client()
+        response = c.post('/api/login_organizer/', {'username': 'org1'})
+        self.assertEqual(response.content.decode('utf-8'), '{"msg": "input error", "error_num": 1}')
+
+    def test_organizer_login_confirmed2(self):
+        c = Client()
+        response = c.post('/api/login_organizer/', {'password': '2018'})
+        self.assertEqual(response.content.decode('utf-8'), '{"msg": "input error", "error_num": 1}')
 
 class TestCreateCompetition(unittest.TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpClass(cls):
         user = User.objects.create_user(username="org2", password=md5(("2018").encode('utf-8')).hexdigest(), user_type="Org")
         Organizer.objects.create(user=user,status=Organizer.STATUS_CONFIRMED)
 
@@ -84,8 +121,16 @@ class TestCreateCompetition(unittest.TestCase):
         response = c.post('/api/create_competition/',{'title':'test','description':'test','sign_up_start':'2018-12-25','sign_up_end':'2018-12-25','start_time':'2018-12-26','end_time':'2018-12-26','sponsor':'test'})
         self.assertEqual(response.content.decode('utf-8'), '{"msg": "success", "error_num": 0}')
 
+
+class TestCompetitorCompetitionList(unittest.TestCase):
+    def test_competitor_competition_list(self):
+        c = Client()
+        response = c.post('/api/login_organizer/', {'username': 'org2', 'password': '2018'})
+
+
 class TestInviteJury(unittest.TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpClass(cls):
         user = User.objects.create_user(username="jury1", password=md5(("2018").encode('utf-8')).hexdigest(), user_type="Rat")
         Jury.objects.create(user=user)
         user = User.objects.create_user(username="org3", password=md5(("2018").encode('utf-8')).hexdigest(), user_type="Org")
@@ -99,27 +144,28 @@ class TestInviteJury(unittest.TestCase):
         self.assertEqual(response.content.decode('utf-8'), '{"msg": "success", "error_num": 0}')
 
 
-'''class TestIndexCompetitionList(unittest.TestCase):
-    def setUp(self):
-        Competition.objects.create(title='test1', description='test1', sign_up_end='2018-12-25', sign_up_start='2018-12-25', start_time='2018-12-26', end_time='2018-12-26',
+class TestIndexCompetitionList(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        now_time = datetime.datetime.now()
+        Competition.objects.create(title='test1', description='test1', sign_up_end=now_time, sign_up_start=now_time, start_time='2018-12-26', end_time='2018-12-26',
                                                         organizer='organizer1', sponsor='sponsor1')
-        Competition.objects.create(title='test2', description='test2', sign_up_end='2018-12-25', sign_up_start='2018-12-25', start_time='2018-12-26', end_time='2018-12-26',
+        Competition.objects.create(title='test2', description='test2', sign_up_end=now_time, sign_up_start=now_time, start_time='2018-12-26', end_time='2018-12-26',
                                                         organizer='organizer2', sponsor='sponsor2')
+    
     def test_index_competition_list(self):
         c = Client()
         response = c.get('/api/index_competition_list/')
         response = json.loads(response.content)
         print(response)
-        self.assertEqual(response,[{'title': 'test1', 'organizer': 'organizer1', 'type': '', 'start_time': '2018-12-26', 'end_time': '2018-12-26', 'msg': 'success', 'error_num': 0}, {'title': 'test2', 'organizer': 'organizer2', 'type': '', 'start_time': '2018-12-26', 'end_time': '2018-12-26', 'msg': 'success', 'error_num': 0}])
-'''
-'''class TestCompetitorCompetitionList(unittest.TestCase):
-    def test_competitor_competition_list(self):
-        c = Client()
-        response'''
+        self.assertEqual(response,[{'title': 'test1', 'sponsor': 'sponsor1','start_time': '2018-12-26', 'end_time': '2018-12-26', 'msg': 'success', 'error_num': 0}, 
+                                   {'title': 'test2', 'sponsor': 'sponsor2','start_time': '2018-12-26', 'end_time': '2018-12-26', 'msg': 'success', 'error_num': 0}])
+
 
 
 class TestUploadFile(unittest.TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpClass(cls):
         user = User.objects.create_user(username="comp1", password=md5(("2018").encode('utf-8')).hexdigest(), user_type="Comp")
         Competitor.objects.create(user=user)
 
@@ -134,7 +180,8 @@ class TestUploadFile(unittest.TestCase):
 
 
 class TestDividePaper(unittest.TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpClass(cls):
         user = User.objects.create_user(username="jury2", password=md5(("2018").encode('utf-8')).hexdigest(), user_type="Rat")
         Jury.objects.create(user=user)
         user = User.objects.create_user(username="jury3", password=md5(("2018").encode('utf-8')).hexdigest(), user_type="Rat")
@@ -154,7 +201,7 @@ class TestDividePaper(unittest.TestCase):
         c = Client()
         c.post('/api/login_competitor/',{'username':'comp2','password':'2018'})
         response = c.get('/api/sign_up/',{'competition_name':'test4'})
-        print(response.content)
+        #print(response.content)
         with open('test1.txt','rb') as fp:
             response = c.post('/api/upload/', {'userfile':fp,'competition':'test4'})
             #print(response.content)
@@ -174,13 +221,14 @@ class TestDividePaper(unittest.TestCase):
         response = c.post('/api/invite_jury/',{"jury":"jury3","competition_name":"test4"})
         #print(response.content)
         response = c.post('/api/divide_paper/',{'competition_name':'test4','time':2})
-        print(response.content)
+        #print(response.content)
         response = c.post('/api/login_jury/', {'username': 'jury2', 'password': '2018'})
         response = c.post('/api/grade_upload/',{'grade':'98','filepath':'test2.txt'})
-        print(response.content)
+        #print(response.content)
 
 class TestCompetitorSignUp(unittest.TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpClass(cls):
         user = User.objects.create_user(username="comp5", password=md5(("2018").encode('utf-8')).hexdigest(), user_type="Comp")
         Competitor.objects.create(user=user)
         Competition.objects.create(title='test5', description='test5', sign_up_end='2018-12-25', sign_up_start='2018-12-25', start_time='2018-12-26', end_time='2018-12-26',
@@ -190,3 +238,23 @@ class TestCompetitorSignUp(unittest.TestCase):
         response = c.post('/api/login_competitor/',{'username':'comp5','password':'2018'})
         response = c.get('/api/sign_up/',{'competition_name':'test5'})
         self.assertEqual(response.content.decode('utf-8'), '{"msg": "success", "error_num": 0}')
+
+class TestCheckGrade(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        user = User.objects.create_user(username="comp6", password=md5(("2018").encode('utf-8')).hexdigest(), user_type="Comp")
+        Competitor.objects.create(user=user)
+        UserFile.objects.create(username='comp6',competition='test_test_grade',grade=98.8)
+        UserFile.objects.create(username='comp6',competition='test_grade_list',grade_list="100,98,99",jury_count=3)
+
+    def test_check_grade(self):
+        c = Client()
+        response = c.post('/api/login_competitor/',{'username':'comp6','password':'2018'})
+        response = c.get('/api/check_grade/',{'competition_name':'test_test_grade'})
+        self.assertEqual(response.content.decode('utf-8'), '{"grade": 98.8, "msg": "success", "error_num": 0}')
+    
+    def test_grade_list(self):
+        c = Client()
+        response = c.post('/api/login_competitor/',{'username':'comp6','password':'2018'})
+        response = c.get('/api/check_grade/',{'competition_name':'test_grade_list'})
+        self.assertEqual(response.content.decode('utf-8'), '{"grade": 99.0, "msg": "success", "error_num": 0}')

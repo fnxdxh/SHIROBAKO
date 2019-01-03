@@ -12,6 +12,7 @@ urlpatterns = [
     url(r'^index_competition_list/', index_competition_list),
     url(r'^jury_competition_list/', jury_competition_list),
     url(r'^organizer_competition_list/', organizer_competition_list),
+    url(r'^competitor_competition_list/', competitor_competition_list),
     url(r'^upload/', file_upload),
     url(r'^file_download/', file_download),
     url(r'^create_competition/',create_competition),
@@ -25,4 +26,5 @@ urlpatterns = [
     url(r'^invite_jury/', invite_jury),
     url(r'^sign_up/', competitor_sign_up),
     url(r'^grade_upload/', grade_upload),
+    url(r'^check_grade/', check_grade),
 ]

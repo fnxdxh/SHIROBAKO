@@ -19,7 +19,7 @@ class Competitor(models.Model):
     competition_list = models.TextField(default='')
 
     # basic_info:
-    school = models.CharField(max_length=128)
+    school = models.CharField(max_length=128,default='')
 
 
 class Organizer(models.Model):
@@ -67,43 +67,21 @@ class Competition(models.Model):
 
 
 class UserFile(models.Model):
-    username = models.CharField(max_length=128)
-    competition = models.CharField(max_length=128)
-    file_url = models.CharField(max_length=128)
+    username = models.CharField(max_length=128,default='')
+    competition = models.CharField(max_length=128,default='')
+    file_url = models.CharField(max_length=128,default='')
     grade_list = models.CharField(max_length=128,default="")
     jury_list = models.CharField(max_length=128,default="")
-    grade = models.FloatField(default=0)
+    grade = models.FloatField(default=0.0)
     jury_count = models.IntegerField(default=0)
 
 
 class JuryFile(models.Model):
-    file_list = models.TextField()
-    jury = models.CharField(max_length=128)
-    competition = models.CharField(max_length=128)
+    file_list = models.TextField(default='')
+    jury = models.CharField(max_length=128,default='')
+    competition = models.CharField(max_length=128,default='')
     file_count = models.IntegerField(default=0)
     finished_count = models.IntegerField(default=0)
 
-
-'''class OrgCompetition(models.Model):
-    title = models.CharField(max_length=128)
-    organizer = models.ForeignKey(Organizer)
-    stage = models.IntegerField()
-    description = models.TextField()
-
-    STATUS_PREPARE = 0
-    STATUS_PRELIMINARY = 1
-    STATUS_SEMIFINALS = 2
-    STATUS_FINAL = 3
-    STATUS_SUSPEND = 4
-    STATUS_END = 5
-
-
-class UserCompetition(models.Model):
-    title = models.CharField(max_length=128)
-    file_url = models.URLField()
-    grade = models.IntegerField()
-    competiton = models.ForeignKey(OrgCompetition)
-    competitor = models.OneToOneField(User)
-    jury = models.ManyToManyField(jury)'''
 
 
