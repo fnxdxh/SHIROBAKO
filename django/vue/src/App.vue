@@ -5,18 +5,24 @@
         <el-row>
           <el-col :span="5">
             <router-link to="/home">
-              <!-- <img src="\src\assets\images\logo.jpg"> -->
               <h3>SHIROBAKO</h3>
             </router-link>
           </el-col>
-          <el-col :span="6">
+          <el-col :span="4">
             <el-menu mode="horizontal" :router="true">
               <el-menu-item index="/home">首页</el-menu-item>
               <el-menu-item index="/matchlist">赛事</el-menu-item>
             </el-menu>
           </el-col>
-          <el-col :span="5">
-            <el-input placeholder="请输入内容" prefix-icon="el-icon-search"></el-input>
+          <el-col :span="7">
+            <el-form :inline="true" :model="formInline">
+              <el-form-item>
+                <el-input v-model="formInline.keyword" placeholder="请输入关键词"></el-input>
+              </el-form-item>
+              <el-form-item>
+                <el-button type="primary" @click="search">搜索</el-button>
+              </el-form-item>
+            </el-form>
           </el-col>
           <el-col :span="1" :offset="3">
             <i class="el-icon-bell"></i>
@@ -66,24 +72,29 @@
 export default {
   data() {
     return {
-      
+      formInline: {
+        keyword: ''
+      }
     };
   },
-   methods: {
-      logout() {
-        console.log('logout')
-        this.$http.get("api/logout/").then(result => {
-          console.log(result.body);
-          if (result.body.error_num === 0){
-            alert("登出成功");
-            this.$store.commit('logout')
-            this.$router.push({path: '/home'})
-          }
-          else {
-            alert("登出失败")
-          }
-        })
-      }
+  methods: {
+    search() {
+      this.$http.post("api/search/", {to_search: this.formInline.keyword}).then(result => {
+        this.$store.commit("writelist", result.body)
+      })
+    },
+    logout() {
+      this.$http.get("api/logout/").then(result => {
+        console.log(result.body);
+        if (result.body.error_num === 0) {
+          alert("登出成功");
+          this.$store.commit("logout");
+          this.$router.push({ path: "/home" });
+        } else {
+          alert("登出失败");
+        }
+      });
+    }
   }
 };
 </script>
