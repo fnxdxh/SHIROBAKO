@@ -8,7 +8,7 @@
     style="width: 100%">
         <el-table-column
         prop="judge"
-        label="评委用户名"
+        label="已邀请评委"
         width="180">
         </el-table-column>
     </el-table>
@@ -34,13 +34,19 @@ export default {
             let competition = temp_list[temp_list.length - 1];
             formData.append('jury',jury);
             formData.append('competition_name',competition);
-            this.tableData.push({judge: jury});
             this.$http.post('http://127.0.0.1:8000/api/invite_jury/',formData,{
                 headers:{'Content-Type':'multipart/form-data'}
             }).then(response=>{
-                alert('邀请成功！');
+                var response_list = response.body;
+                if (response_list['msg'] == 'no user') {
+                    alert('您邀请的用户不存在！');
+                }
+                else if(response_list['msg'] == 'success'){
+                    alert('邀请成功！')
+                    this.tableData.push({judge: jury});
+                }
             }
-            );
+            ).catch();
         }
     }
 }
