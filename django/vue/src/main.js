@@ -6,6 +6,7 @@ import VueRouter from 'vue-router'
 import router from './router.js'
 import VueResource from 'vue-resource'
 import store from './store.js'
+import 'bootstrap/dist/css/bootstrap.min.css'
 
 Vue.use(ElementUI)
 Vue.use(VueRouter)

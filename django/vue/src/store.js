@@ -15,6 +15,10 @@ var store = new Vuex.Store({
         state.identify = identify;
         state.islogin = true;
       },
+      logout(state) {
+        state.identify = 0;
+        state.islogin = false;
+      },
       setSession(username){
         sessionStorage.setItem("username", username);
       }

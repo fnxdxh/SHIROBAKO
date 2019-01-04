@@ -11,7 +11,7 @@
         label="上传文件"
         width="400">
         <template slot-scope="scope">
-        <input style="width: 260px" type="file" @change="getFile($event,scope.row.name)">上传</input>
+        <input style="width: 260px" type="file" @change="getFile($event,scope.row.name)"></input>
         <el-button type="primary"  @click="FileUpload">上传文件</el-button>
       </template>
       </el-table-column>
@@ -37,7 +37,10 @@
           }],
           refs: ["http://127.0.0.1:8000/api/upload/"],
           compet_list: [],
-          items:{username:""}
+          items:{username:""},
+          file_list:[
+            {name:''}
+          ]
         }
       },
       methods:{
@@ -47,7 +50,9 @@
             //let formData = new FormData();
             //var formData = new FormData();
             var formData = new window.FormData();
-            formData.append('userfile', document.querySelector('input[type=file]').files[0]);
+            var file_upload = document.querySelector('input[type=file]').files[0];
+            console.log(file_upload);
+            formData.append('userfile',this.file);
             //formData.append("file", this.file);
             console.log(formData.get('userfile'));
             formData.append('competition', this.competition);
@@ -63,7 +68,9 @@
         },
         getFile(e,name){
           console.log(e);
-          this.file = e.target.files[0];
+          var file = e.target.files[0];
+          this.file = file;
+          console.log(this.file);
           this.competition = name;
       }
     },
