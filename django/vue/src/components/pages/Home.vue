@@ -64,7 +64,7 @@ export default {
     
   },
   mounted(){
-      this.$http.get('http://127.0.0.1:8000/api/organizer_competition_list/').then(response=>{
+      this.$http.get('http://127.0.0.1:8000/api/index_competition_list/').then(response=>{
         this.compet_list = response.body;
       });;
   }

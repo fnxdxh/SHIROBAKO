@@ -241,7 +241,7 @@ class TestDividePaper(unittest.TestCase):
         response = c.post('/api/invite_jury/',{"jury":"jury3","competition_name":"test4"})
         #print(response.content)
         response = c.post('/api/divide_paper/',{'competition_name':'test4','time':2})
-        self.assertEqual(response.content.decode('utf-8'),'success')
+        self.assertEqual(response.content.decode('utf-8'),'{"msg": "success", "error_num": 0}')
 
 
 class TestGradeUpload(unittest.TestCase):
