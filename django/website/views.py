@@ -129,7 +129,7 @@ def competitor_login(request):
         response['msg'] = 'input error'
         response['error_num'] = 1
         return JsonResponse(response)
-    response['msg'] = 'create failed'
+    response['msg'] = 'failed'
     response['error_num'] = 1
     return JsonResponse(response)
 
@@ -158,7 +158,7 @@ def jury_login(request):
         response['msg'] = 'input error'
         response['error_num'] = 1
         return JsonResponse(response)
-    response['msg'] = 'create failed'
+    response['msg'] = 'failed'
     response['error_num'] = 1
     return JsonResponse(response)
 
@@ -179,7 +179,7 @@ def organizer_login(request):
                     response['msg'] = 'have not confirmed'
                     response['error_num'] = 1
             except:
-                response['msg'] = 'failed'
+                response['msg'] = 'no user'
                 response['error_num'] = 1
             return JsonResponse(response)
         response['msg'] = 'input error'
@@ -210,13 +210,13 @@ def admin_login(request):
         response['msg'] = 'input error'
         response['error_num'] = 1
         return JsonResponse(response)
-    response['msg'] = 'method failed'
+    response['msg'] = 'have no data'
     response['error_num'] = 1
     return JsonResponse(response)
 
 
 def index_competition_list(request):
-    now_time = datetime.datetime.now()
+    now_time = datetime.datetime.now(tz=timezone.utc)
     print(now_time)
     competition_list = Competition.objects.filter(Q(sign_up_start__gte=(now_time - datetime.timedelta(days=7))) & Q(sign_up_end__lte=now_time+datetime.timedelta(days=7)))
     response = []
@@ -269,7 +269,7 @@ def competitor_competition_list(request):
             fail_msg['error_num'] = 1
             response.append(fail_msg)
             return HttpResponse(json.dumps(response))
-    fail_msg['msg'] = 'no user'
+    fail_msg['msg'] = 'not log in'
     fail_msg['error_num'] = 1
     response.append(fail_msg)
     return HttpResponse(json.dumps(response))
@@ -329,7 +329,7 @@ def organizer_competition_list(request):
                     response.append(org)
                 return HttpResponse(json.dumps(response))
         except:
-            fail_msg['msg'] = 'no permission'
+            fail_msg['msg'] = 'failed'
             fail_msg['error_num'] = 1
             response.append(fail_msg)
             return HttpResponse(json.dumps(response))
@@ -431,8 +431,8 @@ def file_upload(request):
 
 def file_download(request):
     fail_response = {}
-    if request.method == "POST":
-        file = request.POST.get('filename')
+    if request.method == "GET":
+        file = request.GET.get('filename')
         if file is None:
             fail_response['msg'] = 'input error'
             fail_response['error_num'] = 1
@@ -452,7 +452,7 @@ def file_download(request):
             response['Content-Disposition'] = "attachment;filename*=utf-8''{}".format(escape_uri_path(filename))
             return response
         except:
-            fail_response['msg'] = 'download failed'
+            fail_response['msg'] = 'failed'
             fail_response['error_num'] = 1
             return JsonResponse(fail_response)
     fail_response['msg'] = 'method error'
@@ -536,8 +536,8 @@ def file_list(request):
     response = []
     org = {}
     if request.user.is_authenticated():
-        if request.method == "POST":
-            competition = request.POST.get("competition_name")
+        if request.method == "GET":
+            competition = request.GET.get("competition_name")
             try:
                 jury_file = JuryFile.objects.get(competition=competition, jury=request.user.username)
                 file_list = jury_file.file_list.split(",")
@@ -550,7 +550,7 @@ def file_list(request):
                     for newjury in jury:
                         if newjury == request.user.username:
                             content['grade'] = grade[i]
-                        i = i+1
+                    i = i+1
                     content['name'] = file
                     content['msg'] = 'success'
                     content['error_num'] = 0
@@ -574,7 +574,7 @@ def competition_detail(request):
         try:
             activity = Competition.objects.get(title=activity_name)
             detail['title'] = activity.title
-            detail['stage'] = activity.stage
+            #detail['stage'] = activity.stage
             detail['organizor' ] = activity.organizor.name
             detail['description'] = activity.description
             detail['sign_up_start'] = activity.sign_up_start.strftime("%Y-%m-%d-%H")
@@ -621,8 +621,8 @@ def admin_to_confirm_list(request):
 
 def admin_to_confirm(request):
     response = {}
-    if request.method == "POST":
-        username = request.POST.get('username')
+    if request.method == "GET":
+        username = request.GET.get('username')
         #unique_id = request.POST.get('unique_id')
         try:
             #user = User.objects.get(username=username, unique_id=unique_id,user_type="Org")
@@ -677,6 +677,7 @@ def assign(Task,jury_li,m,k,per_person):
 
 
 def divide_paper(request):
+    response = {}
     if request.user.is_authenticated() and request.user.user_type == "Org":
         if request.method == "POST":
             title = request.POST.get("competition_name")
@@ -723,11 +724,19 @@ def divide_paper(request):
                         j = (j+1)%jury_count
                 #for jury in jury_li:
                     #print(jury.file_list)
-                return HttpResponse("success")
+                response['msg'] = 'success'
+                response['error_num'] = 0
+                return JsonResponse(response)
             except:
-                return HttpResponse("divide fail")
-        return HttpResponse("method wrong")
-    return HttpResponse("not log in")
+                response['msg'] = 'failed'
+                response['error_num'] = 1
+                return JsonResponse(response)
+        response['msg'] = 'method wrong'
+        response['error_num'] = 0
+        return JsonResponse(response)
+    response['msg'] = 'not log in'
+    response['error_num'] = 0
+    return JsonResponse(response)
 
 
 def create_competition(request):
@@ -758,10 +767,10 @@ def create_competition(request):
                 response['msg'] = 'success'
                 response['error_num'] = 0
             except:
-                response['msg'] = 'error'
+                response['msg'] = 'failed'
                 response['error_num'] = 1
             return JsonResponse(response)
-    response['msg'] = 'failed'
+    response['msg'] = 'not log in'
     response['error_num'] = 1
     return JsonResponse(response)
 
@@ -797,7 +806,7 @@ def invite_jury(request):
                         response['msg'] = 'success'
                         response['error_num'] = 0
                     except:
-                        response['msg'] = 'error'
+                        response['msg'] = 'failed'
                         response['error_num'] = 1
                 return JsonResponse(response)
             except:
@@ -819,7 +828,7 @@ def my_logout(request):
         response['msg'] = 'success'
         response['error_num'] = 0
     except:
-        response['msg'] = 'logout failed'
+        response['msg'] = 'failed'
         response['error_num'] = 1
     return JsonResponse(response)
 
@@ -839,10 +848,10 @@ def search_competition(request):
                 content['error_num'] = 0
                 response.append(content)
                 return HttpResponse(json.dumps(response))
-            org['msg'] = 'no result'
-            org['error_num'] = 1
-            response.append(org)
-            return HttpResponse(json.dumps(response))
+        org['msg'] = 'no result'
+        org['error_num'] = 0
+        response.append(org)
+        return HttpResponse(json.dumps(response))
     org['msg'] = 'failed'
     org['error_num'] = 1
     response.append(org)
