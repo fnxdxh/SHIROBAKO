@@ -6,7 +6,7 @@
           <el-col :span="3">
             <router-link to="/home">
               <!-- <img src="\src\assets\images\logo.jpg"> -->
-              <h1>SHIROBAKO</h1>
+              <h3>SHIROBAKO</h3>
             </router-link>
           </el-col>
           <el-col :span="8">
