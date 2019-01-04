@@ -58,8 +58,10 @@ class Competition(models.Model):
     status = models.IntegerField(default=0)
     sign_up_start = models.DateTimeField()
     sign_up_end = models.DateTimeField()
-    start_time = models.TextField(default="")
-    end_time = models.TextField(default="")
+    #start_time = models.TextField(default='')
+    #end_time = models.TextField(default='')
+    start_time = models.DateTimeField()
+    end_time = models.DateTimeField()
     sponsor = models.CharField(max_length=128, default="")
 
     organizer = models.CharField(max_length=128)
