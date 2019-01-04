@@ -3,13 +3,13 @@
     <el-container>
       <el-header>
         <el-row>
-          <el-col :span="3">
+          <el-col :span="5">
             <router-link to="/home">
               <!-- <img src="\src\assets\images\logo.jpg"> -->
               <h3>SHIROBAKO</h3>
             </router-link>
           </el-col>
-          <el-col :span="8">
+          <el-col :span="6">
             <el-menu mode="horizontal" :router="true">
               <el-menu-item index="/home">首页</el-menu-item>
               <el-menu-item index="/matchlist">赛事</el-menu-item>
