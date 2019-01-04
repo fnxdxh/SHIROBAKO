@@ -3,13 +3,13 @@
     <el-container>
       <el-header>
         <el-row>
-          <el-col :span="3">
+          <el-col :span="5">
             <router-link to="/home">
               <!-- <img src="\src\assets\images\logo.jpg"> -->
-              <h1>SHIROBAKO</h1>
+              <h3>SHIROBAKO</h3>
             </router-link>
           </el-col>
-          <el-col :span="8">
+          <el-col :span="6">
             <el-menu mode="horizontal" :router="true">
               <el-menu-item index="/home">首页</el-menu-item>
               <el-menu-item index="/matchlist">赛事</el-menu-item>
@@ -25,20 +25,23 @@
             <div v-if="$store.state.identify === 1">
               <router-link to="/usercenter_competitor">
                 <!-- <img src="src\assets\images\photo.jpg"> -->
-                <el-button type="text">个人中心</el-button>
+                <el-button type="primary">个人中心</el-button>
               </router-link>
+              <el-button type="primary" @click="logout">登出</el-button>
             </div>
             <div v-else-if="$store.state.identify === 2">
               <router-link to="/usercenter_organizer">
                 <!-- <img src="src\assets\images\photo.jpg"> -->
-                <el-button type="text">个人中心</el-button>
+                <el-button type="primary">个人中心</el-button>
               </router-link>
+              <el-button type="primary" @click="logout">登出</el-button>
             </div>
             <div v-else-if="$store.state.identify === 3">
               <router-link to="/usercenter_jury">
                 <!-- <img src="src\assets\images\photo.jpg"> -->
-                <el-button type="text">个人中心</el-button>
+                <el-button type="primary">个人中心</el-button>
               </router-link>
+              <el-button type="primary" @click="logout">登出</el-button>
             </div>
             <div v-else>
               <router-link to="/login">
@@ -65,6 +68,22 @@ export default {
     return {
       
     };
+  },
+   methods: {
+      logout() {
+        console.log('logout')
+        this.$http.get("api/logout/").then(result => {
+          console.log(result.body);
+          if (result.body.error_num === 0){
+            alert("登出成功");
+            this.$store.commit('logout')
+            this.$router.push({path: '/home'})
+          }
+          else {
+            alert("登出失败")
+          }
+        })
+      }
   }
 };
 </script>
