@@ -90,7 +90,7 @@ def organizer_register(request):
                 uniq = uuid.uuid5(uuid.NAMESPACE_DNS, username)
                 user = User.objects.create_user(username=username, password=md5_pwd, unique_id=uniq, user_type='Org')
                 #Organizer.objects.create(user=user, status=Organizer.STATUS_UNCONFIRM)
-                Organizer.objects.create(user=user, status=Organizer.STATUS_CONFIRMED)
+                Organizer.objects.create(user=user, status=Organizer.STATUS_UNCONFIRM)
                 response['msg'] = 'success'
                 response['error_num'] = 0
             except:
@@ -577,6 +577,12 @@ def competition_detail(request):
             detail['stage'] = activity.stage
             detail['organizor' ] = activity.organizor.name
             detail['description'] = activity.description
+            detail['sign_up_start'] = activity.sign_up_start.strftime("%Y-%m-%d-%H")
+            detail['sign_up_end'] = activity.sign_up_end.strftime("%Y-%m-%d-%H")
+            detail['start_time'] = activity.start_time.strftime("%Y-%m-%d-%H")
+            #end_time_list = competition.end_time.split(',')
+            #cmp['end_time'] = end_time_list[-1]
+            detail['end_time'] = activity.end_time.strftime("%Y-%m-%d-%H")
             detail['msg'] = 'success'
             detail['error_num'] = 0
             return JsonResponse(detail)
@@ -617,9 +623,10 @@ def admin_to_confirm(request):
     response = {}
     if request.method == "POST":
         username = request.POST.get('username')
-        unique_id = request.POST.get('unique_id')
+        #unique_id = request.POST.get('unique_id')
         try:
-            user = User.objects.get(username=username, unique_id=unique_id,user_type="Org")
+            #user = User.objects.get(username=username, unique_id=unique_id,user_type="Org")
+            user = User.objects.get(username=username,user_type="Org")
             organizer = Organizer.objects.get(user=user, status=Organizer.STATUS_UNCONFIRM)
             organizer.status = Organizer.STATUS_CONFIRMED
             organizer.save()
@@ -729,19 +736,13 @@ def create_competition(request):
     if request.user.is_authenticated() and request.user.user_type=='Org':
         if request.method == "POST":
             title = request.POST.get('title')
-            #print(title)
             description = request.POST.get('description')
-            #print(description)
             sign_up_start = request.POST.get('sign_up_start')
-            #print(sign_up_start)
             sign_up_end = request.POST.get('sign_up_end')
-            #print(sign_up_end)
             start_time = request.POST.get('start_time')
             #start_time = datetime.datetime.strptime(start_t, "%Y-%m-%d-%H")
-            #print(start_time)
             end_time = request.POST.get("end_time")
             #end_time = datetime.datetime.strptime(end_t, "%Y-%m-%d-%H")
-            #print(end_time)
             sponsor = request.POST.get('sponsor')
             #print(title)
             # there are some information of the competition
@@ -763,9 +764,6 @@ def create_competition(request):
     response['msg'] = 'failed'
     response['error_num'] = 1
     return JsonResponse(response)
-    #response['msg'] = 'not log in'
-    #response['error_num'] = 1
-    #return JsonResponse(response)
 
 
 def invite_jury(request):
