@@ -360,8 +360,8 @@ def competitor_sign_up(request):
     try:
         if request.user.is_authenticated() and request.user.user_type == "Comp":
             competitor = request.user.competitor
-            if request.method == "GET":
-                name = request.GET.get("competition_title")
+            if request.method == "POST":
+                name = request.POST.get("competition_title")
                 print(name)
                 try:
                     competition = Competition.objects.get(title=name)
@@ -516,8 +516,8 @@ def grade_upload(request):
 def check_grade(request):
     response = {}
     if request.user.is_authenticated():
-        if request.method == "GET" and request.user.user_type == "Comp":
-            competition = request.GET.get('competition_name')
+        if request.method == "POST" and request.user.user_type == "Comp":
+            competition = request.POST.get('competition_name')
             try:
                 file = UserFile.objects.get(username=request.user.username, competition=competition)
                 print(file.grade_list)
@@ -556,8 +556,8 @@ def file_list(request):
     response = []
     org = {}
     if request.user.is_authenticated():
-        if request.method == "GET":
-            competition = request.GET.get("competition_name")
+        if request.method == "POST":
+            competition = request.POST.get("competition_name")
             try:
                 jury_file = JuryFile.objects.get(competition=competition, jury=request.user.username)
                 file_list = jury_file.file_list.split(",")
@@ -589,8 +589,8 @@ def file_list(request):
 
 def competition_detail(request):
     detail = {}
-    if request.method == "GET":
-        activity_name = request.GET.get("competition_title")
+    if request.method == "POST":
+        activity_name = request.POST.get("competition_title")
         print(activity_name)
         try:
             activity = Competition.objects.get(title=activity_name)

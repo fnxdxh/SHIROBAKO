@@ -31,7 +31,7 @@ export default {
       competition = decodeURIComponent(competition);
       console.log(competition);
       this.$http
-        .get("http://127.0.0.1:8000/api/competition_detail/",{ 'competition_title': competition })
+        .post("http://127.0.0.1:8000/api/competition_detail/", { 'competition_title': competition })
         .then(result => {
           console.log(result.body);
           this.match = result.body;

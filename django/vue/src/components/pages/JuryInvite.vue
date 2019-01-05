@@ -32,6 +32,8 @@ export default {
             let temp_list = this.$route.path.split('/');
             console.log(temp_list);
             let competition = temp_list[temp_list.length - 1];
+            competition = decodeURIComponent(competition);
+            console.log(competition);
             formData.append('jury',jury);
             formData.append('competition_name',competition);
             this.$http.post('http://127.0.0.1:8000/api/invite_jury/',formData,{
