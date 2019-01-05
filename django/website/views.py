@@ -587,11 +587,12 @@ def competition_detail(request):
     detail = {}
     if request.method == "GET":
         activity_name = request.GET.get("competition_title")
+        print(activity_name)
         try:
             activity = Competition.objects.get(title=activity_name)
             detail['title'] = activity.title
             #detail['stage'] = activity.stage
-            detail['organizor' ] = activity.organizor.name
+            detail['organizer' ] = activity.organizer
             detail['description'] = activity.description
             detail['sign_up_start'] = activity.sign_up_start.strftime("%Y-%m-%d-%H")
             detail['sign_up_end'] = activity.sign_up_end.strftime("%Y-%m-%d-%H")

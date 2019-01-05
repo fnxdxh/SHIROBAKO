@@ -23,14 +23,14 @@ export default {
   methods: {
     getdata() {
       this.$http
-        .get("http://127.0.0.1:8000/api/competition_detail/", { competition_title: 'test1' })
+        .get("http://127.0.0.1:8000/api/competition_detail/", {params:{ competition_title: 'test1' }})
         .then(result => {
           console.log(result.body);
           this.match = result.body;
         });
     },
     signup() {
-      this.$http.get("api/competitor_sign_up/", this.form).then(result => {
+      this.$http.get("api/competitor_sign_up/", {params:{ competition_title: 'test1' }}).then(result => {
         console.log(result.body);
         if (result.body.error_num === 0) {
           alert("报名成功");
