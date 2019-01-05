@@ -12,6 +12,7 @@ from django.contrib import auth
 import os
 import uuid
 import json
+import operator
 from django.utils.encoding import escape_uri_path
 from django.db.models import Q
 from django.contrib.auth import authenticate, login, logout
@@ -247,7 +248,7 @@ def index_competition_list(request):
             cmp = {}
             print(competition.title)
             cmp['title'] = competition.title
-            cmp['sponsor'] = competition.sponsor
+            cmp['sponsor'] = competition.organizer
             #start_time_list = competition.start_time.split(',')
             #cmp['start_time'] = start_time_list[0]
             cmp['start_time'] = competition.start_time.strftime("%Y-%m-%d %H:%M:%S")
@@ -486,9 +487,16 @@ def grade_upload(request):
         if request.method == "POST":
             mygrade = request.POST.get("grade")
             file_url = request.POST.get("filepath")
+            title = request.POST.get('title')
             print(file_url)
             try:
                 print('ok')
+                competition = Competition.objects.get(title=title)
+                now_time = datetime.now(tz=timezone.utc)
+                if now_time > competition.end_time + timedelta(days=7):
+                    response['msg'] = 'out of time'
+                    response['error'] = 1
+                    return JsonResponse(response)
                 file = UserFile.objects.get(file_url=file_url)
                 grade = file.grade_list.split(',')
                 jury_list=file.jury_list.split(',')
@@ -550,6 +558,59 @@ def check_grade(request):
     response['msg'] = 'not log in'
     response['error_num'] = 1
     return JsonResponse(response)
+
+
+def check_grade_list(request):
+    res = []
+    if request.method == "POST":
+        comp= request.POST.get('competition_name')
+        try:
+            competition = Competition.objects.get(title=comp)
+            now_time = datetime.now(tz=timezone.utc)
+            if now_time < competition.end_time + timedelta(days=7):
+                response = {}
+                response['msg'] = 'out of time'
+                response['error_num'] = 1
+                res.append(response)
+                return HttpResponse(json.dumps(res))
+            user_list = competition.competitor_list.split(',')
+            for user in user_list:
+                file = UserFile.objects.get(username=user,competition=comp)
+                #print(file.grade_list)
+                response = {}
+                if file.grade == 0.0:
+                    grade_list = file.grade_list.split(',')
+                    jury_count = file.jury_count
+                    ans = 0.0
+                    if len(grade_list) == jury_count:
+                        for grade in grade_list:
+                            ans = ans + int(grade)
+                        ans = ans / jury_count
+                        file.grade = ans
+                        file.save()
+                        response['username'] = user
+                        response['grade'] = ans
+                        response['msg'] = 'success'
+                        response['error_num'] = 0
+                        res.append(response)
+                else:
+                    response['username'] = user
+                    response['grade'] = file.grade
+                    response['msg'] = 'success'
+                    response['error_num'] = 0
+                    res.append(response)
+            resp = sorted(res,key=operator.itemgetter('grade'),reverse=True) 
+            return HttpResponse(json.dumps(resp))      
+        except:
+            response={}
+            response['msg'] = 'failed'
+            response['error_num'] = 1
+            res.append(response)
+            return HttpResponse(json.dumps(res))
+    response['msg'] = 'method wrong'
+    response['error_num'] = 1
+    res.append(response)
+    return HttpResponse(json.dumps(res))
 
 
 def file_list(request):

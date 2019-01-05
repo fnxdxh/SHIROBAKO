@@ -28,4 +28,5 @@ urlpatterns = [
     url(r'^check_grade/', check_grade),
     url(r'^logout/', my_logout),
     url(r'^search/', search_competition),
+    url(r'^grade_list/', check_grade_list),
 ]

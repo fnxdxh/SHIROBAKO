@@ -248,13 +248,16 @@ class TestDividePaper(unittest.TestCase):
 class TestGradeUpload(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
+        now_time = datetime.datetime.now(tz=timezone.utc)
         UserFile.objects.create(username="test",competition="test_grade",file_url="test_grade.txt",grade_list="0",jury_list='jury_grade',jury_count=1)
         user = User.objects.create_user(username="jury_grade", password=md5(("2018").encode('utf-8')).hexdigest(), user_type="Rat")
         Jury.objects.create(user=user)
+        Competition.objects.create(title='test_upload_grade', description='test_sign_up', sign_up_end=now_time+datetime.timedelta(days=1), sign_up_start=now_time, start_time=now_time, end_time=now_time + datetime.timedelta(days=7),
+                                                        organizer='org4', sponsor='sponsor5')
     def test_upload_grade(self):
         c = Client()
         response = c.post('/api/login_jury/', {'username': 'jury_grade', 'password': '2018'})
-        response = c.post('/api/grade_upload/',{'grade':'98','filepath':'test_grade.txt'})
+        response = c.post('/api/grade_upload/',{'grade':'98','filepath':'test_grade.txt','title':'test_upload_grade'})
         self.assertEqual(response.content.decode('utf-8'),'{"msg": "success", "error_num": 0}')
 
 class TestCompetitorSignUp(unittest.TestCase):
@@ -339,3 +342,17 @@ class TestCheckGrade(unittest.TestCase):
         response = c.post('/api/login_competitor/',{'username':'comp6','password':'2018'})
         response = c.post('/api/check_grade/',{'competition_name':'test_grade_list'})
         self.assertEqual(response.content.decode('utf-8'), '{"grade": 99.0, "msg": "success", "error_num": 0}')
+
+
+class TestCheckGradeList(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        now_time = datetime.datetime.now(tz=timezone.utc)
+        Competition.objects.create(title='test_list_grade',organizer="test_list",competitor_list="comp7,comp8",sign_up_start=now_time,sign_up_end=now_time,start_time=now_time,end_time=now_time-datetime.timedelta(days=8))
+        UserFile.objects.create(username='comp7',competition='test_list_grade',grade=98.8)
+        UserFile.objects.create(username='comp8',competition='test_list_grade',grade_list="100,98,99",jury_count=3)
+
+    def test_list(self):
+        c = Client()
+        response = c.post('/api/grade_list/',{'competition_name':'test_list_grade'})
+        self.assertEqual(response.content.decode('utf-8'), '[{"username": "comp8", "grade": 99.0, "msg": "success", "error_num": 0}, {"username": "comp7", "grade": 98.8, "msg": "success", "error_num": 0}]')
