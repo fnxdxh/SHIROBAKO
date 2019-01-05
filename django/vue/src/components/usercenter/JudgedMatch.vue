@@ -4,7 +4,7 @@
       :data="tableData"
       style="width: 100%">
       <el-table-column
-        prop="name"
+        prop="title"
         label="竞赛名称"
         width="180">
       </el-table-column>
@@ -15,10 +15,6 @@
         <router-link :to="{name: 'judge',params:{competition: scope.row.name}}"><el-button type="primary">进入评审</el-button></router-link>
       </template>
       </el-table-column>
-      <el-table-column
-        prop="date"
-        label="截止日期">
-      </el-table-column>
     </el-table>
   </div>
 </template>
@@ -27,30 +23,25 @@
 export default {
       data() {
         return {
-          tableData: [{
-            name: '小程序竞赛',
-            date: '2018.12.15'
-          }, {
-            name: '大程序竞赛',
-            date: '2019.1.1'
-          }, {
-            name: '中程序竞赛',
-            date: ''
-          }, {
-            name: 'mini程序竞赛',
-            date: '2018.11.14'
-          }],
+          tableData: [],
           refs: ["http://127.0.0.1:8000/upload"],
           compet_list: [],
           items:{username:""}
         }
       },
-      mounted(){
-      this.$http.get('http://127.0.0.1:8000/api/jury_competition_list/').then(response=>{
-        this.compet_list = response.body;
-      });
-      this.items.username=sessionStorage.getItem("username");
-    }
+      methods:{
+         getdata() {
+      this.$http
+        .get("api/jury_competition_list/")
+        .then(result => {
+          console.log(result.body);
+          this.tableData = result.body;
+        });
+    },
+      },
+      created() {
+    this.getdata();
+  }
 }
 </script>
 

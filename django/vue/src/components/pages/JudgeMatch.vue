@@ -24,6 +24,11 @@
         </el-input>
         </template>
         </el-table-column>
+        <el-table-column
+        prop="grade"
+        label="评分结果"
+        width="180"></el-table-column>
+
     </el-table>
     <p></p>
     <router-link to="/usercenter_jury/judged"><el-button>返回</el-button></router-link>
@@ -34,19 +39,7 @@
 export default {
     data(){
         return{
-            tableData: [{
-            name: 'helloworld.txt',
-            score: ''
-            }, {
-            name: 'ftheworld.txt',
-            score: ''
-            }, {
-            name: 'nicetomeetyou.txt',
-            score: ''
-            }, {
-            name: 'mi.txt',
-            score: ''
-            }],
+            tableData: [],
             file_list: [],
             items: {username: ""}
         }
@@ -87,7 +80,7 @@ export default {
             console.log(score_list);
             var formData = new window.FormData;
             formData.append('grade',score);
-            formData.append('filename',filename);
+            formData.append('filepath',filename);
             formData.append('title',competition);
             this.$http.post('http://127.0.0.1:8000/api/upload_grade/',formData,{
                 headers:{
@@ -96,18 +89,19 @@ export default {
             }).then(result => {
                 alert('打分成功！');
             });
-        }
+        },
+         getdata() {
+      this.$http
+        .get("api/file_list/")
+        .then(result => {
+          console.log(result.body);
+          this.tableData = result.body;
+        });
     },
-    mounted(){
-      this.$http.get('http://127.0.0.1:8000/api/file_list/').then(response=>{
-        let json_list = eval(response.body);
-        for(let i = 0;i < json_list.length;i++){
-          json_list[i].score = 0;
-          this.file_list.append(json_list[i]);
-        }
-      });;
-      this.items.username=sessionStorage.getItem("username");
-    }
+    },
+    created() {
+    this.getdata();
+  }
 }
 </script>
 
