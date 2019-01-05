@@ -26,9 +26,7 @@
       <el-table-column label="组织单位" prop="sponsor"></el-table-column>
       <el-table-column label="查看详情" width="150">
         <template slot-scope="scope">
-          <router-link to="/matchinfo">
-            <el-button type="primary">详情</el-button>
-          </router-link>
+          <router-link :to="{name: 'info_other',params:{competition: scope.row.title}}"><el-button type="primary">比赛详情</el-button></router-link>
         </template>
       </el-table-column>
       <el-table-column label="邀请评委" width="150">

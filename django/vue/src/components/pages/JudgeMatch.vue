@@ -99,14 +99,19 @@ export default {
             });
         },
          getdata() {
+             let temp_list = this.$route.path.split('/');
+            console.log(temp_list);
+            let competition = temp_list[temp_list.length - 1];
+            console.log(competition);
       this.$http
-        .get("api/file_list/")
+        .get("api/file_list/",{params:{competition_name:competition}})
         .then(result => {
           console.log(result.body);
           this.tableData = result.body;
         });
-    },
-      created() {
+    }
+},
+created() {
     this.getdata();
   }
 }

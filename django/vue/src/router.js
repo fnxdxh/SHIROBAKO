@@ -29,6 +29,8 @@ import userinfo from './components/usercenter/UserInfo.vue'
 import store from './store.js';
 import invitejury from './components/pages/JuryInvite.vue'
 
+import orgmatch from './components/pages/OrgMatchInfo.vue'
+
 
 
 var router = new VueRouter({
@@ -37,6 +39,7 @@ var router = new VueRouter({
     { path: '/home', component: homepage },
     { path: '/matchlist', component: matchlistpage },
     { path: '/matchinfo/:competition',name: 'info', component: matchinfopage },
+    { path: '/matchinfo_other/:competition',name: 'info_other', component: orgmatch },
     { path: '/admin', component: adminlogin},
     { path: '/admincenter', component: admincenter},
     { path: '/login', component: loginpage,
