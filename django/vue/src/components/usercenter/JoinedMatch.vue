@@ -11,7 +11,7 @@
         label="上传文件"
         width="400">
         <template slot-scope="scope">
-        <input style="width: 260px" type="file" @change="getFile($event,scope.row.name)"></input>
+        <input style="width: 260px" type="file" @change="getFile($event,scope.row.title)"></input>
         <el-button type="primary"  @click="FileUpload">上传文件</el-button>
       </template>
       </el-table-column>

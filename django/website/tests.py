@@ -221,18 +221,18 @@ class TestDividePaper(unittest.TestCase):
     def test_divide_paper(self):
         c = Client()
         c.post('/api/login_competitor/',{'username':'comp2','password':'2018'})
-        response = c.get('/api/sign_up/',{'competition_name':'test4'})
+        response = c.post('/api/sign_up/',{'competition_title':'test4'})
         #print(response.content)
         with open('test1.txt','rb') as fp:
             response = c.post('/api/upload/', {'userfile':fp,'competition':'test4'})
             #print(response.content)
         c.post('/api/login_competitor/',{'username':'comp3','password':'2018'})
-        c.get('/api/sign_up/',{'competition_name':'test4'})
+        c.post('/api/sign_up/',{'competition_title':'test4'})
         with open('test2.txt','rb') as fp:
             response = c.post('/api/upload/', {'userfile':fp,'competition':'test4'})
             #print(response.content)
         c.post('/api/login_competitor/',{'username':'comp4','password':'2018'})
-        c.get('/api/sign_up/',{'competition_name':'test4'})
+        c.post('/api/sign_up/',{'competition_title':'test4'})
         with open('test3.txt','rb') as fp:
             response = c.post('/api/upload/', {'userfile':fp,'competition':'test4'})
             #print(response.content)
@@ -265,7 +265,7 @@ class TestCompetitorSignUp(unittest.TestCase):
         Competitor.objects.create(user=user)
         Competition.objects.create(title='test_sign_up', description='test_sign_up', sign_up_end=now_time+datetime.timedelta(days=7), sign_up_start=now_time, start_time=now_time, end_time=now_time + datetime.timedelta(days=7),
                                                         organizer='org4', sponsor='sponsor5')
-        Competition.objects.create(title='test_sign_up_list', description='test_sign_up_list', sign_up_end=now_time+datetime.timedelta(days=7), sign_up_start=now_time, start_time=now_time, end_time=now_time + datetime.timedelta(days=7),
+        Competition.objects.create(title='test_sign_up_list', description='test_sign_up_list', sign_up_end=now_time+datetime.timedelta(days=7), sign_up_start=now_time-datetime.timedelta(days=7), start_time=now_time-datetime.timedelta(days=7), end_time=now_time + datetime.timedelta(days=7),
                                                         organizer='org4', sponsor='sponsor5')
         Competition.objects.create(title='test_sign_up_out', description='testouttime', sign_up_end=now_time-datetime.timedelta(days=8), sign_up_start=now_time-datetime.timedelta(days=9), start_time=now_time, end_time=now_time + datetime.timedelta(days=7),
                                                         organizer='org4', sponsor='sponsor5')
@@ -274,29 +274,29 @@ class TestCompetitorSignUp(unittest.TestCase):
         c = Client()
         response = c.post('/api/login_competitor/',{'username':'comp5','password':'2018'})
         #print(response.content)
-        response = c.get('/api/sign_up/',{'competition_name':'test_sign_up'})
+        response = c.post('/api/sign_up/',{'competition_title':'test_sign_up'})
         self.assertEqual(response.content.decode('utf-8'), '{"msg": "success", "error_num": 0}')
 
     def test_competitor_sign_up_again(self):
         c = Client()
         c.post('/api/login_competitor/',{'username':'comp5','password':'2018'})
         #print(response.content)
-        c.get('/api/sign_up/',{'competition_name':'test5'})
-        response = c.get('/api/sign_up/',{'competition_name':'test_sign_up'})
+        c.post('/api/sign_up/',{'competition_title':'test5'})
+        response = c.post('/api/sign_up/',{'competition_title':'test_sign_up'})
         self.assertEqual(response.content.decode('utf-8'), '{"msg": "signed up", "error_num": 1}')
 
     def test_competitor_sign_up_out_of_time(self):
         c = Client()
         response = c.post('/api/login_competitor/',{'username':'comp5','password':'2018'})
         #print(response.content)
-        response = c.get('/api/sign_up/',{'competition_name':'test_sign_up_out'})
+        response = c.post('/api/sign_up/',{'competition_title':'test_sign_up_out'})
         self.assertEqual(response.content.decode('utf-8'), '{"msg": "out of time", "error_num": 1}')
 
     def test_competitor_competition_list(self):
         c = Client()
         response = c.post('/api/login_competitor/',{'username':'comp5','password':'2018'})
         #print(response.content)
-        response = c.get('/api/sign_up/',{'competition_name':'test_sign_up_list'})
+        response = c.post('/api/sign_up/',{'competition_title':'test_sign_up_list'})
         response = c.get('/api/competitor_competition_list/')
         self.assertEqual(response.content.decode('utf-8'), '[{"title": "test_sign_up_list", "msg": "success", "error_num": 0}]')
 
@@ -331,11 +331,11 @@ class TestCheckGrade(unittest.TestCase):
     def test_check_grade(self):
         c = Client()
         response = c.post('/api/login_competitor/',{'username':'comp6','password':'2018'})
-        response = c.get('/api/check_grade/',{'competition_name':'test_test_grade'})
+        response = c.post('/api/check_grade/',{'competition_name':'test_test_grade'})
         self.assertEqual(response.content.decode('utf-8'), '{"grade": 98.8, "msg": "success", "error_num": 0}')
     
     def test_grade_list(self):
         c = Client()
         response = c.post('/api/login_competitor/',{'username':'comp6','password':'2018'})
-        response = c.get('/api/check_grade/',{'competition_name':'test_grade_list'})
+        response = c.post('/api/check_grade/',{'competition_name':'test_grade_list'})
         self.assertEqual(response.content.decode('utf-8'), '{"grade": 99.0, "msg": "success", "error_num": 0}')
