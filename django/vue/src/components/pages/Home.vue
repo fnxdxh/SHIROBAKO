@@ -25,6 +25,11 @@
         <router-link :to="{name: 'info',params:{competition: scope.row.title}}"><el-button type="primary">比赛详情</el-button></router-link>
       </template>
     </el-table-column>
+    <el-table-column label="成绩公示" width="200">
+      <template slot-scope="scope">
+        <router-link :to="{name: 'rank',params:{competition: scope.row.title}}"><el-button type="primary">查看排行榜</el-button></router-link>
+      </template>
+    </el-table-column>
   </el-table>
 </template>
 
