@@ -103,8 +103,10 @@ export default {
             console.log(temp_list);
             let competition = temp_list[temp_list.length - 1];
             console.log(competition);
+            competition = decodeURIComponent(competition);
+            console.log(competition);
       this.$http
-        .get("api/file_list/",{params:{competition_name:competition}})
+        .post("api/file_list/",{'competition_name':competition})
         .then(result => {
           console.log(result.body);
           this.tableData = result.body;

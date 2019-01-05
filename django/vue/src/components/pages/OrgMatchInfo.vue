@@ -28,8 +28,10 @@ export default {
       let temp_list = this.$route.path.split('/');
       console.log(temp_list);
       let competition = temp_list[temp_list.length - 1];
+      competition = decodeURIComponent(competition);
+      console.log(competition);
       this.$http
-        .get("http://127.0.0.1:8000/api/competition_detail/", {params:{ competition_title: competition }})
+        .get("http://127.0.0.1:8000/api/competition_detail/",{ 'competition_title': competition })
         .then(result => {
           console.log(result.body);
           this.match = result.body;
