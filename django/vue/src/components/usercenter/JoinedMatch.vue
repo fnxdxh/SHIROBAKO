@@ -55,8 +55,18 @@
                 headers:{
                     'Content-Type': 'multipart/form-data'
                 }
-            }).then(resule => {
-              alert('上传成功！');
+            }).then(result => {
+              let response_list = result.body;
+              if(response_list['msg'] == 'not login'){
+                alert("用户未登录！");
+                this.$router.push({path: '/login'});
+              }
+              else if (response_list['msg'] == 'out of time') {
+                alert("不在上传时间内！");
+              }
+              else{
+                alert("上传成功！");
+              }
             })
             
         },
