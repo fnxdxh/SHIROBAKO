@@ -357,43 +357,47 @@ def organizer_competition_list(request):
 
 def competitor_sign_up(request):
     response = {}
-    if request.user.is_authenticated():
-        competitor = request.user.competitor
-        if request.method == "GET":
-            name = request.GET.get("competition_name")
-            try:
-                competition = Competition.objects.get(title=name)
-                now_time = datetime.now(tz=timezone.utc)
-                if now_time < competition.sign_up_start or now_time > competition.sign_up_end:
-                    response['msg'] = 'out of time'
+    try:
+        if request.user.is_authenticated() and request.user.user_type == "Comp":
+            competitor = request.user.competitor
+            if request.method == "GET":
+                name = request.GET.get("competition_title")
+                print(name)
+                try:
+                    competition = Competition.objects.get(title=name)
+                    print(competition.sign_up_start)
+                    now_time = datetime.now(tz=timezone.utc)
+                    if now_time < competition.sign_up_start or now_time > competition.sign_up_end:
+                        response['msg'] = 'out of time'
+                        response['error_num'] = 1
+                        return JsonResponse(response)
+                    if competitor.competition_list == "":
+                        competitor.competition_list = name
+                    else:
+                        comp_list = competitor.competition_list.split(',')
+                        for comp in comp_list:
+                            if comp == name:
+                                response['msg'] = 'signed up'
+                                response['error_num'] = 1
+                                return JsonResponse(response)
+                        competitor.competition_list = competitor.competition_list + "," + name
+                    competitor.save()
+                    if competition.competitor_list == "":
+                        competition.competitor_list = request.user.username
+                    else:
+                        competition.competitor_list = competition.competitor_list + "," + request.user.username
+                    competition.save()
+                    response['msg'] = 'success'
+                    response['error_num'] = 0
+                    return JsonResponse(response)
+                except:
+                    response['msg'] = 'failed'
                     response['error_num'] = 1
                     return JsonResponse(response)
-                if competitor.competition_list == "":
-                    competitor.competition_list = name
-                else:
-                    comp_list = competitor.competition_list.split(',')
-                    for comp in comp_list:
-                        if comp == name:
-                            response['msg'] = 'signed up'
-                            response['error_num'] = 1
-                            return JsonResponse(response)
-                    competitor.competition_list = competitor.competition_list + "," + name
-                competitor.save()
-                if competition.competitor_list == "":
-                    competition.competitor_list = request.user.username
-                else:
-                    competition.competitor_list = competition.competitor_list + "," + request.user.username
-                competition.save()
-                response['msg'] = 'success'
-                response['error_num'] = 0
-                return JsonResponse(response)
-            except:
-                response['msg'] = 'failed'
-                response['error_num'] = 1
-                return JsonResponse(response)
-    response['msg'] = 'not login'
-    response['error_num'] = 1
-    return JsonResponse(response)
+    except:
+        response['msg'] = 'not login'
+        response['error_num'] = 1
+        return JsonResponse(response)
 
 
 def file_upload(request):
@@ -447,8 +451,8 @@ def file_upload(request):
 
 def file_download(request):
     fail_response = {}
-    if request.method == "GET":
-        file = request.GET.get('filename')
+    if request.method == "POST":
+        file = request.POST.get('filename')
         if file is None:
             fail_response['msg'] = 'input error'
             fail_response['error_num'] = 1
@@ -587,11 +591,12 @@ def competition_detail(request):
     detail = {}
     if request.method == "GET":
         activity_name = request.GET.get("competition_title")
+        print(activity_name)
         try:
             activity = Competition.objects.get(title=activity_name)
             detail['title'] = activity.title
             #detail['stage'] = activity.stage
-            detail['organizor' ] = activity.organizor.name
+            detail['organizer' ] = activity.organizer
             detail['description'] = activity.description
             detail['sign_up_start'] = activity.sign_up_start.strftime("%Y-%m-%d-%H")
             detail['sign_up_end'] = activity.sign_up_end.strftime("%Y-%m-%d-%H")

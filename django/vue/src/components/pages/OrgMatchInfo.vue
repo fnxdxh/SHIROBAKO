@@ -10,8 +10,7 @@
           <p>比赛开始时间：{{match.start_time}}</p>
           <p>比赛截止时间：{{match.end_time}}</p>
           <p>{{match.description}}</p>
-          <el-button type="primary" @click="signup">报名</el-button>
-          <router-link to="/home"><el-button type="primary">返回</el-button></router-link>
+          <router-link to="/usercenter_organizer"><el-button type="primary">返回</el-button></router-link>
         </div>
       </el-main>
     </el-container>
@@ -36,33 +35,7 @@ export default {
           this.match = result.body;
         });
     },
-    signup() {
-      let temp_list = this.$route.path.split('/');
-      console.log(temp_list);
-      let competition = temp_list[temp_list.length - 1];
-      this.$http.get("http://127.0.0.1:8000/api/sign_up/", {params:{ competition_title: competition }}).then(result => {
-        console.log(result.body);
-        let response_list = result.body;
-        if (response_list['msg'] == 'out of time') {
-          alert("不在报名时间内！");
-        } 
-        else if(response_list['msg'] == 'signed up'){
-          alert("您已报过名！");
-          this.$router.push({path: '/usercenter_competitor'});
-        }
-        else if(response_list['msg'] == 'not login'){
-          alert("用户未登录！");
-          this.$router.push({path: '/login'});
-        }
-        else if(response_list['msg'] == 'failed'){
-          alert("报名失败！");
-        }
-        else{
-          alert("报名成功！");
-          this.$router.push({path: '/usercenter_competitor'});
-        }
-      });
-    }
+    
   },
   created() {
     this.getdata();
