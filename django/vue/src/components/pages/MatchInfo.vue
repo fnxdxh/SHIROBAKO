@@ -1,28 +1,49 @@
 <template>
   <div>
-    <h1>比赛详情</h1>
-    <p>{{$route.params.class}}</p>
-    <p>{{$route.params.matchname}}</p>
-    <div>
-      <h2 v-text="match.name"></h2>
-      <p>组织方：{{match.host}}</p>
-      <p>状态：{{match.status}}</p>
-      <img :src="match.image">
-      <p>{{match.intro}}</p>
-    </div>
+    <el-container>
+      <el-main  :data="match" style="width: 100%">
+        <div>
+          <h2 v-text="match.title"></h2>
+          <p>组织方：{{match.organizer}}</p>
+          <p>截止时间：{{match.end_time}}</p>
+          <p>{{match.description}}</p>
+          <el-button type="primary" @click="signup">报名</el-button>
+        </div>
+      </el-main>
+    </el-container>
   </div>
 </template>
 <script>
 export default {
-  data () {
+  data() {
     return {
-      match: {
-        name: '大数据竞赛',
-        host: '黑箱公司',
-        status: '进行中',
-        intro: '随着云时代的来临，大数据（Big data）也吸引了越来越多的关注。分析师团队认为，大数据（Big data）通常用来形容一个公司创造的大量非结构化数据和半结构化数据，这些数据在下载到关系型数据库用于分析时会花费过多时间和金钱。大数据分析常和云计算联系到一起，因为实时的大型数据集分析需要像MapReduce一样的框架来向数十、数百或甚至数千的电脑分配工作'
-      }
+      match: []
+    };
+  },
+  methods: {
+    getdata() {
+      this.$http
+        .get("http://127.0.0.1:8000/api/competition_detail/", { competition_title: 'test1' })
+        .then(result => {
+          console.log(result.body);
+          this.match = result.body;
+        });
+    },
+    signup() {
+      this.$http.get("api/competitor_sign_up/", this.form).then(result => {
+        console.log(result.body);
+        if (result.body.error_num === 0) {
+          alert("报名成功");
+        this.$store.commit('signup', 1)
+          this.$router.push({path: '/usercenter_competitor'})
+        } else {
+          alert("报名成功");
+        }
+      });
     }
+  },
+  created() {
+    this.getdata();
   }
 }
 
@@ -30,3 +51,13 @@ export default {
 
 
 </script>
+
+
+
+<style scoped>
+  .el-main {
+    background-color:#E9EEF3;
+    color: #333;
+    text-align: center;
+  }
+</style>
