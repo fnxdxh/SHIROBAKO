@@ -30,7 +30,7 @@ export default {
         }
       },
       methods:{
-         getdata() {
+        getdata() {
       this.$http
         .get("api/jury_competition_list/")
         .then(result => {
@@ -39,9 +39,9 @@ export default {
         });
     },
       },
-      created() {
-    this.getdata();
-  }
+      created(){
+        this.getdata();
+      }
 }
 </script>
 

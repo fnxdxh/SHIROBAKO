@@ -36,7 +36,7 @@ var router = new VueRouter({
     { path: '/', redirect: '/home' },
     { path: '/home', component: homepage },
     { path: '/matchlist', component: matchlistpage },
-    { path: '/matchinfo', component: matchinfopage },
+    { path: '/matchinfo/:competition',name: 'info', component: matchinfopage },
     { path: '/admin', component: adminlogin},
     { path: '/admincenter', component: admincenter},
     { path: '/login', component: loginpage,

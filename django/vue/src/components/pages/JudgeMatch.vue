@@ -16,7 +16,7 @@
         </template>
         </el-table-column>
         <el-table-column
-        label="评分"
+        label="打分"
         width="400">
         <template slot-scope="scope">
         <el-input placeholder="请输入分数，分数介于0~100分内。" clearable type="number" v-model="scope.row.score">
@@ -25,10 +25,10 @@
         </template>
         </el-table-column>
         <el-table-column
-        prop="grade"
-        label="评分结果"
-        width="180"></el-table-column>
-
+         prop="grade"
+         label="评分结果"
+         width="180">
+        </el-table-column>
     </el-table>
     <p></p>
     <router-link to="/usercenter_jury/judged"><el-button>返回</el-button></router-link>
@@ -45,6 +45,14 @@ export default {
         }
     },
     methods:{
+        getdata() {
+      this.$http
+        .get("api/file_list/")
+        .then(result => {
+          console.log(result.body);
+          this.tableData = result.body;
+        });
+    },
         FileDownload(filename){
             var formdata = new window.FormData();
             formdata.append('filename',filename)
@@ -98,8 +106,7 @@ export default {
           this.tableData = result.body;
         });
     },
-    },
-    created() {
+      created() {
     this.getdata();
   }
 }

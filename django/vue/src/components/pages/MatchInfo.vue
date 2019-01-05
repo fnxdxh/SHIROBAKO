@@ -5,7 +5,10 @@
         <div>
           <h2 v-text="match.title"></h2>
           <p>组织方：{{match.organizer}}</p>
-          <p>截止时间：{{match.end_time}}</p>
+          <p>报名开始时间：{{match.sign_up_start}}</p>
+          <p>报名截止时间：{{match.sign_up_end}}</p>
+          <p>比赛开始时间：{{match.start_time}}</p>
+          <p>比赛截止时间：{{match.end_time}}</p>
           <p>{{match.description}}</p>
           <el-button type="primary" @click="signup">报名</el-button>
         </div>
@@ -22,22 +25,40 @@ export default {
   },
   methods: {
     getdata() {
+      let temp_list = this.$route.path.split('/');
+      console.log(temp_list);
+      let competition = temp_list[temp_list.length - 1];
       this.$http
-        .get("http://127.0.0.1:8000/api/competition_detail/", {params:{ competition_title: 'test1' }})
+        .get("http://127.0.0.1:8000/api/competition_detail/", {params:{ competition_title: competition }})
         .then(result => {
           console.log(result.body);
           this.match = result.body;
         });
     },
     signup() {
-      this.$http.get("api/competitor_sign_up/", {params:{ competition_title: 'test1' }}).then(result => {
+      let temp_list = this.$route.path.split('/');
+      console.log(temp_list);
+      let competition = temp_list[temp_list.length - 1];
+      this.$http.get("api/competitor_sign_up/", {params:{ competition_title: competition }}).then(result => {
         console.log(result.body);
-        if (result.body.error_num === 0) {
-          alert("报名成功");
-        this.$store.commit('signup', 1)
-          this.$router.push({path: '/usercenter_competitor'})
-        } else {
-          alert("报名成功");
+        let response_list = result.body;
+        if (response_list['msg'] == 'out of time') {
+          alert("不在报名时间内！");
+        } 
+        else if(response_list['msg'] == 'signed up'){
+          alert("您已报过名！");
+          this.$router.push({path: '/usercenter_competitor'});
+        }
+        else if(response_list['msg'] == 'not login'){
+          alert("用户未登录！");
+          this.$router.push({path: '/login'});
+        }
+        else if(response_list['msg'] == 'failed'){
+          alert("报名失败！");
+        }
+        else{
+          alert("报名成功！");
+          this.$router.push({path: '/usercenter_competitor'});
         }
       });
     }
