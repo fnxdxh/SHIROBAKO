@@ -80,7 +80,8 @@ export default {
   methods: {
     search() {
       this.$http.post("api/search/", {to_search: this.formInline.keyword}).then(result => {
-        this.$store.commit("writelist", result.body)
+        this.$store.commit("writelist", result.body);
+        this.$router.push({path:"/matchlist"});
       })
     },
     logout() {

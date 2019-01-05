@@ -54,12 +54,7 @@ export default {
   },
   methods: {
     getdata() {
-      this.$http
-        .get("http://127.0.0.1:8000/api/index_competition_list/")
-        .then(result => {
-          console.log(result.body);
-          this.tableData = result.body;
-        });
+      this.tableData = this.$store.state.list;
     }
   },
 
