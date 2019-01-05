@@ -1,9 +1,9 @@
 <template>
     <el-table
-      :data="compet_list"
+      :data="tableData"
       style="width: 100%">
       <el-table-column
-        prop="name"
+        prop="title"
         label="竞赛名称"
         width="180">
       </el-table-column>
@@ -11,7 +11,7 @@
         label="上传文件"
         width="400">
         <template slot-scope="scope">
-        <input style="width: 260px" type="file" @change="getFile($event,scope.row.name)"></input>
+        <input style="width: 260px" type="file" @change="getFile($event,scope.row.title)"></input>
         <el-button type="primary"  @click="FileUpload">上传文件</el-button>
       </template>
       </el-table-column>
@@ -22,29 +22,23 @@
     export default {
       data() {
         return {
-          tableData: [{
-            name: '小程序竞赛',
-            score: '',
-          }, {
-            name: '大程序竞赛',
-            score: '',
-          }, {
-            name: '中程序竞赛',
-            score: '',
-          }, {
-            name: 'mini程序竞赛',
-            score: '',
-          }],
+          tableData: [],
           refs: ["http://127.0.0.1:8000/api/upload/"],
           compet_list: [],
           items:{username:""},
-          file_list:[
-            {name:''}
-          ]
         }
       },
       methods:{
-        FileUpload(){
+         getdata() {
+      this.$http
+        .get("api/competitor_competition_list/")
+        .then(result => {
+          console.log(result.body);
+          this.tableData = result.body;
+        });
+    },
+        FileUpload(){.93206
+
             this.errText = '';
             //this.$emit('input', this.file);
             //let formData = new FormData();
@@ -74,12 +68,9 @@
           this.competition = name;
       }
     },
-    mounted(){
-      this.$http.get('http://127.0.0.1:8000/api/competitor_competition_list/').then(response=>{
-        this.compet_list = response.body;
-      });
-      this.items.username=sessionStorage.getItem("username");
-    }
+    created() {
+    this.getdata();
+  }
     }
   </script>
 

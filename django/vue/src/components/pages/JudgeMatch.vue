@@ -16,13 +16,18 @@
         </template>
         </el-table-column>
         <el-table-column
-        label="评分"
+        label="打分"
         width="400">
         <template slot-scope="scope">
         <el-input placeholder="请输入分数，分数介于0~100分内。" clearable type="number" v-model="scope.row.score">
             <el-button type="primary" slot="append" @click="UpdateScore(scope.row.name,scope.row.score)">提交分数</el-button>
         </el-input>
         </template>
+        </el-table-column>
+        <el-table-column
+         prop="grade"
+         label="评分结果"
+         width="180">
         </el-table-column>
     </el-table>
     <p></p>
@@ -34,24 +39,20 @@
 export default {
     data(){
         return{
-            tableData: [{
-            name: 'helloworld.txt',
-            score: ''
-            }, {
-            name: 'ftheworld.txt',
-            score: ''
-            }, {
-            name: 'nicetomeetyou.txt',
-            score: ''
-            }, {
-            name: 'mi.txt',
-            score: ''
-            }],
+            tableData: [],
             file_list: [],
             items: {username: ""}
         }
     },
     methods:{
+        getdata() {
+      this.$http
+        .get("api/file_list/")
+        .then(result => {
+          console.log(result.body);
+          this.tableData = result.body;
+        });
+    },
         FileDownload(filename){
             var formdata = new window.FormData();
             formdata.append('filename',filename)
@@ -87,7 +88,7 @@ export default {
             console.log(score_list);
             var formData = new window.FormData;
             formData.append('grade',score);
-            formData.append('filename',filename);
+            formData.append('filepath',filename);
             formData.append('title',competition);
             this.$http.post('http://127.0.0.1:8000/api/upload_grade/',formData,{
                 headers:{
@@ -98,16 +99,9 @@ export default {
             });
         }
     },
-    mounted(){
-      this.$http.get('http://127.0.0.1:8000/api/file_list/').then(response=>{
-        let json_list = eval(response.body);
-        for(let i = 0;i < json_list.length;i++){
-          json_list[i].score = 0;
-          this.file_list.append(json_list[i]);
-        }
-      });;
-      this.items.username=sessionStorage.getItem("username");
-    }
+      created() {
+    this.getdata();
+  }
 }
 </script>
 
