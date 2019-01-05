@@ -120,7 +120,8 @@ class TestCreateCompetition(unittest.TestCase):
         c = Client()
         now_time = datetime.datetime.now(tz=timezone.utc)
         response = c.post('/api/login_organizer/', {'username': 'org2', 'password': '2018'})
-        response = c.post('/api/create_competition/',{'title':'test','description':'test','sign_up_start':now_time+datetime.timedelta(days=8),'sign_up_end':now_time+datetime.timedelta(days=9),'start_time':now_time+datetime.timedelta(days=9),'end_time':now_time+datetime.timedelta(days=10),'sponsor':'test'})
+        #response = c.post('/api/create_competition/',{'title':'test','description':'test','sign_up_start':now_time+datetime.timedelta(days=8),'sign_up_end':now_time+datetime.timedelta(days=9),'start_time':now_time+datetime.timedelta(days=9),'end_time':now_time+datetime.timedelta(days=10),'sponsor':'test'})
+        response = c.post('/api/create_competition/',{'title':'test','description':'test','sign_up_start':'2019-1-4','sign_up_end':'2019-1-8','start_time':'2019-1-8','end_time':'2019-1-18','sponsor':'test'})
         self.assertEqual(response.content.decode('utf-8'), '{"msg": "success", "error_num": 0}')
 
 

@@ -97,7 +97,14 @@ export default {
             }).then(result => {
                 alert('打分成功！');
             });
-        }
+        },
+         getdata() {
+      this.$http
+        .get("api/file_list/")
+        .then(result => {
+          console.log(result.body);
+          this.tableData = result.body;
+        });
     },
       created() {
     this.getdata();

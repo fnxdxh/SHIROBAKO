@@ -3,7 +3,7 @@ from django.shortcuts import redirect
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.http import JsonResponse, StreamingHttpResponse
-import datetime
+from datetime import datetime,tzinfo,timedelta
 from django.utils import timezone
 from hashlib import md5
 from random import Random
@@ -18,6 +18,20 @@ from django.contrib.auth import authenticate, login, logout
 from .models import User, Competitor, Organizer, Jury, Competition, UserFile, SuperUser, JuryFile
 # Create your views here.
 
+
+class UTC(tzinfo):
+    """UTC"""
+    def __init__(self,offset = 0):
+        self._offset = offset
+
+    def utcoffset(self, dt):
+        return timedelta(hours=self._offset)
+
+    def tzname(self, dt):
+        return "UTC +%s" % self._offset
+
+    def dst(self, dt):
+        return timedelta(hours=self._offset)
 
 # 获取密码md5值
 def create_md5(pwd):
@@ -216,10 +230,12 @@ def admin_login(request):
 
 
 def index_competition_list(request):
-    now_time = datetime.datetime.now(tz=timezone.utc)
+    now_time = datetime.now(tz=timezone.utc)
     print(now_time)
-    competition_list = Competition.objects.filter(Q(sign_up_start__gte=(now_time - datetime.timedelta(days=7))) & Q(sign_up_end__lte=now_time+datetime.timedelta(days=7)))
+    competition_list = Competition.objects.filter(Q(sign_up_start__gte=(now_time - timedelta(days=7))) & Q(sign_up_end__lte=now_time+timedelta(days=7)))
+    print('ok')
     response = []
+    print(len(competition_list))
     if len(competition_list) == 0:
         cmp = {}
         cmp['msg'] = 'no data'
@@ -234,10 +250,10 @@ def index_competition_list(request):
             cmp['sponsor'] = competition.sponsor
             #start_time_list = competition.start_time.split(',')
             #cmp['start_time'] = start_time_list[0]
-            cmp['start_time'] = competition.start_time.strftime("%Y-%m-%d-%H")
+            cmp['start_time'] = competition.start_time.strftime("%Y-%m-%d %H:%M:%S")
             #end_time_list = competition.end_time.split(',')
             #cmp['end_time'] = end_time_list[-1]
-            cmp['end_time'] = competition.end_time.strftime("%Y-%m-%d-%H")
+            cmp['end_time'] = competition.end_time.strftime("%Y-%m-%d %H:%M:%S")
             cmp['msg'] = 'success'
             cmp['error_num'] = 0
             response.append(cmp)
@@ -347,7 +363,7 @@ def competitor_sign_up(request):
             name = request.GET.get("competition_name")
             try:
                 competition = Competition.objects.get(title=name)
-                now_time = datetime.datetime.now(tz=timezone.utc)
+                now_time = datetime.now(tz=timezone.utc)
                 if now_time < competition.sign_up_start or now_time > competition.sign_up_end:
                     response['msg'] = 'out of time'
                     response['error_num'] = 1
@@ -392,7 +408,7 @@ def file_upload(request):
                 return JsonResponse(response)
             try:
                 comp = Competition.objects.get(title=competition)
-                now_time = datetime.datetime.now(tz=timezone.utc)
+                now_time = datetime.now(tz=timezone.utc)
                 if now_time < comp.start_time or now_time > comp.end_time:
                     response['msg'] = 'out of time'
                     response['error_num'] = 1
@@ -621,13 +637,16 @@ def admin_to_confirm_list(request):
 
 def admin_to_confirm(request):
     response = {}
-    if request.method == "GET":
-        username = request.GET.get('username')
+    if request.method == "POST":
+        username = request.POST.get('username')
         #unique_id = request.POST.get('unique_id')
         try:
             #user = User.objects.get(username=username, unique_id=unique_id,user_type="Org")
+            print(username)
             user = User.objects.get(username=username,user_type="Org")
+            print('1')
             organizer = Organizer.objects.get(user=user, status=Organizer.STATUS_UNCONFIRM)
+            print('2')
             organizer.status = Organizer.STATUS_CONFIRMED
             organizer.save()
             response['msg'] = 'success'
@@ -637,7 +656,7 @@ def admin_to_confirm(request):
             response['msg'] = 'failed'
             response['error_num'] = 1
             return JsonResponse(response)
-    response['msg'] = 'failed'
+    response['msg'] = 'no get'
     response['error_num'] = 1
     return JsonResponse(response)
 
@@ -746,11 +765,19 @@ def create_competition(request):
         if request.method == "POST":
             title = request.POST.get('title')
             description = request.POST.get('description')
-            sign_up_start = request.POST.get('sign_up_start')
-            sign_up_end = request.POST.get('sign_up_end')
-            start_time = request.POST.get('start_time')
+            sign_up_st = request.POST.get('sign_up_start').split('-')
+            print(sign_up_st)
+            sign_up_start = datetime(int(sign_up_st[0]),int(sign_up_st[1]),int(sign_up_st[2]),0,0,0,tzinfo = UTC(0))
+            sign_up_en = request.POST.get('sign_up_end').split('-')
+            print(sign_up_en)
+            sign_up_end = datetime(int(sign_up_en[0]),int(sign_up_en[1]),int(sign_up_en[2]),0,0,0,tzinfo = UTC(0))
+            start_t = request.POST.get('start_time').split('-')
+            print(start_t)
+            start_time = datetime(int(start_t[0]),int(start_t[1]),int(start_t[2]),0,0,0,tzinfo = UTC(0))
             #start_time = datetime.datetime.strptime(start_t, "%Y-%m-%d-%H")
-            end_time = request.POST.get("end_time")
+            end_t = request.POST.get("end_time").split('-')
+            print(end_t)
+            end_time = datetime(int(end_t[0]),int(end_t[1]),int(end_t[2]),0,0,0,tzinfo = UTC(0))
             #end_time = datetime.datetime.strptime(end_t, "%Y-%m-%d-%H")
             sponsor = request.POST.get('sponsor')
             #print(title)

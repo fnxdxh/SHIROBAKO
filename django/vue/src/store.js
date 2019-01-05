@@ -8,7 +8,8 @@ var store = new Vuex.Store({
     state: {
       islogin: false,
       identify: 0, //0表示未登录，1表示参赛者，2是主办方，3是评委
-      items:{username: ""}
+      items:{username: ""},
+      list: []
     },
     mutations: {
       login(state, identify) {
@@ -21,6 +22,9 @@ var store = new Vuex.Store({
       },
       setSession(username){
         sessionStorage.setItem("username", username);
+      },
+      writelist(state, data) {
+        state.list = data;
       }
     }
   })

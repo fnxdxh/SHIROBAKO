@@ -112,7 +112,11 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'shirobako',
         'USER': 'root',
-        'PASSWORD': '123dxh',
+<<<<<<< Updated upstream
+        'PASSWORD': 'Zrt2018',
+=======
+        'PASSWORD': '',
+>>>>>>> Stashed changes
         'HOST': '127.0.0.1',
     }
 }
