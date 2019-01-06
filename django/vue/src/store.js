@@ -14,10 +14,12 @@ var store = new Vuex.Store({
     mutations: {
       login(state, identify) {
         state.identify = identify;
+        sessionStorage.setItem("identify",identify);
         state.islogin = true;
       },
       logout(state) {
         state.identify = 0;
+        sessionStorage.setItem("identify",0);
         state.islogin = false;
       },
       setSession(username){
