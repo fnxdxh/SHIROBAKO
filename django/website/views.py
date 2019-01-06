@@ -1044,7 +1044,7 @@ def search_competition(request):
                 content = {}
                 content['title'] = competition.title
                 print(competition.title)
-                content['sponsor'] = competition.sponsor
+                content['sponsor'] = competition.organizer
                 content['msg'] = 'success'
                 content['error_num'] = 0
                 response.append(content)
