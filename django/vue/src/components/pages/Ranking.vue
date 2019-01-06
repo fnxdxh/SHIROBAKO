@@ -28,10 +28,10 @@ export default {
             .then(result => {
                 console.log(result.body);
                 let table = result.body;
-                if(table['msg'] == 'out of time'){
+                if(table[0]['msg'] == 'out of time'){
                     alert("排行榜尚未公布！");
                 }
-                else if(table['msg'] == 'success'){
+                else if(table[0]['msg'] == 'success'){
                     this.tableData = result.body;
                 }
             });
