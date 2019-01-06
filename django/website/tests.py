@@ -356,3 +356,21 @@ class TestCheckGradeList(unittest.TestCase):
         c = Client()
         response = c.post('/api/grade_list/',{'competition_name':'test_list_grade'})
         self.assertEqual(response.content.decode('utf-8'), '[{"username": "comp8", "grade": 99.0, "msg": "success", "error_num": 0}, {"username": "comp7", "grade": 98.8, "msg": "success", "error_num": 0}]')
+
+
+class TestJuryList(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        now_time = datetime.datetime.now(tz=timezone.utc)
+        Competition.objects.create(title='test_list_jury',organizer="test_list",jury_list="jury7,jury8",sign_up_start=now_time,sign_up_end=now_time,start_time=now_time,end_time=now_time-datetime.timedelta(days=8))
+        Competition.objects.create(title='test_list_jury_null',organizer="test_list",sign_up_start=now_time,sign_up_end=now_time,start_time=now_time,end_time=now_time-datetime.timedelta(days=8))
+
+    def test_jury_list(self):
+        c = Client()
+        response = c.post('/api/jury_list/',{'competition_title':'test_list_jury'})
+        self.assertEqual(response.content.decode('utf-8'), '[{"jury": "jury7", "msg": "success", "error_num": 0}, {"jury": "jury8", "msg": "success", "error_num": 0}]')
+    
+    def test_jury_list_null(self):
+        c = Client()
+        response = c.post('/api/jury_list/',{'competition_title':'test_list_jury_null'})
+        self.assertEqual(response.content.decode('utf-8'), '[{"msg": "no jury", "error_num": 0}]')

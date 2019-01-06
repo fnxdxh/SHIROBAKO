@@ -7,7 +7,7 @@
     :data="tableData"
     style="width: 100%">
         <el-table-column
-        prop="judge"
+        prop="jury"
         label="已邀请评委"
         width="180">
         </el-table-column>

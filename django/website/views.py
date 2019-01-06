@@ -690,6 +690,38 @@ def file_list(request):
     return HttpResponse(json.dumps(response))
 
 
+def jury_list(request):
+    response = []
+    fail = {}
+    if request.method == "POST":
+        competition = request.POST.get('competition_title')
+        try:
+            comp = Competition.objects.get(title=competition)
+            
+            if comp.jury_list == "":
+                fail['msg'] = 'no jury'
+                fail['error_num'] = 0
+                response.append(fail)
+                return HttpResponse(json.dumps(response))
+            jury_list = comp.jury_list.split(',')
+            for jury in jury_list:
+                res = {}
+                res['jury'] = jury
+                res['msg'] = 'success'
+                res['error_num'] = 0
+                response.append(res)
+            return HttpResponse(json.dumps(response))
+        except:
+            fail['msg'] = 'failed'
+            fail['error_num'] = 1
+            response.append(fail)
+            return HttpResponse(json.dumps(response))
+    fail['msg'] = 'not POST'
+    fail['error_num'] = 1
+    response.append(fail)
+    return HttpResponse(json.dumps(response))
+
+
 def competition_detail(request):
     detail = {}
     if request.method == "POST":
@@ -823,6 +855,15 @@ def divide_paper(request):
                 try:
                     #print(request.user.username)
                     competition = Competition.objects.get(title=title, organizer=request.user.username)
+                    '''now_time = datetime.now(tz=timezone.utc)
+                    if now_time < competition.end_time:
+                        response['msg'] = 'out of time'
+                        response['error_num'] = 1
+                        return JsonResponse(response)'''
+                    if competition.status == Competition.STATUS_FINAL:
+                        response['msg'] = 'divided'
+                        response['error_num'] = 1
+                        return JsonResponse(response)
                     user_list = competition.competitor_list.split(",")
                     #print(user_list)
                     paper_count = len(user_list)  #试卷数量
@@ -858,6 +899,8 @@ def divide_paper(request):
                             j = (j+1)%jury_count
                     #for jury in jury_li:
                         #print(jury.file_list)
+                    competition.status = Competition.STATUS_FINAL
+                    competition.save()
                     response['msg'] = 'success'
                     response['error_num'] = 0
                     return JsonResponse(response)
@@ -1001,7 +1044,7 @@ def search_competition(request):
                 content = {}
                 content['title'] = competition.title
                 print(competition.title)
-                content['sponsor'] = competition.sponsor
+                content['sponsor'] = competition.organizer
                 content['msg'] = 'success'
                 content['error_num'] = 0
                 response.append(content)
