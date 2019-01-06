@@ -180,6 +180,12 @@ class TestOrganizerCompetitionList(unittest.TestCase):
         response = c.get('/api/organizer_competition_list/')
         self.assertEqual(response.content.decode('utf-8'), '[{"title": "test_list1", "msg": "success", "error_num": 0}, {"title": "test_list2", "msg": "success", "error_num": 0}]')
 
+    def test_organizer_competition_list_null(self):
+        c = Client()
+        response = c.post('/api/login_organizer/', {'username': 'org_list_null', 'password': '2018'})
+        response = c.get('/api/organizer_competition_list/')
+        self.assertEqual(response.content.decode('utf-8'), '[{"msg": "not log in", "error_num": 1}]')
+
 class TestInviteJury(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -195,18 +201,35 @@ class TestInviteJury(unittest.TestCase):
         response = c.post('/api/invite_jury/',{"jury":"jury1","competition_name":"test3"})
         self.assertEqual(response.content.decode('utf-8'), '{"msg": "success", "error_num": 0}')
 
+    def test_invite_jury_null(self):
+        c = Client()
+        c.post('/api/login_organizer/', {'username': 'org3', 'password': '2018'})
+        response = c.post('/api/invite_jury/',{"jury":"jury1_null","competition_name":"test3"})
+        self.assertEqual(response.content.decode('utf-8'), '{"msg": "no user", "error_num": 1}')
+
+    def test_invite_jury_none(self):
+        c = Client()
+        c.post('/api/login_organizer/', {'username': 'org3_null', 'password': '2018'})
+        response = c.post('/api/invite_jury/',{"jury":"jury1","competition_name":"test3"})
+        self.assertEqual(response.content.decode('utf-8'), '{"msg": "not log in", "error_num": 1}')
 
 class TestJuryCompetitionList(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         user = User.objects.create_user(username="jury_list", password=md5(("2018").encode('utf-8')).hexdigest(), user_type="Rat")
         Jury.objects.create(user=user,competition_list="test_list1,test_list2")
+    
     def test_jury_competition_list(self):
         c = Client()
         c.post('/api/login_jury/', {'username': 'jury_list', 'password': '2018'})
         response = c.get('/api/jury_competition_list/')
         self.assertEqual(response.content.decode('utf-8'), '[{"title": "test_list1", "msg": "success", "error_num": 0}, {"title": "test_list2", "msg": "success", "error_num": 0}]')
 
+    def test_jury_competition_list_null(self):
+        c = Client()
+        c.post('/api/login_jury/', {'username': 'jury_list_null', 'password': '2018'})
+        response = c.get('/api/jury_competition_list/')
+        self.assertEqual(response.content.decode('utf-8'), '[{"msg": "not log in", "error_num": 1}]')
 
 
 class TestIndexCompetitionList(unittest.TestCase):
@@ -241,6 +264,21 @@ class TestUploadFile(unittest.TestCase):
             content = json.loads(response.content)
             self.assertEqual(content['msg'], "success")
 
+    def test_upload_file_null(self):
+        c = Client()
+        c.post('/api/login_competitor/',{'username':'comp1','password':'2018'})
+        #with open('test.txt','rb') as fp:
+        response = c.post('/api/upload/', {'competition':'test_upload'})
+        content = json.loads(response.content)
+        self.assertEqual(content['msg'], 'not login')
+
+    def test_upload_file_no(self):
+        c = Client()
+        c.post('/api/login_competitor/',{'username':'comp1_null','password':'2018'})
+        with open('test.txt','rb') as fp:
+            response = c.post('/api/upload/', {'userfile':fp,'competition':'test_upload'})
+            content = json.loads(response.content)
+            self.assertEqual(content['msg'], 'not login')
 
 
 class TestDividePaper(unittest.TestCase):
@@ -314,9 +352,9 @@ class TestGradeUpload(unittest.TestCase):
         c = Client()
         response = c.post('/api/login_jury/', {'username': 'jury_grade', 'password': '2018'})
         response = c.post('/api/grade_upload/',{'filepath':'test_grade.txt','title':'test_upload_grade'})
-        self.assertEqual(response.content.decode('utf-8'),'{"msg": "failed", "error_num": 1}')
+        self.assertEqual(response.content.decode('utf-8'),'{"msg": "not login", "error_num": 1}')
 
-    def test_upload_file_null(self):
+    def test_upload_file_null1(self):
         c = Client()
         response = c.post('/api/login_jury/', {'username': 'jury_grade', 'password': '2018'})
         response = c.post('/api/grade_upload/',{'grade':'98','title':'test_upload_grade'})
@@ -364,6 +402,14 @@ class TestCompetitorSignUp(unittest.TestCase):
         response = c.post('/api/sign_up/',{'competition_title':'test_sign_up_list'})
         response = c.get('/api/competitor_competition_list/')
         self.assertEqual(response.content.decode('utf-8'), '[{"title": "test_sign_up_list", "msg": "success", "error_num": 0}]')
+    
+    def test_competitor_competition_list_null(self):
+        c = Client()
+        response = c.post('/api/login_competitor/',{'username':'comp5_null','password':'2018'})
+        #print(response.content)
+        response = c.post('/api/sign_up/',{'competition_title':'test_sign_up_list'})
+        response = c.get('/api/competitor_competition_list/')
+        self.assertEqual(response.content.decode('utf-8'), '[{"msg": "not log in", "error_num": 1}]')
 
 class TestCompetitorCompetitionList(unittest.TestCase):
     @classmethod
@@ -417,6 +463,7 @@ class TestCheckGradeList(unittest.TestCase):
     def setUpClass(cls):
         now_time = datetime.datetime.now(tz=timezone.utc)
         Competition.objects.create(title='test_list_grade',organizer="test_list",competitor_list="comp7,comp8",sign_up_start=now_time,sign_up_end=now_time,start_time=now_time,end_time=now_time-datetime.timedelta(days=8))
+        Competition.objects.create(title='test_list_grade1',organizer="test_list",competitor_list="comp7,comp8",sign_up_start=now_time,sign_up_end=now_time,start_time=now_time,end_time=now_time)
         UserFile.objects.create(username='comp7',competition='test_list_grade',grade=98.8)
         UserFile.objects.create(username='comp8',competition='test_list_grade',grade_list="100,98,99",jury_count=3)
 
@@ -429,6 +476,11 @@ class TestCheckGradeList(unittest.TestCase):
         c = Client()
         response = c.post('/api/grade_list/',{'competition_name':'test_list_grade_null'})
         self.assertEqual(response.content.decode('utf-8'), '[{"msg": "failed", "error_num": 1}]')
+    
+    def test_list_null_out(self):
+        c = Client()
+        response = c.post('/api/grade_list/',{'competition_name':'test_list_grade1'})
+        self.assertEqual(response.content.decode('utf-8'), '[{"msg": "out of time", "error_num": 1}]')
 
 class TestJuryList(unittest.TestCase):
     @classmethod
