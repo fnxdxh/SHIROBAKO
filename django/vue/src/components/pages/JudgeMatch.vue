@@ -19,8 +19,8 @@
         label="打分"
         width="400">
         <template slot-scope="scope">
-        <el-input placeholder="请输入分数，分数介于0~100分内。" clearable type="number" v-model="scope.row.score">
-            <el-button type="primary" slot="append" @click="UpdateScore(scope.row.name,scope.row.score)">提交分数</el-button>
+        <el-input placeholder="请输入分数，分数介于0~100分内。" clearable type="number" v-model="scope.row.grade">
+            <el-button type="primary" slot="append" @click="UpdateScore(scope.row.name,scope.row.grade)">提交分数</el-button>
         </el-input>
         </template>
         </el-table-column>
@@ -45,14 +45,6 @@ export default {
         }
     },
     methods:{
-        getdata() {
-      this.$http
-        .get("api/file_list/")
-        .then(result => {
-          console.log(result.body);
-          this.tableData = result.body;
-        });
-    },
         FileDownload(filename){
             var formdata = new window.FormData();
             formdata.append('filename',filename)
@@ -60,7 +52,7 @@ export default {
                     'Content-Type': 'multipart/form-data'
                 }}).then(response => {
             console.log(response.data);
-            let response_list = result.body;
+            let response_list = response.body;
             if(response_list[0]['msg'] == 'no competition'){
                 alert('没有此比赛！');
             }
@@ -121,11 +113,12 @@ export default {
         .post("api/file_list/",{'competition_name':competition})
         .then(result => {
           let response_list = result.body;
-                if(response_lis['msg'] == 'not log in'){
+          console.log(response_list);
+                if(response_list[0]['msg'] == 'not log in'){
                     alert('用户未登录！');
                     this.$router.push({path: '/login'});
                 }
-                else if(response_list['msg'] == 'success'){
+                else if(response_list[0]['msg'] == 'success'){
                     this.tableData = response_list;
                 }
         });

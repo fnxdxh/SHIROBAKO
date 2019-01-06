@@ -28,21 +28,21 @@
             <i class="el-icon-bell"></i>
           </el-col>
           <el-col :span="4">
-            <div v-if="identify === 1">
+            <div v-if="$store.state.identify === 1">
               <router-link to="/usercenter_competitor">
                 <!-- <img src="src\assets\images\photo.jpg"> -->
                 <el-button type="primary">个人中心</el-button>
               </router-link>
               <el-button type="primary" @click="logout">登出</el-button>
             </div>
-            <div v-else-if="identify === 2">
+            <div v-else-if="$store.state.identify === 2">
               <router-link to="/usercenter_organizer">
                 <!-- <img src="src\assets\images\photo.jpg"> -->
                 <el-button type="primary">个人中心</el-button>
               </router-link>
               <el-button type="primary" @click="logout">登出</el-button>
             </div>
-            <div v-else-if="identify === 3">
+            <div v-else-if="$store.state.identify === 3">
               <router-link to="/usercenter_jury">
                 <!-- <img src="src\assets\images\photo.jpg"> -->
                 <el-button type="primary">个人中心</el-button>
@@ -81,8 +81,13 @@ export default {
   methods: {
     search() {
       this.$http.post("api/search/", {to_search: this.formInline.keyword}).then(result => {
-        this.$store.commit("writelist", result.body);
-        this.$router.push({path:"/matchlist"});
+        if(result.body[0]['msg'] == 'no result'){
+          alert('没有包含此关键字的比赛！')
+        }
+        else{
+          this.$store.commit("writelist", result.body);
+          this.$router.push({path:"/matchlist"});
+        }
       })
     },
     logout() {
@@ -98,9 +103,6 @@ export default {
       });
     }
   },
-  mounted:function(){
-    this.identify = sessionStorage.getItem("identify");
-  }
 };
 </script>
 

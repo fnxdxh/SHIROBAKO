@@ -405,6 +405,8 @@ def competitor_sign_up(request):
                     else:
                         competition.competitor_list = competition.competitor_list + "," + request.user.username
                     competition.save()
+                    print(competition.competitor_list)
+                    print(competitor.competition_list)
                     response['msg'] = 'success'
                     response['error_num'] = 0
                     return JsonResponse(response)
@@ -515,6 +517,7 @@ def grade_upload(request):
                 file_url = request.POST.get("filepath")
                 title = request.POST.get('title')
                 print(file_url)
+                print(int(mygrade))
                 try:
                     print('ok')
                     competition = Competition.objects.get(title=title)
@@ -658,6 +661,7 @@ def file_list(request):
                 competition = request.POST.get("competition_name")
                 try:
                     jury_file = JuryFile.objects.get(competition=competition, jury=request.user.username)
+                    print(jury_file.file_list)
                     file_list = jury_file.file_list.split(",")
                     for file in file_list:
                         content = {}
@@ -668,11 +672,13 @@ def file_list(request):
                         for newjury in jury:
                             if newjury == request.user.username:
                                 content['grade'] = grade[i]
-                        i = i+1
+                            i = i+1
                         content['name'] = file
                         content['msg'] = 'success'
                         content['error_num'] = 0
                         response.append(content)
+                    print('ok')
+                    print(response)
                     return HttpResponse(json.dumps(response))
                 except:
                     org['msg'] = 'failed'
@@ -757,7 +763,12 @@ def admin_to_confirm_list(request):
     try:
         if request.user.is_superuser:
             organizers = Organizer.objects.filter(status=Organizer.STATUS_UNCONFIRM)
-            if organizers is not None:
+            if len(organizers)==0 :
+                org['msg'] = 'no'
+                org['error_num'] = 0
+                organizer_list.append(org)
+                return HttpResponse(json.dumps(organizer_list))
+            else:
                 for organizer in organizers:
                     content = {}
                     content['username'] = organizer.user.username
@@ -766,10 +777,7 @@ def admin_to_confirm_list(request):
                     content['error_num'] = 0
                     organizer_list.append(content)
                 return HttpResponse(json.dumps(organizer_list))
-            org['msg'] = 'no'
-            org['error_num'] = 0
-            organizer_list.append(org)
-            return HttpResponse(json.dumps(organizer_list))
+            
     except:
         org['msg'] = 'failed'
         org['error_num'] = 1
@@ -861,6 +869,7 @@ def divide_paper(request):
                         response['error_num'] = 1
                         return JsonResponse(response)'''
                     if competition.status == Competition.STATUS_FINAL:
+                        print('divided')
                         response['msg'] = 'divided'
                         response['error_num'] = 1
                         return JsonResponse(response)
@@ -885,11 +894,12 @@ def divide_paper(request):
                     #print(jury_count)
                     Task = [([None]*int(per_person)) for i in range(jury_count)] 
                     #Teacher = [(range(per_person) for i in range(jury_count)]
-                    print(Task[0][0])
+                    
                     #partition(Task,paper_count,per_person,file_list)
                     for i in range(paper_count):
                         #print(i)
                         Task[int(i/per_person)][i%per_person] = file_list[i]
+                    print(Task[0][0])
                     for i in range(per_time):
                         count = 0
                         j = i
