@@ -35,14 +35,14 @@
               </router-link>
               <el-button type="primary" @click="logout">登出</el-button>
             </div>
-            <div v-else-if="sessionStorage.getItem('identify') === 2">
+            <div v-else-if="$store.state.identify === 2">
               <router-link to="/usercenter_organizer">
                 <!-- <img src="src\assets\images\photo.jpg"> -->
                 <el-button type="primary">个人中心</el-button>
               </router-link>
               <el-button type="primary" @click="logout">登出</el-button>
             </div>
-            <div v-else-if="sessionStorage.getItem('identify') === 3">
+            <div v-else-if="$store.state.identify === 3">
               <router-link to="/usercenter_jury">
                 <!-- <img src="src\assets\images\photo.jpg"> -->
                 <el-button type="primary">个人中心</el-button>

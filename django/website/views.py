@@ -961,7 +961,7 @@ def create_competition(request):
                     response['error_num'] = 1
                 return JsonResponse(response)
     except:
-        response['msg'] = 'not log in'
+        response['msg'] = 'failed'
         response['error_num'] = 1
         return JsonResponse(response)
     response['msg'] = 'not log in'
@@ -1012,7 +1012,7 @@ def invite_jury(request):
             response['error_num'] = 1
             return JsonResponse(response)
     except:
-        response['msg'] = 'not log in'
+        response['msg'] = 'failed'
         response['error_num'] = 1
         return JsonResponse(response)
     response['msg'] = 'not log in'
@@ -1036,23 +1036,31 @@ def search_competition(request):
     response = []
     org = {}
     if request.method == "POST":
-        to_search = request.POST.get("to_search")
-        competition_list = Competition.objects.filter(Q(title__contains=to_search) | Q(type__contains=to_search))
-        print(len(competition_list))
-        if competition_list is not None:
-            for competition in competition_list:
-                content = {}
-                content['title'] = competition.title
-                print(competition.title)
-                content['sponsor'] = competition.organizer
-                content['msg'] = 'success'
-                content['error_num'] = 0
-                response.append(content)
+        try:
+            to_search = request.POST.get("to_search")
+            competition_list = Competition.objects.filter(Q(title__contains=to_search))
+            print(len(competition_list))
+            if len(competition_list) == 0:
+                org['msg'] = 'no result'
+                org['error_num'] = 0
+                response.append(org)
+                return HttpResponse(json.dumps(response))
+            else:
+                for competition in competition_list:
+                    content = {}
+                    content['title'] = competition.title
+                    print(competition.title)
+                    content['sponsor'] = competition.organizer
+                    content['msg'] = 'success'
+                    content['error_num'] = 0
+                    response.append(content)
+                return HttpResponse(json.dumps(response))
+            
+        except:
+            org['msg'] = 'input error'
+            org['error_num'] = 1
+            response.append(org)
             return HttpResponse(json.dumps(response))
-        org['msg'] = 'no result'
-        org['error_num'] = 0
-        response.append(org)
-        return HttpResponse(json.dumps(response))
     org['msg'] = 'failed'
     org['error_num'] = 1
     response.append(org)
