@@ -67,8 +67,8 @@ export default {
             .then(result => {
                 console.log(result.body);
                 let response_list = result.body;
-                if(response_list[0]['msg'] == 'no competition'){
-                    alert('没有此比赛！');
+                if(response_list[0]['msg'] == 'no jury'){
+                    alert('尚未添加任何评委！');
                 }
                 else if(response_list[0]['msg'] == 'not log in'){
                     alert('用户未登录！');
