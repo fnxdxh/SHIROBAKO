@@ -35,7 +35,17 @@ export default {
         .get("api/jury_competition_list/")
         .then(result => {
           console.log(result.body);
-          this.tableData = result.body;
+          let response_list = result.body;
+          if(response_list[0]['msg'] == 'no competition'){
+            alert('没有此比赛！');
+          }
+          else if(response_list[0]['msg'] == 'not log in'){
+            alert('用户未登录！');
+            this.$router.push({path: '/login'});
+          }
+          else if(response_list[0]['msg'] == 'success'){
+            this.tableData = response_list;
+          }
         });
     },
       },

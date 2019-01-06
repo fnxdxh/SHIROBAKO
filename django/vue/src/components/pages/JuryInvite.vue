@@ -23,7 +23,7 @@ export default {
         return{
             tableData:[
             {judge: '王小明'}],
-            name: ''
+            name: '',
         }
     },
     methods:{
@@ -43,13 +43,45 @@ export default {
                 if (response_list['msg'] == 'no user') {
                     alert('您邀请的用户不存在！');
                 }
+                else if(response_list['msg'] == 'exist'){
+                    alert('此评委已被邀请过！')
+                }
+                else if(response_list['msg'] == 'not log in'){
+                    alert('用户未登录！')
+                    this.$router.push({path: '/login'});
+                }
                 else if(response_list['msg'] == 'success'){
-                    alert('邀请成功！')
-                    this.tableData.push({judge: jury});
+                    alert('邀请成功！请刷新页面！')
                 }
             }
             ).catch();
+        },
+        getdata() {
+            let temp_list = this.$route.path.split('/');
+            console.log(temp_list);
+            let competition = temp_list[temp_list.length - 1];
+            competition = decodeURIComponent(competition);
+            console.log(competition);
+            this.$http
+            .post("api/jury_list/",{'competition_title':competition})
+            .then(result => {
+                console.log(result.body);
+                let response_list = result.body;
+                if(response_list[0]['msg'] == 'no competition'){
+                    alert('没有此比赛！');
+                }
+                else if(response_list[0]['msg'] == 'not log in'){
+                    alert('用户未登录！');
+                    this.$router.push({path: '/login'});
+                }
+                else if(response_list[0]['msg'] == 'success'){
+                    this.tableData = response_list;
+                }
+            });
         }
+    },
+    created() {
+    this.getdata();
     }
 }
 </script>

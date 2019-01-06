@@ -60,6 +60,15 @@ export default {
                     'Content-Type': 'multipart/form-data'
                 }}).then(response => {
             console.log(response.data);
+            let response_list = result.body;
+            if(response_list[0]['msg'] == 'no competition'){
+                alert('没有此比赛！');
+            }
+            else if(response_list[0]['msg'] == 'not log in'){
+                alert('用户未登录！');
+                this.$router.push({path: '/login'});
+            }
+            else{
             // get body data;
             const blob = new Blob([response.body]);
             if (window.navigator.msSaveOrOpenBlob) {
@@ -73,6 +82,7 @@ export default {
             aTag.href = URL.createObjectURL(blob);
             aTag.click();
             URL.revokeObjectURL(aTag.href);
+            }
             }
             }, response => {
                 console.log("error");
@@ -110,8 +120,14 @@ export default {
       this.$http
         .post("api/file_list/",{'competition_name':competition})
         .then(result => {
-          console.log(result.body);
-          this.tableData = result.body;
+          let response_list = result.body;
+                if(response_lis['msg'] == 'not log in'){
+                    alert('用户未登录！');
+                    this.$router.push({path: '/login'});
+                }
+                else if(response_list['msg'] == 'success'){
+                    this.tableData = response_list;
+                }
         });
     }
 },

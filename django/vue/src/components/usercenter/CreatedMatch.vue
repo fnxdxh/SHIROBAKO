@@ -64,12 +64,7 @@
 export default {
   data() {
     return {
-      tableData: [
-        {title:'小程序竞赛',
-         sponsor:'青蛙大学',
-         number:18
-        }
-      ]
+      tableData: []
     };
   },
   methods: {
@@ -78,6 +73,7 @@ export default {
         .get("api/organizer_competition_list/")
         .then(result => {
           console.log(result.body);
+          
           this.tableData = result.body;
         });
     },
