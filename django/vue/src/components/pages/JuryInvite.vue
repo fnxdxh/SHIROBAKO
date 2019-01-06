@@ -13,7 +13,7 @@
         </el-table-column>
     </el-table>
     <p></p>
-    <router-link to="/usercenter_organizor/created"><el-button>返回</el-button></router-link>
+    <router-link to="/usercenter_organizer/created"><el-button>返回</el-button></router-link>
 </div>
 </template>
 

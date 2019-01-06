@@ -28,21 +28,21 @@
             <i class="el-icon-bell"></i>
           </el-col>
           <el-col :span="4">
-            <div v-if="sessionStorage.getItem('identify') === 1">
+            <div v-if="identify === 1">
               <router-link to="/usercenter_competitor">
                 <!-- <img src="src\assets\images\photo.jpg"> -->
                 <el-button type="primary">个人中心</el-button>
               </router-link>
               <el-button type="primary" @click="logout">登出</el-button>
             </div>
-            <div v-else-if="sessionStorage.getItem('identify') === 2">
+            <div v-else-if="identify === 2">
               <router-link to="/usercenter_organizer">
                 <!-- <img src="src\assets\images\photo.jpg"> -->
                 <el-button type="primary">个人中心</el-button>
               </router-link>
               <el-button type="primary" @click="logout">登出</el-button>
             </div>
-            <div v-else-if="sessionStorage.getItem('identify') === 3">
+            <div v-else-if="identify === 3">
               <router-link to="/usercenter_jury">
                 <!-- <img src="src\assets\images\photo.jpg"> -->
                 <el-button type="primary">个人中心</el-button>
@@ -74,7 +74,8 @@ export default {
     return {
       formInline: {
         keyword: ''
-      }
+      },
+      identify: 0
     };
   },
   methods: {
@@ -96,6 +97,9 @@ export default {
         }
       });
     }
+  },
+  mounted:function(){
+    this.identify = sessionStorage.getItem("identify");
   }
 };
 </script>
